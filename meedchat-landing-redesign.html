@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeedChat — AI Lead Qualification for Service Companies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F1F3D;
+  --navy-light:#1E40AF;
+  --navy-accent:#2563EB;
+  --text-primary:#0F1F3D;
+  --text-secondary:#6B7280;
+  --text-muted:#9CA3AF;
+  --border:#E5E7EB;
+}
+
+html,body{height:100%;font-family:'Inter',sans-serif;background:#fff;color:var(--text-primary)}
+body{overflow-x:hidden}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.nav-logo{font-size:18px;font-weight:800;color:var(--navy);letter-spacing:-1px;display:flex;align-items:center;gap:8px}
+.nav-logo svg{width:28px;height:28px;flex-shrink:0}
+.nav-links{display:flex;gap:32px;flex:1;margin-left:60px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--text-secondary);font-size:13px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--navy)}
+.nav-right{display:flex;gap:12px;align-items:center}
+.btn-nav{padding:8px 18px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-nav:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.3)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#f0f4ff 0%,#fafbfc 100%);padding:80px 48px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.15);color:var(--navy-accent);padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:24px}
+.hero h1{font-size:clamp(48px,8vw,72px);font-weight:800;line-height:1.1;color:var(--navy);margin-bottom:16px;max-width:900px;margin-left:auto;margin-right:auto}
+.hero-sub{font-size:18px;color:var(--text-secondary);line-height:1.8;margin-bottom:40px;max-width:700px;margin-left:auto;margin-right:auto}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-primary{padding:14px 36px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;text-decoration:none}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,99,235,0.4)}
+.btn-secondary{padding:14px 36px;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;text-decoration:none}
+.btn-secondary:hover{background:var(--navy);color:#fff;transform:translateY(-2px)}
+
+/* DEMO SECTION */
+.demo-section{padding:80px 48px;background:#fff}
+.demo-container{max-width:1200px;margin:0 auto}
+.demo-header{text-align:center;margin-bottom:60px}
+.demo-header h2{font-size:48px;font-weight:800;color:var(--navy);margin-bottom:12px}
+.demo-header p{font-size:16px;color:var(--text-secondary);margin-bottom:32px}
+.industry-switcher{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.industry-btn{padding:10px 20px;border:2px solid var(--border);background:#fff;color:var(--text-secondary);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.industry-btn:hover{border-color:var(--navy-accent);color:var(--navy-accent)}
+.industry-btn.active{background:var(--navy-accent);color:#fff;border-color:var(--navy-accent)}
+
+.chat-demo-container{background:#f8fafc;border-radius:16px;padding:40px;box-shadow:0 8px 32px rgba(0,0,0,0.08);max-width:700px;margin:0 auto;border:1px solid var(--border)}
+.chat-demo-header{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:12px;margin:-40px -40px 24px -40px}
+.chat-avatar{width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
+.chat-info h3{font-size:15px;font-weight:700}
+.chat-info p{font-size:12px;opacity:0.8}
+.chat-messages{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;max-height:400px;overflow-y:auto;padding:8px 0}
+.msg-bot{display:flex;gap:10px;align-items:flex-start}
+.msg-avatar{width:32px;height:32px;background:var(--navy-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.msg-bubble{background:#fff;border:1px solid var(--border);padding:12px 16px;border-radius:8px;font-size:13px;color:var(--text-primary);line-height:1.5;max-width:85%;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.msg-user{display:flex;justify-content:flex-end;gap:10px}
+.msg-user .msg-bubble{background:var(--navy-accent);color:#fff;border:none;border-radius:12px 4px 12px 12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{padding:8px 14px;border:1.5px solid var(--border);background:#fff;border-radius:20px;font-size:12px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:all 0.2s}
+.chip:hover{border-color:var(--navy-accent);color:var(--navy-accent)}
+.chip.selected{background:var(--navy-accent);color:#fff;border-color:var(--navy-accent)}
+
+/* FORM SECTION */
+.form-section{padding:80px 48px;background:linear-gradient(135deg,#f0f4ff 0%,#fafbfc 100%)}
+.form-container{max-width:500px;margin:0 auto;text-align:center}
+.form-container h2{font-size:36px;font-weight:800;color:var(--navy);margin-bottom:16px}
+.form-container p{font-size:16px;color:var(--text-secondary);margin-bottom:40px}
+.form-group{margin-bottom:16px;text-align:left}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);background:#fff;color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;border-radius:8px;outline:none;transition:all 0.2s}
+.form-input:focus{border-color:var(--navy-accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.industries-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.industry-option{padding:11px;border:1.5px solid var(--border);background:#fff;border-radius:8px;cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--text-secondary);transition:all 0.2s}
+.industry-option:hover{border-color:var(--navy-accent);background:#f0f4ff;color:var(--navy-accent)}
+.industry-option.selected{border-color:var(--navy-accent);background:var(--navy-accent);color:#fff}
+.form-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.04em;margin-top:8px}
+.form-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,0.3)}
+.form-footer{font-size:11px;color:var(--text-muted);margin-top:12px}
+.form-footer a{color:var(--navy-accent);text-decoration:none;font-weight:600}
+
+/* FOOTER */
+.footer{background:var(--navy);color:#fff;padding:48px;text-align:center;font-size:13px}
+.footer a{color:#fff;text-decoration:none;font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect x="2" y="2" width="28" height="28" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+    <span style="color:var(--navy)">Meed<span style="color:var(--navy-accent)">Chat</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#demo">Demo</a></li>
+    <li><a href="#features">How it works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" style="text-decoration:none;color:var(--text-secondary);font-size:13px;font-weight:500">Login</a>
+    <button class="btn-nav">Get started</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">AI-Powered Lead Qualification</div>
+  <h1>Let AI handle lead qualification</h1>
+  <p class="hero-sub">Get qualified leads automatically. Your chatbot asks the right questions, disqualifies tire-kickers, and sends you only serious prospects ready to buy.</p>
+  <div class="hero-ctas">
+    <button class="btn-primary" onclick="document.getElementById('form-section').scrollIntoView({behavior:'smooth'})">Get started free →</button>
+    <button class="btn-secondary" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">See demo below ↓</button>
+  </div>
+</section>
+
+<!-- DEMO SECTION -->
+<section id="demo-section" class="demo-section">
+  <div class="demo-container">
+    <div class="demo-header">
+      <h2>See it in action</h2>
+      <p>Select an industry to see how Aria qualifies leads for your business</p>
+    </div>
+    
+    <div class="industry-switcher">
+      <button class="industry-btn active" onclick="switchIndustry('roofing', this)">Roofing</button>
+      <button class="industry-btn" onclick="switchIndustry('plumbing', this)">Plumbing</button>
+      <button class="industry-btn" onclick="switchIndustry('hvac', this)">HVAC</button>
+      <button class="industry-btn" onclick="switchIndustry('electrical', this)">Electrical</button>
+    </div>
+
+    <div class="chat-demo-container">
+      <div class="chat-demo-header">
+        <div class="chat-avatar">A</div>
+        <div class="chat-info">
+          <h3>Aria</h3>
+          <p>Online · Replies instantly</p>
+        </div>
+      </div>
+      <div class="chat-messages">
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">Hi! I'm Aria. I can get you a free quote in 60 seconds. What's your full name?</div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">James Carter</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">Nice to meet you, James! What roofing service do you need?</div>
+        </div>
+        <div class="msg-bot">
+          <div class="chips">
+            <div class="chip">Full Replacement</div>
+            <div class="chip">Leak Repair</div>
+            <div class="chip selected">Storm Damage</div>
+            <div class="chip">New Install</div>
+          </div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">Storm Damage</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">What's your city or zip?</div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">Plano, TX</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">What's your approximate budget?</div>
+        </div>
+        <div class="msg-bot">
+          <div class="chips">
+            <div class="chip">Under $2K</div>
+            <div class="chip selected">$2K–$8K</div>
+            <div class="chip">$8K–$20K</div>
+            <div class="chip">$20K+</div>
+          </div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">$2K–$8K</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">How soon do you need this done?</div>
+        </div>
+        <div class="msg-bot">
+          <div class="chips">
+            <div class="chip selected">Emergency</div>
+            <div class="chip">This Week</div>
+            <div class="chip">This Month</div>
+          </div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">Emergency</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">Perfect! What's the best number to reach you?</div>
+        </div>
+        <div class="msg-user">
+          <div class="msg-bubble">(214) 555-0192</div>
+        </div>
+        <div class="msg-bot">
+          <div class="msg-avatar">✓</div>
+          <div class="msg-bubble" style="background:#ecfdf5;border-color:#d1fae5;color:#065f46"><strong>You're all set, James!</strong> We'll call within 60 minutes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section style="padding:100px 48px;background:linear-gradient(135deg,#f8fbff 0%,#f0f4ff 100%)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:80px">
+      <h2 style="font-size:48px;font-weight:800;color:var(--navy);margin-bottom:12px">Built for your process</h2>
+      <p style="font-size:17px;color:var(--text-secondary);margin:0">Customize every aspect of Aria to match exactly how you qualify leads</p>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden;hover-transform:translateY(-4px)">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#2563EB 0%,#3B82F6 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">?</div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">Custom Questions</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Build the exact qualification flow you need. Drag to reorder, toggle to enable, deploy instantly.</p>
+      </div>
+      
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#F59E0B 0%,#FBBF24 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">★</div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">Smart Scoring</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Auto-score every lead as hot, warm, or cold. Get SMS alerts only for prospects worth your time.</p>
+      </div>
+      
+      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,#10B981 0%,#34D399 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">↔</div>
+        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">CRM Sync</h3>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Sync to Salesforce, HubSpot, Pipedrive, Zapier, or any platform. Zero manual data entry.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM SECTION -->
+<section id="form-section" class="form-section">
+  <div class="form-container">
+    <h2>Ready to qualify leads?</h2>
+    <p>Start your 14-day free trial. No credit card required.</p>
+    
+    <form>
+      <div class="form-group">
+        <label class="form-label">Company Name</label>
+        <input type="text" class="form-input" placeholder="e.g., Texas Star Roofing">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" placeholder="owner@company.com">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-input" placeholder="(972) 555-1234">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Industry</label>
+        <div class="industries-grid">
+          <button type="button" class="industry-option" onclick="selectIndustry(this)">Roofing</button>
+          <button type="button" class="industry-option" onclick="selectIndustry(this)">Plumbing</button>
+          <button type="button" class="industry-option" onclick="selectIndustry(this)">HVAC</button>
+          <button type="button" class="industry-option" onclick="selectIndustry(this)">Electrical</button>
+        </div>
+      </div>
+      
+      <button type="submit" class="form-submit">Get started free</button>
+      <div class="form-footer">No credit card required. 14-day free trial. <a href="#">Privacy</a> · <a href="#">Terms</a></div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>&copy; 2026 MeedChat. AI lead qualification for service companies.</p>
+  <p style="margin-top:12px"><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Contact</a></p>
+</footer>
+
+<script>
+const industries = {
+  roofing: {
+    services: ['Full Replacement', 'Leak Repair', 'Storm Damage', 'New Install'],
+    budgets: ['Under $2K', '$2K–$8K', '$8K–$20K', '$20K+'],
+    name: 'roofing'
+  },
+  plumbing: {
+    services: ['Leak Repair', 'Pipe Repair', 'Water Heater', 'Drain Cleaning'],
+    budgets: ['Under $500', '$500–$2K', '$2K–$5K', '$5K+'],
+    name: 'plumbing'
+  },
+  hvac: {
+    services: ['AC Repair', 'Furnace Repair', 'Ductwork', 'System Install'],
+    budgets: ['Under $1K', '$1K–$4K', '$4K–$10K', '$10K+'],
+    name: 'hvac'
+  },
+  electrical: {
+    services: ['Panel Repair', 'Outlet Install', 'Wiring', 'Emergency'],
+    budgets: ['Under $500', '$500–$1.5K', '$1.5K–$4K', '$4K+'],
+    name: 'electrical'
+  }
+};
+
+function switchIndustry(industry, btn) {
+  document.querySelectorAll('.industry-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const data = industries[industry];
+  
+  // Update service chips
+  const serviceChips = document.querySelectorAll('.chat-messages .chips')[0];
+  if(serviceChips) {
+    serviceChips.innerHTML = data.services.map((s, i) => 
+      `<div class="chip${i === 2 ? ' selected' : ''}">${s}</div>`
+    ).join('');
+  }
+  
+  // Update budget chips - select middle/average option (index 1)
+  const budgetChips = document.querySelectorAll('.chat-messages .chips')[1];
+  if(budgetChips) {
+    budgetChips.innerHTML = data.budgets.map((b, i) => 
+      `<div class="chip${i === 1 ? ' selected' : ''}">${b}</div>`
+    ).join('');
+  }
+  
+  // Update bot message to mention the industry
+  const botMessages = document.querySelectorAll('.chat-messages .msg-bubble');
+  if(botMessages[1]) {
+    botMessages[1].innerHTML = `Nice to meet you, James! What ${industry} service do you need?`;
+  }
+  
+  // Update user response
+  const userMsgs = document.querySelectorAll('.chat-messages .msg-user');
+  if(userMsgs[1]) {
+    userMsgs[1].innerHTML = `<div class="msg-bubble">${data.services[2]}</div>`;
+  }
+  
+  // Update budget response (index 3 after reordering)
+  if(userMsgs[3]) {
+    userMsgs[3].innerHTML = `<div class="msg-bubble">${data.budgets[1]}</div>`;
+  }
+}
+
+function selectIndustry(btn) {
+  document.querySelectorAll('.industry-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+</script>
+</body>
+</html>
