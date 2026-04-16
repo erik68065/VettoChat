@@ -742,21 +742,21 @@ const STEPS = [
   { key:'name',    type:'text',   placeholder:'Enter your full name…' },
   { key:'service', type:'chips',  placeholder:'Or type your service…',
     chips:[
-      {emoji:'🏚️',label:'Full Replacement'},{emoji:'🔧',label:'Leak Repair'},
-      {emoji:'⛈️',label:'Storm Damage'},{emoji:'🏗️',label:'New Install'},
-      {emoji:'🪣',label:'Gutters'},{emoji:'🔍',label:'Inspection'}
+      {label:'Full Replacement'},{label:'Leak Repair'},
+      {label:'Storm Damage'},{label:'New Install'},
+      {label:'Gutters'},{label:'Inspection'}
     ]},
   { key:'zip',     type:'text',   placeholder:'City or zip code…' },
   { key:'urgency', type:'chips',  placeholder:'Or describe urgency…',
     chips:[
-      {emoji:'🚨',label:'Emergency'},{emoji:'📅',label:'This Week'},
-      {emoji:'🗓️',label:'This Month'},{emoji:'👀',label:'Just Exploring'}
+      {label:'Emergency'},{label:'This Week'},
+      {label:'This Month'},{label:'Just Exploring'}
     ]},
   { key:'budget',  type:'chips',  placeholder:'Or enter an amount…',
     chips:[
-      {emoji:'💵',label:'Under $1K'},{emoji:'💰',label:'$1K–$5K'},
-      {emoji:'💎',label:'$5K–$15K'},{emoji:'🏆',label:'$15K+'},
-      {emoji:'❓',label:'Need Estimate'}
+      {label:'Under $1K'},{label:'$1K–$5K'},
+      {label:'$5K–$15K'},{label:'$15K+'},
+      {label:'Need Estimate'}
     ]},
   { key:'phone',   type:'text',   placeholder:'10-digit phone number…' }
 ];
@@ -820,7 +820,7 @@ function addChips(chips, key){
   chips.forEach(c=>{
     const btn=document.createElement('button');
     btn.className='q-chip';
-    btn.innerHTML=`<span class="chip-emoji">${c.emoji}</span>${c.label}`;
+    btn.innerHTML=`</span>${c.label}`;
     btn.onclick=()=>selectChip(c.label, key, wrap);
     wrap.appendChild(btn);
   });
