@@ -975,5 +975,53 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  // 1. Connect to your local VettoChat Real-Time Engine
+  const socket = io('http://localhost:8080'); 
+
+  // 2. Listen for incoming 'new_lead' events from the backend
+  socket.on('new_lead', (lead) => {
+    
+    // Determine the correct CSS badge color based on the score
+    const badgeClass = lead.status === 'Hot' ? 'pill-hot' : (lead.status === 'Warm' ? 'pill-warm' : 'pill-cold');
+    
+    // 3. Construct the HTML for the new table row
+    const newRow = `
+      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
+        <td>
+          <div class="name-cell">
+            <div class="avatar">${lead.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="lead-name">${lead.name}</div>
+              <div class="muted">Just now</div>
+            </div>
+          </div>
+        </td>
+        <td><strong>${lead.phone}</strong></td>
+        <td>${lead.intent}</td>
+        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
+        <td><span class="status-dot dot-new"></span>New</td>
+        <td><button class="call-btn">1-Click Call</button></td>
+      </tr>
+    `;
+
+    // 4. Inject the new lead at the top of the table
+    const tbody = document.querySelector('.leads-table tbody');
+    if (tbody) {
+      tbody.insertAdjacentHTML('afterbegin', newRow);
+    }
+    
+    // 5. Instantly update the metric counters at the top of the dashboard
+    const newLeadsCounter = document.getElementById('stat-new-leads');
+    if (newLeadsCounter) {
+      newLeadsCounter.innerText = parseInt(newLeadsCounter.innerText || 0) + 1;
+    }
+    
+    // Optional: Play a subtle notification chime during the demo
+    // const audio = new Audio('https://cdn.freesound.org/previews/415/415510_5121236-lq.mp3');
+    // audio.play().catch(e => console.log("Audio play blocked by browser"));
+  });
+</script>
 </body>
 </html>

@@ -781,6 +781,45 @@ const ERR = {
   budget: "Our minimum project is $500. Enter 500 or above to continue."
 };
 
+// leadScorer.js (Backend Service)
+
+const SCORING_MATRIX = {
+  urgency: {
+    "Emergency (Within 24h)": 50,
+    "This week": 30,
+    "Just browsing / Next month": 10
+  },
+  intent: {
+    "Active Leak / Storm Damage": 40,
+    "Full Roof Replacement": 35,
+    "Minor Repair": 15,
+    "Gutter Cleaning": 5
+  }
+};
+
+function calculateLeadTier(leadData, clientThresholds) {
+  let score = 0;
+
+  // 1. Point Distribution
+  score += SCORING_MATRIX.urgency[leadData.budget] || 0;
+  score += SCORING_MATRIX.intent[leadData.intent] || 0;
+
+  // 2. Light NLP / Regex overrides for edge cases
+  const highIntentKeywords = /(leak|flooding|tree fell|hole|hail)/i;
+  if (highIntentKeywords.test(leadData.intent)) {
+    score += 20; 
+  }
+
+  // 3. Threshold Evaluation
+  let tier = 'Cold';
+  if (score >= clientThresholds.hot) tier = 'Hot';
+  else if (score >= clientThresholds.warm) tier = 'Warm';
+
+  return { score, tier };
+}
+
+module.exports = { calculateLeadTier };
+
 // ── DOM helpers ───────────────────────────────────
 const $ = id => document.getElementById(id);
 const msgs = () => $('chatMessages');
@@ -935,16 +974,40 @@ function advanceStep(val, isChip){
   }
 }
 
-function finishConversation(){
+async function finishConversation(){
   S.done=true;
   disableInput();
   showTyping();
-  setTimeout(()=>{
-    removeTyping();
-    addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes to confirm your free inspection.`, 'success');
-  }, 900);
-}
+  
+  // 1. Structure the Lead Payload
+  const leadPayload = {
+    name: S.data.name || S.data.firstName,
+    phone: S.data.phone || 'N/A',
+    intent: S.data.service || 'General Inquiry',     
+    budget: S.data.budget || 'N/A',      
+    source_url: window.location.hostname
+  };
 
+  try {
+    // 2. Fire to your local VettoChat Real-Time Engine
+    const response = await fetch('http://localhost:8080/api/leads/capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leadPayload)
+    });
+
+    if(response.ok) {
+      setTimeout(() => {
+        removeTyping();
+        addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
+      }, 900);
+    }
+  } catch (error) {
+    console.error("VettoChat Payload Failed:", error);
+    removeTyping();
+    addBotMsg("Thanks! We've received your info and will be in touch.", "success");
+  }
+}
 function disableInput(){
   $('chatInput').disabled=true;
   $('sendBtn').disabled=true;
