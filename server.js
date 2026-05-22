@@ -38,8 +38,8 @@ function calculateLeadTier(leadData) {
   let score = 0;
 
   // Point Distribution
-  score += SCORING_MATRIX.urgency[leadData.budget] || 10; // Default to 10 if unknown
-  score += SCORING_MATRIX.intent[leadData.intent] || 15;  // Default to 15 if unknown
+  score += SCORING_MATRIX.urgency[leadData.budget] || 10; 
+  score += SCORING_MATRIX.intent[leadData.intent] || 15;  
 
   // Light NLP / Regex overrides for edge cases
   const highIntentKeywords = /(leak|flooding|tree fell|hole|hail|emergency)/i;
@@ -47,10 +47,10 @@ function calculateLeadTier(leadData) {
     score += 20; 
   }
 
-  // Dashboard Default Thresholds (Hot >= 80, Warm >= 50)
-  let status = 'Cold';
-  if (score >= 80) status = 'Hot';
-  else if (score >= 50) status = 'Warm';
+  // UPDATED: High, Medium, Low Thresholds
+  let status = 'Low';
+  if (score >= 80) status = 'High';
+  else if (score >= 50) status = 'Medium';
 
   return { score, status };
 }

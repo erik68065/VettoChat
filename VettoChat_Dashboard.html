@@ -466,7 +466,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="chip chip-green"><div class="live-dot"></div>Aria Active</div>
         </div>
         <table class="leads-table">
-          <thead><tr><th>Contact</th><th>Service Requested</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
+          <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
           <tbody id="overviewBody"></tbody>
         </table>
       </div>
@@ -479,7 +479,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div style="display:flex;gap:8px"><span class="chip chip-orange">4 High Priority</span><span class="chip chip-blue">10 Total</span></div>
         </div>
         <table class="leads-table">
-          <thead><tr><th>Contact</th><th>Service Requested</th><th>Location</th><th>Budget</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
+          <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Location</th><th>Budget</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
           <tbody id="leadsBody"></tbody>
         </table>
       </div>
@@ -977,50 +977,79 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-  // 1. Connect to your local VettoChat Real-Time Engine
+  // 1. Reset Dashboard to Zero for the Demo
+  document.addEventListener('DOMContentLoaded', () => {
+    // Clear the table
+    const tbody = document.getElementById('overviewBody');
+    if(tbody) tbody.innerHTML = ''; 
+    
+    // Reset the top Stat Boxes to zero
+    document.getElementById('sv0').innerText = '0';      // Total Leads
+    document.getElementById('sv1').innerText = '0';      // High Priority
+    document.getElementById('sv2').innerText = '< 1s';   // Avg Response (AI is instant!)
+    document.getElementById('sv3').innerText = '$0';     // Pipeline Value
+  });
+
+  // 2. Connect to Local Engine
   const socket = io('http://localhost:8080'); 
 
-  // 2. Listen for incoming 'new_lead' events from the backend
   socket.on('new_lead', (lead) => {
     
-    // Determine the correct CSS badge color based on the score
-    const badgeClass = lead.status === 'Hot' ? 'pill-hot' : (lead.status === 'Warm' ? 'pill-warm' : 'pill-cold');
+    // Map the new High/Medium/Low statuses to your CSS badge colors
+    let badgeClass = 'pill-cold'; // Default to Low
+    if (lead.status === 'High') badgeClass = 'pill-hot';
+    if (lead.status === 'Medium') badgeClass = 'pill-warm';
     
-    // 3. Construct the HTML for the new table row
+    // Format phone number (e.g. 9725551234 -> (972) 555-1234)
+    let formattedPhone = lead.phone;
+    if (lead.phone && lead.phone.length === 10) {
+      formattedPhone = `(${lead.phone.substring(0,3)}) ${lead.phone.substring(3,6)}-${lead.phone.substring(6,10)}`;
+    }
+    
+    // 3. Inject Row into Table
     const newRow = `
       <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
         <td>
           <div class="name-cell">
-            <div class="avatar">${lead.name.charAt(0).toUpperCase()}</div>
+            <div class="avatar" style="background-color: var(--navy); color: white;">${lead.name.charAt(0).toUpperCase()}</div>
             <div>
               <div class="lead-name">${lead.name}</div>
               <div class="muted">Just now</div>
             </div>
           </div>
         </td>
-        <td><strong>${lead.phone}</strong></td>
-        <td>${lead.intent}</td>
+        <td class="muted">${formattedPhone}</td>
+        <td><strong>${lead.intent}</strong><br><span class="muted">${lead.budget || ''}</span></td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td><span class="status-dot dot-new"></span>New</td>
+        <td class="muted">Just now</td>
         <td><button class="call-btn">1-Click Call</button></td>
       </tr>
     `;
 
-    // 4. Inject the new lead at the top of the table
-    const tbody = document.querySelector('.leads-table tbody');
-    if (tbody) {
-      tbody.insertAdjacentHTML('afterbegin', newRow);
-    }
+    const tbody = document.getElementById('overviewBody');
+    if (tbody) tbody.insertAdjacentHTML('afterbegin', newRow);
     
-    // 5. Instantly update the metric counters at the top of the dashboard
-    const newLeadsCounter = document.getElementById('stat-new-leads');
-    if (newLeadsCounter) {
-      newLeadsCounter.innerText = parseInt(newLeadsCounter.innerText || 0) + 1;
+    // 4. LIVE UPDATE THE STAT BOXES
+    // Update Total Leads
+    const totalLeadsEl = document.getElementById('sv0');
+    totalLeadsEl.innerText = parseInt(totalLeadsEl.innerText) + 1;
+
+    // Update High Priority Counter
+    if (lead.status === 'High') {
+      const highPriorityEl = document.getElementById('sv1');
+      highPriorityEl.innerText = parseInt(highPriorityEl.innerText) + 1;
     }
+
+    // Estimate & Add Pipeline Value based on intent
+    let addedValue = 1500; // Default base value
+    if (lead.intent.includes('Replacement') || lead.intent.includes('Storm')) addedValue = 12000;
+    if (lead.intent.includes('Repair')) addedValue = 3500;
     
-    // Optional: Play a subtle notification chime during the demo
-    // const audio = new Audio('https://cdn.freesound.org/previews/415/415510_5121236-lq.mp3');
-    // audio.play().catch(e => console.log("Audio play blocked by browser"));
+    const pipelineEl = document.getElementById('sv3');
+    let currentPipeline = parseInt(pipelineEl.innerText.replace(/\D/g, '')) || 0; // strip non-digits
+    let newPipeline = currentPipeline + addedValue;
+    pipelineEl.innerText = '$' + newPipeline.toLocaleString(); // format with commas
   });
 </script>
 </body>
