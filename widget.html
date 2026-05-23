@@ -355,25 +355,13 @@ function askStep(step){
   }
 }
 
-function getBusinessName(){
-  let host = window.location.hostname.replace(/^www\./,'');
-  host = host.replace(/\.(com|net|org|io|co|us|biz|info)(\..+)?$/,'');
-  const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : '';
-  const suffixes = ['roofing','exteriors','construction','contractors','services','homes','home','pros','roof'];
-  for(const sfx of suffixes){
-    const idx = host.toLowerCase().indexOf(sfx);
-    if(idx > 0) return cap(host.substring(0,idx))+' '+cap(host.substring(idx));
-  }
-  return cap(host);
-}
-
 function startChat(){
   if(S.step>=0) return;
   $('chatInput').disabled=true; $('sendBtn').disabled=true;
   showTyping();
   setTimeout(()=>{
     removeTyping();
-    addBotMsg("Hi! I'm the "+getBusinessName()+" assistant, powered by VettoChat.");
+    addBotMsg("Hi! I'm your virtual assistant, powered by VettoChat.");
     showTyping();
     setTimeout(()=>{
       removeTyping();
