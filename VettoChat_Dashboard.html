@@ -787,7 +787,7 @@ function showPage(name){
   pg.classList.add('active');
   document.getElementById('topbarTitle').textContent=PAGE_TITLES[name]||name;
   document.getElementById('playBtn').style.display=name==='overview'?'':'none';
-  requestAnimationFrame(()=>{pg.classList.add('visible');if(name==='analytics'){initBarChart();initFunnel();}if(name==='leads')renderLeads();if(name==='botconfig')initBotConfig();});
+  requestAnimationFrame(()=>{pg.classList.add('visible');if(name==='botconfig')initBotConfig();});
 }
 
 // ─── TOAST ──────────────────────────────────────────────────────────────────
@@ -943,9 +943,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
   // 1. Reset Dashboard to Zero for the Demo
   document.addEventListener('DOMContentLoaded', () => {
-    // Clear the table
+    // Clear both tables
     const tbody = document.getElementById('overviewBody');
-    if(tbody) tbody.innerHTML = ''; 
+    if(tbody) tbody.innerHTML = '';
+    const leadsBody = document.getElementById('leadsBody');
+    if(leadsBody) leadsBody.innerHTML = '';
     
     // Reset the top Stat Boxes to zero
     document.getElementById('sv0').innerText = '0';      // Total Leads
