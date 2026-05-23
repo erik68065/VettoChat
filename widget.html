@@ -182,7 +182,7 @@
           <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
         </div>
         <div class="chat-modal-info">
-          <h4>Ironcrest Assistant</h4>
+          <h4>Vetto Assistant</h4>
           <div class="online-status">
             <div class="online-dot"></div>
             <div class="online-text">Online</div>
@@ -250,7 +250,7 @@ const STEPS = [
 const V = {
   name:   v => { const p=v.trim().split(/\s+/); return p.length>=2 && p.every(x=>/^[a-zA-Z'-]{2,}$/.test(x)); },
   zip:    v => {
-    const zips=['75025','75023','75024','75026','75013','75074','75070','75071','75002','75034','75035','75080','75081','75082','75048','75044'];
+    const zips=['75025','75023','75024','75026','75013','75074','75070','75071','75002','75034','75035','75080','75081','75082','75048','75044','75075'];
     const cities=['plano','dallas','frisco','richardson','mckinney','allen','garland','mesquite','lewisville','carrollton','denton','prosper'];
     if(/^\d{5}$/.test(v.trim())) return zips.includes(v.trim());
     return cities.some(c=>v.toLowerCase().includes(c));
