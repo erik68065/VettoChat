@@ -417,9 +417,6 @@ td.muted{font-size:12px;color:var(--muted)}
       <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="5.5" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="4.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M11 10.5c1.5 0 3 .8 3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span> Leads
       <span class="nav-badge" id="leadsBadge">4</span>
     </div>
-    <div class="nav-item" onclick="nav(this,'analytics')">
-      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="8" width="3" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="6" y="5" width="3" height="9" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="11" y="1" width="3" height="13" rx="1" stroke="currentColor" stroke-width="1.4"/></svg></span> Analytics
-    </div>
     <div class="sb-section">Settings</div>
     <div class="nav-item" onclick="nav(this,'botconfig')">
       <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="4" y="5" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5V3.5a2 2 0 0 1 4 0V5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="7.5" cy="8.5" r="1" fill="currentColor"/></svg></span> Bot Config
@@ -482,39 +479,6 @@ td.muted{font-size:12px;color:var(--muted)}
           <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Location</th><th>Budget</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
           <tbody id="leadsBody"></tbody>
         </table>
-      </div>
-      <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
-    </div>
-
-    <!-- ── ANALYTICS ── -->
-    <div class="page" id="page-analytics">
-      <div class="metric-row">
-        <div class="stat-card"><div class="stat-num">169</div><div class="stat-lbl">Leads This Month</div></div>
-        <div class="stat-card"><div class="stat-num orange">23.4%</div><div class="stat-lbl">Conversion Rate</div></div>
-        <div class="stat-card"><div class="stat-num">$18</div><div class="stat-lbl">Cost Per Lead</div></div>
-      </div>
-      <div class="two-col" style="margin-bottom:24px">
-        <div class="card">
-          <div class="card-head"><div class="card-head-left"><h3>Lead Volume — Last 7 Days</h3><p>Current week vs. prior week</p></div></div>
-          <div class="chart-wrap" style="padding:16px 16px 8px"><canvas id="barChart" height="140"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-head-left"><h3>Conversion Funnel</h3><p>Visitor to booked inspection</p></div></div>
-          <div class="funnel-wrap" style="padding:20px 20px 12px">
-            <div class="funnel-item"><div class="funnel-label-row"><span class="funnel-label">Website Visitors</span><span class="funnel-val">9,340</span></div><div class="funnel-track"><div class="funnel-fill" style="width:100%;background:#3B82F6"></div></div></div>
-            <div class="funnel-item"><div class="funnel-label-row"><span class="funnel-label">Chats Initiated</span><span class="funnel-val">1,915 · 20%</span></div><div class="funnel-track"><div class="funnel-fill" id="ff2" style="width:0%;background:#8B5CF6"></div></div></div>
-            <div class="funnel-item"><div class="funnel-label-row"><span class="funnel-label">Leads Qualified</span><span class="funnel-val">449 · 4.8%</span></div><div class="funnel-track"><div class="funnel-fill" id="ff3" style="width:0%;background:#2563EB"></div></div></div>
-            <div class="funnel-item"><div class="funnel-label-row"><span class="funnel-label">Inspections Booked</span><span class="funnel-val">169 · 1.8%</span></div><div class="funnel-track"><div class="funnel-fill" id="ff4" style="width:0%;background:var(--green)"></div></div></div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-head-left"><h3>Response Time Benchmark</h3><p>VettoChat vs. industry average</p></div></div>
-        <div style="padding:20px 22px 22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-          <div style="background:var(--green-bg);border:1px solid #BBF7D0;border-radius:8px;padding:16px 18px"><div style="font-size:28px;font-weight:800;color:var(--green)">47s</div><div style="font-size:12px;color:var(--green);font-weight:600;margin-top:4px">VettoChat — Aria</div><div style="font-size:11px;color:#166534;margin-top:4px;line-height:1.5">Automated response, 24 hours a day</div></div>
-          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:16px 18px"><div style="font-size:28px;font-weight:800;color:#1E40AF">11 hrs</div><div style="font-size:12px;color:#1E40AF;font-weight:600;margin-top:4px">Industry Average</div><div style="font-size:11px;color:#1E3A8A;margin-top:4px;line-height:1.5">Most inquiries go unanswered overnight</div></div>
-          <div style="background:#F8FAFF;border:1px solid #C7D2FE;border-radius:8px;padding:16px 18px"><div style="font-size:28px;font-weight:800;color:#1D4ED8">50%</div><div style="font-size:12px;color:#1D4ED8;font-weight:600;margin-top:4px">Jobs Won by First Responder</div><div style="font-size:11px;color:#1E3A8A;margin-top:4px;line-height:1.5">Response speed is the primary close factor</div></div>
-        </div>
       </div>
       <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
     </div>
@@ -813,7 +777,7 @@ function initFunnel(){
 }
 
 // ─── NAV ────────────────────────────────────────────────────────────────────
-const PAGE_TITLES={overview:'Overview',leads:'Leads',analytics:'Analytics',botconfig:'Bot Config',integrations:'Integrations'};
+const PAGE_TITLES={overview:'Overview',leads:'Leads',botconfig:'Bot Config',integrations:'Integrations'};
 let currentPage='overview';
 function nav(el,name){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');showPage(name);}
 function showPage(name){
@@ -1029,7 +993,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tbody = document.getElementById('overviewBody');
     if (tbody) tbody.insertAdjacentHTML('afterbegin', newRow);
-    
+
+    // Also add to Leads page
+    const leadsRow = `
+      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background-color: var(--navy); color: white;">${lead.name.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="lead-name">${lead.name}</div>
+            </div>
+          </div>
+        </td>
+        <td class="muted">${formattedPhone}</td>
+        <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong></td>
+        <td style="font-size:12px;color:var(--muted)">—</td>
+        <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
+        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
+        <td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>New</td>
+        <td class="muted">Just now</td>
+        <td><button class="call-btn">1-Click Call</button></td>
+      </tr>
+    `;
+    const leadsBody = document.getElementById('leadsBody');
+    if (leadsBody) leadsBody.insertAdjacentHTML('afterbegin', leadsRow);
+
     // 4. LIVE UPDATE THE STAT BOXES
     // Update Total Leads
     const totalLeadsEl = document.getElementById('sv0');
