@@ -246,13 +246,34 @@ const STEPS = [
   { key:'phone',   type:'text',   placeholder:'10-digit phone number…' }
 ];
 
+const ZIP_TO_CITY = {
+  '75025':'Plano','75023':'Plano','75024':'Plano','75026':'Plano','75074':'Plano','75075':'Plano',
+  '75013':'Allen','75002':'Allen',
+  '75070':'McKinney','75071':'McKinney',
+  '75034':'Frisco','75035':'Frisco',
+  '75080':'Richardson','75081':'Richardson','75082':'Richardson',
+  '75048':'Garland','75044':'Garland',
+  '75068':'Lewisville','75067':'Lewisville',
+  '75006':'Carrollton','75007':'Carrollton',
+  '76201':'Denton','76205':'Denton',
+  '75078':'Prosper'
+};
+const CITY_NAMES = ['plano','dallas','frisco','richardson','mckinney','allen','garland','mesquite','lewisville','carrollton','denton','prosper'];
+
+function resolveCity(val) {
+  const v = val.trim();
+  if (/^\d{5}$/.test(v)) return (ZIP_TO_CITY[v] || v) + ', TX';
+  const match = CITY_NAMES.find(c => v.toLowerCase().includes(c));
+  if (match) return match.charAt(0).toUpperCase() + match.slice(1) + ', TX';
+  return v;
+}
+
 const V = {
   name:   v => { const p=v.trim().split(/\s+/); return p.length>=2 && p.every(x=>/^[a-zA-Z'-]{2,}$/.test(x)); },
   zip:    v => {
     const zips=['75025','75023','75024','75026','75013','75074','75070','75071','75002','75034','75035','75080','75081','75082','75048','75044','75075'];
-    const cities=['plano','dallas','frisco','richardson','mckinney','allen','garland','mesquite','lewisville','carrollton','denton','prosper'];
     if(/^\d{5}$/.test(v.trim())) return zips.includes(v.trim());
-    return cities.some(c=>v.toLowerCase().includes(c));
+    return CITY_NAMES.some(c=>v.toLowerCase().includes(c));
   },
   phone:  v => v.replace(/\D/g,'').length===10,
   budget: v => true
@@ -419,8 +440,9 @@ async function finishConversation() {
   const leadPayload = {
     name: S.data.name || S.data.firstName,
     phone: S.data.phone || 'N/A',
-    intent: S.data.service || 'General Inquiry',     
+    intent: S.data.service || 'General Inquiry',
     budget: S.data.urgency || 'Just browsing / Next month', // Aligned with server SCORING_MATRIX.urgency keys
+    location: S.data.zip ? resolveCity(S.data.zip) : '',
     source_url: window.location.hostname
   };
 

@@ -1009,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </td>
         <td class="muted">${formattedPhone}</td>
         <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong></td>
-        <td style="font-size:12px;color:var(--muted)">—</td>
+        <td style="font-size:12px;color:var(--muted)">${lead.location || '—'}</td>
         <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>New</td>
