@@ -132,6 +132,7 @@ td.muted{font-size:12px;color:var(--muted)}
 .field-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:9px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:14px}
 .field-input:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
 .field-textarea{min-height:72px;resize:vertical}
+.field-textarea.locked{background:#F8FAFC;color:var(--navy-mid);cursor:default;resize:none;border-style:dashed}
 .save-btn{padding:10px 20px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s}
 .save-btn:hover{background:var(--orange-h)}
 .toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
@@ -487,8 +488,8 @@ td.muted{font-size:12px;color:var(--muted)}
       </div>
       <div class="card" style="margin-bottom:0">
         <div class="card-head">
-          <div class="card-head-left"><h3>Recent Leads</h3><p>Automatically qualified and scored by Aria</p></div>
-          <div class="chip chip-green"><div class="live-dot"></div>Aria Active</div>
+          <div class="card-head-left"><h3>Recent Leads</h3><p>Automatically qualified and scored by <span data-an-name>(Assistant Name)</span></p></div>
+          <div class="chip chip-green"><div class="live-dot"></div><span data-an-name>(Assistant Name)</span> Active</div>
         </div>
         <table class="leads-table">
           <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
@@ -537,7 +538,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="bc-card-head">
             <div>
               <h3>What Makes a Lead Hot, Warm, or Cold?</h3>
-              <p>Select which answers push a lead into each priority tier. Aria uses these rules to score every conversation in real time.</p>
+              <p>Select which answers push a lead into each priority tier. <span data-an-name>(Assistant Name)</span> uses these rules to score every conversation in real time.</p>
             </div>
           </div>
           <div class="bc-card-body">
@@ -563,7 +564,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="bc-card-head">
             <div>
               <h3>SMS Alerts</h3>
-              <p>Receive an instant text message whenever Aria captures a new lead that meets your threshold.</p>
+              <p>Receive an instant text message whenever <span data-an-name>(Assistant Name)</span> captures a new lead that meets your threshold.</p>
             </div>
           </div>
           <div class="bc-card-body">
@@ -628,14 +629,14 @@ Phone: (214) 555-0192
           <div class="bc-card-head">
             <div>
               <h3>Assistant Identity</h3>
-              <p>Configure how Aria presents itself to visitors on your website.</p>
+              <p>Configure how <span data-an-name>(Assistant Name)</span> presents itself to visitors on your website.</p>
             </div>
           </div>
           <div class="bc-card-body">
             <div class="identity-grid">
               <div>
                 <label class="field-label">Assistant Name</label>
-                <input class="field-input" id="identityName" value="Aria — ABC Roofing Assistant" type="text" oninput="syncNameToMessage()">
+                <input class="field-input" id="identityName" type="text" placeholder="(Assistant Name)" oninput="syncAssistantName(this.value)">
                 <label class="field-label">Chat Bubble Label</label>
                 <input class="field-input" id="identityLabel" value="Need a roof inspection?" type="text">
                 <label class="field-label">Brand Color</label>
@@ -645,8 +646,12 @@ Phone: (214) 555-0192
                 </div>
               </div>
               <div>
-                <label class="field-label">Opening Message</label>
-                <textarea class="field-input field-textarea" id="identityMessage" style="height:148px">Hi! I'm Aria — ABC Roofing Assistant. I can get you a free quote in under 60 seconds — what's your full name?</textarea>
+                <label class="field-label" style="display:flex;align-items:center;gap:6px">
+                  Opening Message
+                  <span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#2563EB;padding:2px 7px;border-radius:10px;letter-spacing:.04em">AUTO</span>
+                </label>
+                <textarea class="field-input field-textarea locked" id="identityMessage" readonly style="height:148px" placeholder="Hi! I'm your (Assistant Name). I can get you a free quote in under 60 seconds — what's your full name?"></textarea>
+                <div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:6px">Driven by the Assistant Name field — not manually editable.</div>
               </div>
             </div>
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
@@ -710,7 +715,7 @@ Phone: (214) 555-0192
   <div class="toast-icon">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#16A34A" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
-  <div><strong>New lead received — Aria</strong><span>2 seconds ago &nbsp;·&nbsp; James Carter &nbsp;·&nbsp; Storm Damage Repair</span></div>
+  <div><strong>New lead received — <span data-an-name>(Assistant Name)</span></strong><span>2 seconds ago &nbsp;·&nbsp; James Carter &nbsp;·&nbsp; Storm Damage Repair</span></div>
 </div>
 
 <!-- SMS TOAST -->
@@ -1122,12 +1127,28 @@ function sendTestSMS(){
 }
 
 // ─── ASSISTANT IDENTITY SYNC ─────────────────────────────────────────────────
-const OPENING_MSG_TEMPLATE = name =>
-  `Hi! I'm ${name}. I can get you a free quote in under 60 seconds — what's your full name?`;
+let _assistantName = '';
 
-function syncNameToMessage() {
-  const name = document.getElementById('identityName').value.trim();
-  if (name) document.getElementById('identityMessage').value = OPENING_MSG_TEMPLATE(name);
+function buildOpeningMsg(name) {
+  return name
+    ? `Hi! I'm ${name}. I can get you a free quote in under 60 seconds — what's your full name?`
+    : '';
+}
+
+function syncAssistantName(raw) {
+  _assistantName = (raw || '').trim();
+  const display = _assistantName || '(Assistant Name)';
+
+  // Update every marked element in the DOM
+  document.querySelectorAll('[data-an-name]').forEach(el => {
+    el.textContent = display;
+  });
+
+  // Auto-generate the locked opening message textarea
+  const msgEl = document.getElementById('identityMessage');
+  if (msgEl) {
+    msgEl.value = buildOpeningMsg(_assistantName);
+  }
 }
 
 function previewColor(val) {
@@ -1138,21 +1159,23 @@ function previewColor(val) {
 function loadIdentityForm() {
   try {
     const saved = JSON.parse(localStorage.getItem('vettochat_config') || '{}');
-    if (saved.assistantName)  document.getElementById('identityName').value    = saved.assistantName;
-    if (saved.chatLabel)      document.getElementById('identityLabel').value   = saved.chatLabel;
-    if (saved.brandColor)   { document.getElementById('identityColor').value   = saved.brandColor;
-                              previewColor(saved.brandColor); }
-    if (saved.openingMessage) document.getElementById('identityMessage').value = saved.openingMessage;
-    else syncNameToMessage(); // auto-generate from current name if no custom message saved
+    if (saved.chatLabel)  document.getElementById('identityLabel').value = saved.chatLabel;
+    if (saved.brandColor) { document.getElementById('identityColor').value = saved.brandColor; previewColor(saved.brandColor); }
+    // Name drives everything — call last so all targets are ready
+    if (saved.assistantName) {
+      document.getElementById('identityName').value = saved.assistantName;
+      syncAssistantName(saved.assistantName);
+    }
   } catch(e) {}
 }
 
 function saveIdentity() {
+  const name = document.getElementById('identityName').value.trim();
   const config = {
-    assistantName:  document.getElementById('identityName').value.trim(),
+    assistantName:  name,
     chatLabel:      document.getElementById('identityLabel').value.trim(),
     brandColor:     document.getElementById('identityColor').value.trim(),
-    openingMessage: document.getElementById('identityMessage').value.trim(),
+    openingMessage: buildOpeningMsg(name),
   };
   // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
