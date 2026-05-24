@@ -481,9 +481,9 @@ td.muted{font-size:12px;color:var(--muted)}
     <div class="page active" id="page-overview">
       <div class="stats">
         <div class="stat-card" id="sc0"><div class="stat-num" id="sv0">28</div><div class="stat-lbl">New Leads This Week</div></div>
-        <div class="stat-card" id="sc1"><div class="stat-num orange" id="sv1">11</div><div class="stat-lbl">High-Priority Leads</div></div>
-        <div class="stat-card" id="sc2"><div class="stat-num" id="sv2">47s</div><div class="stat-lbl">Avg. Response Time</div></div>
-        <div class="stat-card" id="sc3"><div class="stat-num" id="sv3">$142K</div><div class="stat-lbl">Estimated Pipeline Value</div></div>
+        <div class="stat-card" id="sc1"><div class="stat-num orange" id="sv1">11</div><div class="stat-lbl">Hot Leads</div></div>
+        <div class="stat-card" id="sc2"><div class="stat-num orange" id="sv2">6</div><div class="stat-lbl">Needs Follow-up</div></div>
+        <div class="stat-card" id="sc3"><div class="stat-num" id="sv3">$142K</div><div class="stat-lbl">Est. Pipeline Value</div></div>
       </div>
       <div class="card" style="margin-bottom:0">
         <div class="card-head">
@@ -781,7 +781,7 @@ const DEMO_STEPS=[
   {step:'Step 1 of 4',desc:'Aria qualified 28 leads this week — automatically, with no manual effort required.'},
   {step:'Step 2 of 4',desc:'A new high-priority lead has been received: James Carter, Storm Damage Repair, $9,200 estimated budget.'},
   {step:'Step 3 of 4',desc:'Each lead is scored and prioritised. Your team receives an immediate notification and can call directly from the dashboard.'},
-  {step:'Step 4 of 4',desc:'Aria responded in 47 seconds. The industry average is 11 hours. First contact wins the job.'},
+  {step:'Step 4 of 4',desc:'6 leads are waiting for a callback right now. The team that follows up first wins — 78% of roofing jobs go to whoever makes contact within the hour.'},
 ];
 function buildPips(){const c=document.getElementById('hudPips');c.innerHTML=DEMO_STEPS.map((_,i)=>`<div class="pip" id="pip${i}"></div>`).join('');}
 function setPips(a){DEMO_STEPS.forEach((_,i)=>{const p=document.getElementById('pip'+i);if(p)p.className='pip'+(i<a?' done':i===a?' active':'');});}
@@ -1134,10 +1134,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if(leadsBody) leadsBody.innerHTML = '';
     
     // Reset the top Stat Boxes to zero
-    document.getElementById('sv0').innerText = '0';      // Total Leads
-    document.getElementById('sv1').innerText = '0';      // High Priority
-    document.getElementById('sv2').innerText = '< 1s';   // Avg Response (AI is instant!)
-    document.getElementById('sv3').innerText = '$0';     // Pipeline Value
+    document.getElementById('sv0').innerText = '0';   // New Leads
+    document.getElementById('sv1').innerText = '0';   // Hot Leads
+    document.getElementById('sv2').innerText = '0';   // Needs Follow-up
+    document.getElementById('sv3').innerText = '$0';  // Pipeline Value
   });
 
   // 2. Connect to Local Engine
@@ -1217,11 +1217,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalLeadsEl = document.getElementById('sv0');
     totalLeadsEl.innerText = parseInt(totalLeadsEl.innerText) + 1;
 
-    // Update High Priority Counter
+    // Update Hot Leads counter
     if (lead.status === 'High') {
-      const highPriorityEl = document.getElementById('sv1');
-      highPriorityEl.innerText = parseInt(highPriorityEl.innerText) + 1;
+      const hotEl = document.getElementById('sv1');
+      hotEl.innerText = parseInt(hotEl.innerText) + 1;
     }
+
+    // Every new lead needs a follow-up call
+    const followUpEl = document.getElementById('sv2');
+    followUpEl.innerText = parseInt(followUpEl.innerText) + 1;
 
     // Estimate & Add Pipeline Value based on intent
     let addedValue = 1500; // Default base value
