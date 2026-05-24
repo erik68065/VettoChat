@@ -217,7 +217,6 @@
 
   <script>
 // ─── CONFIG SYNC ─────────────────────────────────────────────────────────────
-const _vc_channel = new BroadcastChannel('vettochat_config');
 let _vc_config = {};
 
 function _vc_apply(cfg) {
@@ -248,8 +247,12 @@ function _vc_apply(cfg) {
 // Apply saved config immediately on load
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
-// Live sync: apply the moment the dashboard saves
-_vc_channel.onmessage = e => _vc_apply(e.data);
+// Live sync via storage event — fires in THIS tab when ANOTHER tab writes localStorage
+window.addEventListener('storage', e => {
+  if (e.key === 'vettochat_config' && e.newValue) {
+    try { _vc_apply(JSON.parse(e.newValue)); } catch(err) {}
+  }
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 const S = {

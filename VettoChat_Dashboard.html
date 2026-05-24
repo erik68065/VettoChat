@@ -1122,11 +1122,20 @@ function sendTestSMS(){
 }
 
 // ─── ASSISTANT IDENTITY SYNC ─────────────────────────────────────────────────
-const _vcChannel = new BroadcastChannel('vettochat_config');
-
 function previewColor(val) {
   if (/^#[0-9A-Fa-f]{6}$/.test(val.trim()))
     document.getElementById('colorSwatch').style.background = val.trim();
+}
+
+function loadIdentityForm() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('vettochat_config') || '{}');
+    if (saved.assistantName)  document.getElementById('identityName').value    = saved.assistantName;
+    if (saved.chatLabel)      document.getElementById('identityLabel').value   = saved.chatLabel;
+    if (saved.brandColor)   { document.getElementById('identityColor').value   = saved.brandColor;
+                              previewColor(saved.brandColor); }
+    if (saved.openingMessage) document.getElementById('identityMessage').value = saved.openingMessage;
+  } catch(e) {}
 }
 
 function saveIdentity() {
@@ -1136,8 +1145,8 @@ function saveIdentity() {
     brandColor:     document.getElementById('identityColor').value.trim(),
     openingMessage: document.getElementById('identityMessage').value.trim(),
   };
+  // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
-  _vcChannel.postMessage(config);
 
   const btn    = document.getElementById('saveIdentityBtn');
   const status = document.getElementById('identitySyncStatus');
@@ -1154,6 +1163,7 @@ function saveIdentity() {
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   renderOverview(null);
+  loadIdentityForm();
   requestAnimationFrame(() => {
     document.getElementById('page-overview').classList.add('visible');
   });
