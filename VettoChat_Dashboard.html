@@ -646,7 +646,7 @@ Phone: (214) 555-0192
               </div>
               <div>
                 <label class="field-label">Opening Message</label>
-                <textarea class="field-input field-textarea" id="identityMessage" style="height:148px">Hi, I'm Aria, the virtual assistant for ABC Roofing. I can prepare a free quote estimate in under 60 seconds. May I start with your name?</textarea>
+                <textarea class="field-input field-textarea" id="identityMessage" style="height:148px">Hi! I'm Aria — ABC Roofing Assistant. I can get you a free quote in under 60 seconds — what's your full name?</textarea>
               </div>
             </div>
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
@@ -1143,6 +1143,7 @@ function loadIdentityForm() {
     if (saved.brandColor)   { document.getElementById('identityColor').value   = saved.brandColor;
                               previewColor(saved.brandColor); }
     if (saved.openingMessage) document.getElementById('identityMessage').value = saved.openingMessage;
+    else syncNameToMessage(); // auto-generate from current name if no custom message saved
   } catch(e) {}
 }
 
