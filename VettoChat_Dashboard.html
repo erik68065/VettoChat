@@ -1160,16 +1160,20 @@ function previewColor(val) {
     document.getElementById('colorSwatch').style.background = val.trim();
 }
 
+const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Need a roof inspection?' };
+
 function loadIdentityForm() {
   try {
     const saved = JSON.parse(localStorage.getItem('vettochat_config') || '{}');
-    if (saved.chatLabel)  document.getElementById('identityLabel').value = saved.chatLabel;
-    if (saved.brandColor) { document.getElementById('identityColor').value = saved.brandColor; previewColor(saved.brandColor); }
-    // Name drives everything — call last so all targets are ready
-    if (saved.assistantName) {
-      document.getElementById('identityName').value = saved.assistantName;
-      syncAssistantName(saved.assistantName);
-    }
+    const name  = saved.assistantName || DEFAULTS.assistantName;
+    const color = saved.brandColor    || DEFAULTS.brandColor;
+    const label = saved.chatLabel     || DEFAULTS.chatLabel;
+
+    document.getElementById('identityName').value  = name;
+    document.getElementById('identityLabel').value = label;
+    document.getElementById('identityColor').value = color;
+    previewColor(color);
+    syncAssistantName(name);
   } catch(e) {}
 }
 
