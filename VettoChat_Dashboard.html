@@ -501,7 +501,7 @@ td.muted{font-size:12px;color:var(--muted)}
       <div class="card" style="margin-bottom:0">
         <div class="card-head">
           <div class="card-head-left"><h3>All Leads</h3><p>Complete lead register for ABC Roofing & Exteriors</p></div>
-          <div style="display:flex;gap:8px"><span class="chip chip-orange">4 High Priority</span><span class="chip chip-blue">10 Total</span></div>
+          <div style="display:flex;gap:8px" id="leadsChips"></div>
         </div>
         <table class="leads-table">
           <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Location</th><th>Budget</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
@@ -1138,6 +1138,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sv1').innerText = '0';   // Hot Leads
     document.getElementById('sv2').innerText = '0';   // Needs Follow-up
     document.getElementById('sv3').innerText = '$0';  // Pipeline Value
+
+    // Clear leads page chips until leads arrive
+    const chipsEl = document.getElementById('leadsChips');
+    if (chipsEl) chipsEl.innerHTML = '';
   });
 
   // 2. Connect to Local Engine
@@ -1221,6 +1225,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lead.status === 'High') {
       const hotEl = document.getElementById('sv1');
       hotEl.innerText = parseInt(hotEl.innerText) + 1;
+    }
+
+    // Update Leads page header chips
+    const chipsEl = document.getElementById('leadsChips');
+    if (chipsEl) {
+      const totalRows = document.getElementById('leadsBody')?.querySelectorAll('tr').length || 0;
+      const hotRows   = document.getElementById('leadsBody')?.querySelectorAll('.pill-hot').length || 0;
+      chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
+                          `<span class="chip chip-blue">${totalRows} Total</span>`;
     }
 
     // Every new lead needs a follow-up call
