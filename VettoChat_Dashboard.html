@@ -132,7 +132,9 @@ td.muted{font-size:12px;color:var(--muted)}
 .field-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:9px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:14px}
 .field-input:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
 .field-textarea{min-height:72px;resize:vertical}
-.field-textarea.locked{background:#F8FAFC;color:var(--navy-mid);cursor:default;resize:none;border-style:dashed}
+.msg-editor{min-height:120px;white-space:pre-wrap;word-break:break-word;cursor:text;outline:none;line-height:1.6;padding:9px 12px}
+.msg-editor:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.an-name-chip{display:inline;background:#EFF6FF;color:#1E40AF;font-weight:700;border-radius:4px;padding:1px 6px;cursor:not-allowed;user-select:none;font-size:13px}
 .save-btn{padding:10px 20px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s}
 .save-btn:hover{background:var(--orange-h)}
 .toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
@@ -646,12 +648,9 @@ Phone: (214) 555-0192
                 </div>
               </div>
               <div>
-                <label class="field-label" style="display:flex;align-items:center;gap:6px">
-                  Opening Message
-                  <span style="font-size:10px;font-weight:600;background:#EFF6FF;color:#2563EB;padding:2px 7px;border-radius:10px;letter-spacing:.04em">AUTO</span>
-                </label>
-                <textarea class="field-input field-textarea locked" id="identityMessage" readonly style="height:148px" placeholder="Hi! I'm your (Assistant Name). I can get you a free quote in under 60 seconds — what's your full name?"></textarea>
-                <div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:6px">Driven by the Assistant Name field — not manually editable.</div>
+                <label class="field-label">Opening Message</label>
+                <div class="field-input msg-editor" id="identityMessage" contenteditable="true" spellcheck="false"></div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:6px">Freely editable — the <span class="an-name-chip" style="font-size:11px;padding:0 4px">highlighted name</span> updates only via the Assistant Name field.</div>
               </div>
             </div>
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
@@ -1129,10 +1128,28 @@ function sendTestSMS(){
 // ─── ASSISTANT IDENTITY SYNC ─────────────────────────────────────────────────
 let _assistantName = '';
 
+function _esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function buildOpeningMsg(name) {
   return name
     ? `Hi! I'm ${name}. I can get you a free quote in under 60 seconds — what's your full name?`
     : '';
+}
+
+function setEditorContent(message, name) {
+  const editor = document.getElementById('identityMessage');
+  if (!editor) return;
+  const display = name || '(Assistant Name)';
+  let before = "Hi! I'm ", after = ". I can get you a free quote in under 60 seconds — what's your full name?";
+  if (message) {
+    const i = message.indexOf(name || display);
+    if (i !== -1) { before = message.slice(0, i); after = message.slice(i + (name || display).length); }
+  }
+  editor.innerHTML = _esc(before) +
+    `<span class="an-name-chip" contenteditable="false">${_esc(display)}</span>` +
+    _esc(after);
 }
 
 function syncAssistantName(raw) {
@@ -1140,18 +1157,19 @@ function syncAssistantName(raw) {
   const display = _assistantName || '(Assistant Name)';
 
   // Update every marked element in the DOM
-  document.querySelectorAll('[data-an-name]').forEach(el => {
-    el.textContent = display;
-  });
+  document.querySelectorAll('[data-an-name]').forEach(el => { el.textContent = display; });
 
   // Active chip — built as one string to avoid double spaces
   const chipEl = document.getElementById('activeChipText');
   if (chipEl) chipEl.textContent = `${display} Active`;
 
-  // Auto-generate the locked opening message textarea
-  const msgEl = document.getElementById('identityMessage');
-  if (msgEl) {
-    msgEl.value = buildOpeningMsg(_assistantName);
+  // Update ONLY the locked name chip inside the editor — don't touch surrounding text
+  const msgChip = document.querySelector('#identityMessage .an-name-chip');
+  if (msgChip) {
+    msgChip.textContent = display;
+  } else {
+    // First time (editor is empty) — build the full structure
+    setEditorContent(buildOpeningMsg(_assistantName), _assistantName);
   }
 }
 
@@ -1168,12 +1186,18 @@ function loadIdentityForm() {
     const name  = saved.assistantName || DEFAULTS.assistantName;
     const color = saved.brandColor    || DEFAULTS.brandColor;
     const label = saved.chatLabel     || DEFAULTS.chatLabel;
+    const msg   = saved.openingMessage || buildOpeningMsg(name);
 
     document.getElementById('identityName').value  = name;
     document.getElementById('identityLabel').value = label;
     document.getElementById('identityColor').value = color;
     previewColor(color);
-    syncAssistantName(name);
+    // Build the editor with the saved message, then sync name markers
+    setEditorContent(msg, name);
+    _assistantName = name;
+    document.querySelectorAll('[data-an-name]').forEach(el => el.textContent = name || '(Assistant Name)');
+    const chipEl = document.getElementById('activeChipText');
+    if (chipEl) chipEl.textContent = `${name || '(Assistant Name)'} Active`;
   } catch(e) {}
 }
 
@@ -1183,7 +1207,7 @@ function saveIdentity() {
     assistantName:  name,
     chatLabel:      document.getElementById('identityLabel').value.trim(),
     brandColor:     document.getElementById('identityColor').value.trim(),
-    openingMessage: buildOpeningMsg(name),
+    openingMessage: document.getElementById('identityMessage').innerText.trim(),
   };
   // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
