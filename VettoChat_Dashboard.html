@@ -310,6 +310,34 @@ td.muted{font-size:12px;color:var(--muted)}
 .tl-item.warm{color:var(--warm)}.tl-item.warm .tl-dot{background:var(--warm)}
 .tl-item.cold{color:var(--cold)}.tl-item.cold .tl-dot{background:var(--cold)}
 
+/* ── Scoring — interactive criteria ── */
+.scoring-col-body{padding:0 0 4px}
+.sc-group{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;padding:10px 14px 3px}
+.sc-item{display:flex;align-items:center;gap:6px;padding:5px 14px;transition:background .1s;position:relative}
+.sc-item:hover{background:var(--bg)}
+.sc-item.sc-dragging{opacity:.3}
+.sc-item.sc-drag-over{border-top:2px solid #2563EB}
+.sc-handle{color:#CBD5E1;cursor:grab;flex-shrink:0;display:flex;align-items:center;line-height:1}
+.sc-handle:active{cursor:grabbing}
+.sc-check{width:14px;height:14px;cursor:pointer;flex-shrink:0;accent-color:#2563EB}
+.sc-text{flex:1;font-size:12px;font-weight:500;color:var(--navy);border:none;background:none;outline:none;padding:1px 3px;font-family:'Inter',sans-serif;cursor:text;min-width:0}
+.sc-text:focus{background:#F0F4FF;border-radius:3px}
+.sc-del{opacity:0;background:none;border:none;cursor:pointer;color:#CBD5E1;padding:1px 4px;border-radius:3px;font-size:15px;line-height:1;transition:all .15s}
+.sc-item:hover .sc-del{opacity:1}
+.sc-del:hover{background:var(--hot-bg);color:var(--hot)}
+.sc-add-wrap{padding:8px 14px 10px}
+.sc-add-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:5px;background:none;border:1px dashed var(--border);color:var(--muted);font-size:11px;font-weight:600;padding:6px 10px;border-radius:6px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
+.sc-add-btn:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
+.sc-form{padding:8px 14px 12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.sc-form-row{display:flex;gap:6px}
+.sc-fi{flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--navy);font-family:'Inter',sans-serif;outline:none;background:var(--surface)}
+.sc-fi:focus{border-color:#2563EB}
+.sc-fs{padding:5px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--navy);outline:none}
+.sc-fsave{padding:5px 12px;background:#2563EB;color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.sc-fsave:hover{background:#1D4ED8}
+.sc-fcancel{padding:5px 9px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif}
+.scoring-col.sc-col-over{outline:2px dashed #2563EB;outline-offset:-3px}
+
 /* ── Section 3: SMS Notifications ── */
 .sms-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .sms-left{}
@@ -513,53 +541,7 @@ td.muted{font-size:12px;color:var(--muted)}
             </div>
           </div>
           <div class="bc-card-body">
-            <div class="scoring-cols">
-
-              <!-- HOT -->
-              <div class="scoring-col hot">
-                <div class="scoring-col-head"><span class="scoring-col-dot"></span>Hot Lead</div>
-                <div class="scoring-col-body">
-                  <div class="scoring-check-group">Urgency</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Emergency</span></label>
-                  <div class="scoring-check-group">Budget</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">$5K – $15K</span></label>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">$15K+</span></label>
-                  <div class="scoring-check-group">Service</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Storm Damage</span></label>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Full Replacement</span></label>
-                </div>
-              </div>
-
-              <!-- WARM -->
-              <div class="scoring-col warm">
-                <div class="scoring-col-head"><span class="scoring-col-dot"></span>Warm Lead</div>
-                <div class="scoring-col-body">
-                  <div class="scoring-check-group">Urgency</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">This Week</span></label>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">This Month</span></label>
-                  <div class="scoring-check-group">Budget</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">$1K – $5K</span></label>
-                  <div class="scoring-check-group">Service</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Leak Repair</span></label>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">New Install</span></label>
-                </div>
-              </div>
-
-              <!-- COLD -->
-              <div class="scoring-col cold">
-                <div class="scoring-col-head"><span class="scoring-col-dot"></span>Cold Lead</div>
-                <div class="scoring-col-body">
-                  <div class="scoring-check-group">Urgency</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Just Exploring</span></label>
-                  <div class="scoring-check-group">Budget</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Under $1K</span></label>
-                  <div class="scoring-check-group">Service</div>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Inspection</span></label>
-                  <label class="scoring-check-row"><input type="checkbox" checked><span class="scoring-check-label">Gutters</span></label>
-                </div>
-              </div>
-
-            </div><!-- /scoring-cols -->
+            <div class="scoring-cols" id="scoringCols"></div>
 
             <!-- Score threshold slider -->
             <div class="threshold-row">
@@ -841,6 +823,7 @@ function initBotConfig(){
   if(bcInited) return;
   bcInited = true;
   renderQB();
+  renderScoring();
 }
 
 function renderQB(){
@@ -911,6 +894,207 @@ function addQuestion(){
     const inputs = document.querySelectorAll('.qb-input');
     if(inputs.length) inputs[inputs.length-1].focus();
   }, 50);
+}
+
+// ─── BOT CONFIG — LEAD SCORING ───────────────────────────────────────────────
+let scoringNextId = 20;
+const TIER_LABELS = { hot:'Hot Lead', warm:'Warm Lead', cold:'Cold Lead' };
+const DEFAULT_GROUPS = ['Urgency','Budget','Service','Timeline','Other'];
+
+let scoringTiers = {
+  hot:  { items:[
+    {id:1, group:'Urgency', text:'Emergency',        enabled:true},
+    {id:2, group:'Budget',  text:'$5K – $15K',       enabled:true},
+    {id:3, group:'Budget',  text:'$15K+',            enabled:true},
+    {id:4, group:'Service', text:'Storm Damage',     enabled:true},
+    {id:5, group:'Service', text:'Full Replacement', enabled:true},
+  ]},
+  warm: { items:[
+    {id:6,  group:'Urgency', text:'This Week',   enabled:true},
+    {id:7,  group:'Urgency', text:'This Month',  enabled:true},
+    {id:8,  group:'Budget',  text:'$1K – $5K',  enabled:true},
+    {id:9,  group:'Service', text:'Leak Repair', enabled:true},
+    {id:10, group:'Service', text:'New Install', enabled:true},
+  ]},
+  cold: { items:[
+    {id:11, group:'Urgency', text:'Just Exploring', enabled:true},
+    {id:12, group:'Budget',  text:'Under $1K',      enabled:true},
+    {id:13, group:'Service', text:'Inspection',     enabled:true},
+    {id:14, group:'Service', text:'Gutters',        enabled:true},
+  ]}
+};
+
+let scoringDragSrc = null;
+
+function renderScoring() {
+  const container = document.getElementById('scoringCols');
+  if (!container) return;
+  container.innerHTML = '';
+
+  ['hot','warm','cold'].forEach(tier => {
+    const col = document.createElement('div');
+    col.className = `scoring-col ${tier}`;
+    col.dataset.tier = tier;
+
+    col.innerHTML = `<div class="scoring-col-head"><span class="scoring-col-dot"></span>${TIER_LABELS[tier]}</div>`;
+
+    const body = document.createElement('div');
+    body.className = 'scoring-col-body';
+
+    // Render items grouped
+    const items = scoringTiers[tier].items;
+    const groups = [...new Set(items.map(i => i.group))];
+    groups.forEach(group => {
+      const ghdr = document.createElement('div');
+      ghdr.className = 'sc-group';
+      ghdr.textContent = group;
+      body.appendChild(ghdr);
+      items.filter(i => i.group === group).forEach(item => body.appendChild(makeScoringItem(tier, item)));
+    });
+
+    // Add-criterion button
+    const addWrap = document.createElement('div');
+    addWrap.className = 'sc-add-wrap';
+    addWrap.id = `sc-add-wrap-${tier}`;
+    addWrap.innerHTML = `<button class="sc-add-btn" onclick="showScoringForm('${tier}')">+ Add Criterion</button>`;
+    body.appendChild(addWrap);
+
+    // Inline add form (hidden by default)
+    const allGroups = [...new Set([...DEFAULT_GROUPS, ...Object.values(scoringTiers).flatMap(t => t.items.map(i => i.group))])];
+    const groupOpts = allGroups.map(g => `<option value="${g}">${g}</option>`).join('');
+    const form = document.createElement('div');
+    form.className = 'sc-form';
+    form.id = `sc-form-${tier}`;
+    form.style.display = 'none';
+    form.innerHTML = `
+      <div class="sc-form-row">
+        <input class="sc-fi" id="sc-fi-${tier}" placeholder="e.g. Roof Replacement" onkeydown="if(event.key==='Enter')saveScoringItem('${tier}')">
+        <select class="sc-fs" id="sc-fs-${tier}" onchange="scoringGroupChange('${tier}')">${groupOpts}<option value="__new__">+ New group…</option></select>
+      </div>
+      <div class="sc-form-row" id="sc-fn-wrap-${tier}" style="display:none">
+        <input class="sc-fi" id="sc-fn-${tier}" placeholder="New group name…">
+      </div>
+      <div class="sc-form-row">
+        <button class="sc-fsave" onclick="saveScoringItem('${tier}')">Add</button>
+        <button class="sc-fcancel" onclick="hideScoringForm('${tier}')">Cancel</button>
+      </div>`;
+    body.appendChild(form);
+
+    col.appendChild(body);
+
+    // Column drop zone (drop onto empty area appends to column)
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('sc-col-over'); });
+    col.addEventListener('dragleave', e => { if (!col.contains(e.relatedTarget)) col.classList.remove('sc-col-over'); });
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('sc-col-over');
+      if (!scoringDragSrc) return;
+      moveScoringItem(scoringDragSrc.tier, scoringDragSrc.id, tier, null);
+    });
+
+    container.appendChild(col);
+  });
+}
+
+function makeScoringItem(tier, item) {
+  const row = document.createElement('div');
+  row.className = 'sc-item';
+  row.draggable = true;
+  row.dataset.id = item.id;
+
+  const safeText = item.text.replace(/"/g, '&quot;');
+  row.innerHTML = `
+    <span class="sc-handle" title="Drag to move or reorder">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+        <rect x="1" y="1.5" width="10" height="1.2" rx=".6"/><rect x="1" y="5.4" width="10" height="1.2" rx=".6"/><rect x="1" y="9.3" width="10" height="1.2" rx=".6"/>
+      </svg>
+    </span>
+    <input type="checkbox" class="sc-check" ${item.enabled ? 'checked' : ''} onchange="scoringToggle('${tier}',${item.id},this.checked)">
+    <input class="sc-text" value="${safeText}" oninput="scoringUpdateText('${tier}',${item.id},this.value)">
+    <button class="sc-del" onclick="scoringDelete('${tier}',${item.id})" title="Remove">×</button>`;
+
+  row.addEventListener('dragstart', e => {
+    scoringDragSrc = { tier, id: item.id };
+    setTimeout(() => row.classList.add('sc-dragging'), 0);
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
+  });
+  row.addEventListener('dragend', () => {
+    row.classList.remove('sc-dragging');
+    document.querySelectorAll('.sc-item').forEach(r => r.classList.remove('sc-drag-over'));
+    document.querySelectorAll('.scoring-col').forEach(c => c.classList.remove('sc-col-over'));
+    scoringDragSrc = null;
+  });
+  row.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    document.querySelectorAll('.sc-item').forEach(r => r.classList.remove('sc-drag-over'));
+    row.classList.add('sc-drag-over');
+    row.closest('.scoring-col').classList.remove('sc-col-over');
+  });
+  row.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    row.classList.remove('sc-drag-over');
+    if (!scoringDragSrc) return;
+    moveScoringItem(scoringDragSrc.tier, scoringDragSrc.id, tier, item.id);
+  });
+
+  return row;
+}
+
+function moveScoringItem(fromTier, itemId, toTier, beforeItemId) {
+  if (fromTier === toTier && itemId === beforeItemId) return;
+  const fromItems = scoringTiers[fromTier].items;
+  const idx = fromItems.findIndex(i => i.id === itemId);
+  if (idx === -1) return;
+  const [item] = fromItems.splice(idx, 1);
+  const toItems = scoringTiers[toTier].items;
+  if (beforeItemId === null) {
+    toItems.push(item);
+  } else {
+    const insertIdx = toItems.findIndex(i => i.id === beforeItemId);
+    toItems.splice(insertIdx === -1 ? toItems.length : insertIdx, 0, item);
+  }
+  scoringDragSrc = null;
+  renderScoring();
+}
+
+function scoringToggle(tier, id, checked) {
+  const item = scoringTiers[tier].items.find(i => i.id === id);
+  if (item) item.enabled = checked;
+}
+function scoringUpdateText(tier, id, val) {
+  const item = scoringTiers[tier].items.find(i => i.id === id);
+  if (item) item.text = val;
+}
+function scoringDelete(tier, id) {
+  scoringTiers[tier].items = scoringTiers[tier].items.filter(i => i.id !== id);
+  renderScoring();
+}
+function showScoringForm(tier) {
+  document.getElementById(`sc-add-wrap-${tier}`).style.display = 'none';
+  document.getElementById(`sc-form-${tier}`).style.display = '';
+  document.getElementById(`sc-fi-${tier}`).focus();
+}
+function hideScoringForm(tier) {
+  document.getElementById(`sc-form-${tier}`).style.display = 'none';
+  document.getElementById(`sc-add-wrap-${tier}`).style.display = '';
+  document.getElementById(`sc-fi-${tier}`).value = '';
+}
+function scoringGroupChange(tier) {
+  const sel = document.getElementById(`sc-fs-${tier}`);
+  document.getElementById(`sc-fn-wrap-${tier}`).style.display = sel.value === '__new__' ? '' : 'none';
+}
+function saveScoringItem(tier) {
+  const textInput = document.getElementById(`sc-fi-${tier}`);
+  const groupSel  = document.getElementById(`sc-fs-${tier}`);
+  const newGrpInp = document.getElementById(`sc-fn-${tier}`);
+  const text = textInput.value.trim();
+  if (!text) { textInput.focus(); return; }
+  const group = groupSel.value === '__new__' ? (newGrpInp.value.trim() || 'Other') : groupSel.value;
+  scoringTiers[tier].items.push({ id: scoringNextId++, group, text, enabled: true });
+  renderScoring();
 }
 
 // ─── BOT CONFIG — SCORE THRESHOLD SLIDER ────────────────────────────────────
