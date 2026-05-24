@@ -1182,22 +1182,30 @@ const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Ne
 
 function loadIdentityForm() {
   try {
-    const saved = JSON.parse(localStorage.getItem('vettochat_config') || '{}');
-    const name  = saved.assistantName || DEFAULTS.assistantName;
-    const color = saved.brandColor    || DEFAULTS.brandColor;
-    const label = saved.chatLabel     || DEFAULTS.chatLabel;
-    const msg   = saved.openingMessage || buildOpeningMsg(name);
+    const raw   = localStorage.getItem('vettochat_config');
+    const saved = raw ? JSON.parse(raw) : null;
+
+    const name  = (saved && saved.assistantName) || DEFAULTS.assistantName;
+    const color = (saved && saved.brandColor)    || DEFAULTS.brandColor;
+    const label = (saved && saved.chatLabel)     || DEFAULTS.chatLabel;
+    const msg   = (saved && saved.openingMessage) || buildOpeningMsg(name);
 
     document.getElementById('identityName').value  = name;
     document.getElementById('identityLabel').value = label;
     document.getElementById('identityColor').value = color;
     previewColor(color);
-    // Build the editor with the saved message, then sync name markers
     setEditorContent(msg, name);
     _assistantName = name;
-    document.querySelectorAll('[data-an-name]').forEach(el => el.textContent = name || '(Assistant Name)');
+    document.querySelectorAll('[data-an-name]').forEach(el => el.textContent = name);
     const chipEl = document.getElementById('activeChipText');
-    if (chipEl) chipEl.textContent = `${name || '(Assistant Name)'} Active`;
+    if (chipEl) chipEl.textContent = `${name} Active`;
+
+    // Push defaults to localStorage on first load so the widget gets them immediately
+    if (!raw) {
+      localStorage.setItem('vettochat_config', JSON.stringify({
+        assistantName: name, brandColor: color, chatLabel: label, openingMessage: msg
+      }));
+    }
   } catch(e) {}
 }
 
