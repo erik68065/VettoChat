@@ -737,6 +737,41 @@ const LEADS = [
   {initials:'KW',color:'#94A3B8',name:'Kevin Walsh',       service:'Roof Inspection',      location:'Mesquite, TX',budget:'Under $1K',quality:'cold',status:'New',     date:'Mar 22'},
   {initials:'LP',color:'#94A3B8',name:'Lisa Patel',        service:'Gutter Cleaning',      location:'Denton, TX',  budget:'Under $1K',quality:'cold',status:'New',     date:'Mar 21'},
 ];
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  const d = new Date(ts);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dDay = new Date(d); dDay.setHours(0,0,0,0);
+  if (Math.round((today - dDay) / 86400000) === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+}
+function parseLeadDate(str) {
+  const now = new Date();
+  if (str && str.startsWith('Today')) {
+    const m = str.match(/(\d+):(\d+)\s*(am|pm)/i);
+    if (m) {
+      let h = parseInt(m[1]), min = parseInt(m[2]);
+      if (m[3].toLowerCase() === 'pm' && h !== 12) h += 12;
+      if (m[3].toLowerCase() === 'am' && h === 12) h = 0;
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, min).getTime();
+    }
+    return now.getTime();
+  }
+  if (str === 'Yesterday') return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 12, 0).getTime();
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const mp = str && str.match(/^(\w{3})\s+(\d+)$/);
+  if (mp && months[mp[1]] !== undefined) {
+    const d = new Date(now.getFullYear(), months[mp[1]], parseInt(mp[2]), 12, 0);
+    if (d > now) d.setFullYear(now.getFullYear() - 1);
+    return d.getTime();
+  }
+  return now.getTime();
+}
+LEADS.forEach(l => { l.ts = parseLeadDate(l.date); });
+
 function pillHtml(q){return q==='hot'?'<span class="pill pill-hot">High</span>':q==='warm'?'<span class="pill pill-warm">Medium</span>':'<span class="pill pill-cold">Low</span>'}
 function statusHtml(s){const c=s==='New'?'dot-new':s==='Called'?'dot-called':'dot-follow';return`<span class="status-dot ${c}"></span>${s}`}
 
@@ -744,17 +779,18 @@ function renderOverview(demoLeadName){
   const tbody=document.getElementById('overviewBody');
   let rows=LEADS.slice(0,6),html='';
   if(demoLeadName){
-    html+=`<tr class="new-row" id="demoRow"><td><div class="name-cell"><div class="avatar" style="background:#16A34A">JC</div><span class="lead-name">James Carter</span></div></td><td>Storm Damage Repair</td><td><span class="pill pill-new" id="demoPill">New</span></td><td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>Received</td><td class="muted">Just now</td><td><button class="call-btn">Call</button></td></tr>`;
+    const _dts=Date.now();
+    html+=`<tr class="new-row" id="demoRow"><td><div class="name-cell"><div class="avatar" style="background:#16A34A">JC</div><span class="lead-name">James Carter</span></div></td><td>Storm Damage Repair</td><td><span class="pill pill-new" id="demoPill">New</span></td><td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>Received</td><td class="muted"><span data-ts="${_dts}">Just now</span></td><td><button class="call-btn">Call</button></td></tr>`;
     rows=LEADS.slice(0,5);
   }
-  rows.forEach(l=>{html+=`<tr><td><div class="name-cell"><div class="avatar" style="background:${l.color}">${l.initials}</div><span class="lead-name">${l.name}</span></div></td><td>${l.service}</td><td>${pillHtml(l.quality)}</td><td style="font-size:12px;color:var(--muted)">${statusHtml(l.status)}</td><td class="muted">${l.date}</td><td><button class="call-btn">Call</button></td></tr>`;});
+  rows.forEach(l=>{html+=`<tr><td><div class="name-cell"><div class="avatar" style="background:${l.color}">${l.initials}</div><span class="lead-name">${l.name}</span></div></td><td>${l.service}</td><td>${pillHtml(l.quality)}</td><td style="font-size:12px;color:var(--muted)">${statusHtml(l.status)}</td><td class="muted"><span data-ts="${l.ts}">${timeAgo(l.ts)}</span></td><td><button class="call-btn">Call</button></td></tr>`;});
   tbody.innerHTML=html;
   if(demoLeadName) setTimeout(()=>{const p=document.getElementById('demoPill');if(p){p.className='pill pill-hot';p.textContent='High';}},2500);
 }
 
 function renderLeads(){
   const tbody=document.getElementById('leadsBody');
-  tbody.innerHTML=LEADS.map(l=>`<tr><td><div class="name-cell"><div class="avatar" style="background:${l.color}">${l.initials}</div><span class="lead-name">${l.name}</span></div></td><td style="font-size:12px;color:var(--navy-mid)">${l.service}</td><td style="font-size:12px;color:var(--muted)">${l.location}</td><td style="font-size:13px;font-weight:600;color:var(--navy)">${l.budget}</td><td>${pillHtml(l.quality)}</td><td style="font-size:12px;color:var(--muted)">${statusHtml(l.status)}</td><td class="muted">${l.date}</td><td><button class="call-btn">Call</button></td></tr>`).join('');
+  tbody.innerHTML=LEADS.map(l=>`<tr><td><div class="name-cell"><div class="avatar" style="background:${l.color}">${l.initials}</div><span class="lead-name">${l.name}</span></div></td><td style="font-size:12px;color:var(--navy-mid)">${l.service}</td><td style="font-size:12px;color:var(--muted)">${l.location}</td><td style="font-size:13px;font-weight:600;color:var(--navy)">${l.budget}</td><td>${pillHtml(l.quality)}</td><td style="font-size:12px;color:var(--muted)">${statusHtml(l.status)}</td><td class="muted"><span data-ts="${l.ts}">${timeAgo(l.ts)}</span></td><td><button class="call-btn">Call</button></td></tr>`).join('');
 }
 
 // ─── CHART ──────────────────────────────────────────────────────────────────
@@ -805,7 +841,7 @@ async function startDemo(){
   setStep(0);spot(document.querySelector('.stats'));
   ['sc0','sc1','sc2','sc3'].forEach((id,i)=>{setTimeout(()=>{const el=document.getElementById(id);el.classList.add('demo-pop');setTimeout(()=>el.classList.remove('demo-pop'),600);},i*150);});
   await dd(2400);if(!demoActive)return;
-  setStep(1);renderOverview('James Carter');document.getElementById('sv0').textContent='29';document.getElementById('sc0').classList.add('demo-pop');setTimeout(()=>document.getElementById('sc0').classList.remove('demo-pop'),600);document.getElementById('leadsBadge').textContent='5';
+  setStep(1);renderOverview('James Carter');document.getElementById('sv0').textContent='29';document.getElementById('sc0').classList.add('demo-pop');setTimeout(()=>document.getElementById('sc0').classList.remove('demo-pop'),600);const _db=document.getElementById('leadsBadge');if(_db){_db.textContent='5';_db.style.display='flex';}
   await dd(400);const newRow=document.getElementById('demoRow');if(newRow)spot(newRow);showToast();
   await dd(2600);if(!demoActive)return;
   setStep(2);if(newRow){const btn=newRow.querySelector('.call-btn');if(btn)spot(btn);}
@@ -813,7 +849,23 @@ async function startDemo(){
   setStep(3);spot(document.getElementById('sc2'));document.getElementById('sc2').classList.add('demo-pop');
   await dd(2600);endDemo();
 }
-function endDemo(){demoActive=false;demoTimers.forEach(t=>clearTimeout(t));demoTimers=[];document.getElementById('demoOverlay').style.display='none';document.getElementById('demoSpot').style.opacity='0';document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('demo-pop'));}
+function endDemo(){
+  demoActive=false;
+  demoTimers.forEach(t=>clearTimeout(t));
+  demoTimers=[];
+  document.getElementById('demoOverlay').style.display='none';
+  document.getElementById('demoSpot').style.opacity='0';
+  document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('demo-pop'));
+  // Reset to clean new-user state so demo is replayable and new users start fresh
+  document.getElementById('sv0').innerText='0';
+  document.getElementById('sv1').innerText='0';
+  document.getElementById('sv2').innerText='0';
+  document.getElementById('sv3').innerText='$0';
+  const tb=document.getElementById('overviewBody'); if(tb) tb.innerHTML='';
+  const lb=document.getElementById('leadsBody');    if(lb) lb.innerHTML='';
+  const badge=document.getElementById('leadsBadge'); if(badge){badge.textContent='0';badge.style.display='none';}
+  const chips=document.getElementById('leadsChips'); if(chips) chips.innerHTML='';
+}
 
 // ─── BOT CONFIG — QUESTION BUILDER ──────────────────────────────────────────
 const QUESTION_TYPES = { text:'text', chips:'chips', phone:'phone' };
@@ -1279,6 +1331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 3. Inject Row into Table
+    const _ts = Date.now();
     const newRow = `
       <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
         <td>
@@ -1286,7 +1339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="avatar" style="background-color: var(--navy); color: white;">${lead.name.charAt(0).toUpperCase()}</div>
             <div>
               <div class="lead-name">${lead.name}</div>
-              <div class="muted">Just now</div>
+              <div class="muted"><span data-ts="${_ts}">Just now</span></div>
             </div>
           </div>
         </td>
@@ -1294,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td><strong>${lead.intent}</strong><br><span class="muted">${lead.budget || ''}</span></td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td><span class="status-dot dot-new"></span>New</td>
-        <td class="muted">Just now</td>
+        <td class="muted"><span data-ts="${_ts}">Just now</span></td>
         <td><button class="call-btn">1-Click Call</button></td>
       </tr>
     `;
@@ -1319,7 +1372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>New</td>
-        <td class="muted">Just now</td>
+        <td class="muted"><span data-ts="${_ts}">Just now</span></td>
         <td><button class="call-btn">1-Click Call</button></td>
       </tr>
     `;
@@ -1368,6 +1421,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let newPipeline = currentPipeline + addedValue;
     pipelineEl.innerText = '$' + newPipeline.toLocaleString(); // format with commas
   });
+
+  // Tick all live timestamps every 30 seconds
+  setInterval(() => {
+    document.querySelectorAll('[data-ts]').forEach(el => {
+      el.textContent = timeAgo(parseInt(el.dataset.ts));
+    });
+  }, 30000);
 </script>
 </body>
 </html>
