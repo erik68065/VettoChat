@@ -635,17 +635,23 @@ Phone: (214) 555-0192
             <div class="identity-grid">
               <div>
                 <label class="field-label">Assistant Name</label>
-                <input class="field-input" value="Aria — ABC Roofing Assistant" type="text">
-                <label class="field-label">Brand Color (Hex)</label>
-                <input class="field-input" value="#1E40AF" type="text">
+                <input class="field-input" id="identityName" value="Aria — ABC Roofing Assistant" type="text">
+                <label class="field-label">Chat Bubble Label</label>
+                <input class="field-input" id="identityLabel" value="Need a roof inspection?" type="text">
+                <label class="field-label">Brand Color</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+                  <input class="field-input" id="identityColor" value="#1E40AF" type="text" oninput="previewColor(this.value)" style="margin-bottom:0;flex:1;font-family:'JetBrains Mono',monospace;letter-spacing:.04em">
+                  <div id="colorSwatch" style="width:36px;height:36px;border-radius:6px;background:#1E40AF;flex-shrink:0;border:1px solid var(--border);transition:background .2s"></div>
+                </div>
               </div>
               <div>
                 <label class="field-label">Opening Message</label>
-                <textarea class="field-input field-textarea" style="height:96px">Hi, I'm Aria, the virtual assistant for ABC Roofing. I can prepare a free quote estimate in under 60 seconds. May I start with your name?</textarea>
+                <textarea class="field-input field-textarea" id="identityMessage" style="height:148px">Hi, I'm Aria, the virtual assistant for ABC Roofing. I can prepare a free quote estimate in under 60 seconds. May I start with your name?</textarea>
               </div>
             </div>
-            <div style="display:flex;justify-content:flex-end;margin-top:4px">
-              <button class="save-btn">Save Changes</button>
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
+              <span id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none">Syncing…</span>
+              <button class="save-btn" id="saveIdentityBtn" onclick="saveIdentity()">Save Changes</button>
             </div>
           </div>
         </div>
@@ -1113,6 +1119,36 @@ function sendTestSMS(){
   const toast = document.getElementById('smsToast');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ─── ASSISTANT IDENTITY SYNC ─────────────────────────────────────────────────
+const _vcChannel = new BroadcastChannel('vettochat_config');
+
+function previewColor(val) {
+  if (/^#[0-9A-Fa-f]{6}$/.test(val.trim()))
+    document.getElementById('colorSwatch').style.background = val.trim();
+}
+
+function saveIdentity() {
+  const config = {
+    assistantName:  document.getElementById('identityName').value.trim(),
+    chatLabel:      document.getElementById('identityLabel').value.trim(),
+    brandColor:     document.getElementById('identityColor').value.trim(),
+    openingMessage: document.getElementById('identityMessage').value.trim(),
+  };
+  localStorage.setItem('vettochat_config', JSON.stringify(config));
+  _vcChannel.postMessage(config);
+
+  const btn    = document.getElementById('saveIdentityBtn');
+  const status = document.getElementById('identitySyncStatus');
+  status.style.display = '';
+  status.textContent   = '✓ Synced to widget';
+  status.style.color   = '#059669';
+  btn.disabled = true;
+  setTimeout(() => {
+    status.style.display = 'none';
+    btn.disabled = false;
+  }, 2500);
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────

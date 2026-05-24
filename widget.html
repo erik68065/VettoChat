@@ -167,7 +167,7 @@
     <div class="chat-launcher">
       <div class="chat-label" id="chatLabel" onclick="openChat()">
         <div class="chat-label-dot"></div>
-        Need a roof inspection?
+        <span id="chatLabelText">Need a roof inspection?</span>
       </div>
       <button class="chat-btn" id="chatBtn" onclick="toggleChat()">
         <div class="chat-ring"></div>
@@ -182,7 +182,7 @@
           <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
         </div>
         <div class="chat-modal-info">
-          <h4>Vetto Assistant</h4>
+          <h4 id="widgetName">Vetto Assistant</h4>
           <div class="online-status">
             <div class="online-dot"></div>
             <div class="online-text">Online</div>
@@ -216,6 +216,42 @@
   </div>
 
   <script>
+// ─── CONFIG SYNC ─────────────────────────────────────────────────────────────
+const _vc_channel = new BroadcastChannel('vettochat_config');
+let _vc_config = {};
+
+function _vc_apply(cfg) {
+  if (!cfg || typeof cfg !== 'object') return;
+  _vc_config = cfg;
+
+  // Brand color — derive dark + light shades from single hex
+  if (cfg.brandColor && /^#[0-9A-Fa-f]{6}$/.test(cfg.brandColor)) {
+    const h = cfg.brandColor;
+    const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
+    const dk = [Math.round(r*.75), Math.round(g*.75), Math.round(b*.75)];
+    const lt = [Math.min(255,Math.round(r*1.35)), Math.min(255,Math.round(g*1.35)), Math.min(255,Math.round(b*1.35))];
+    const root = document.documentElement;
+    root.style.setProperty('--navy', h);
+    root.style.setProperty('--navy-dark', `rgb(${dk})`);
+    root.style.setProperty('--navy-light', `rgb(${lt})`);
+  }
+
+  // Assistant name in chat header
+  const nameEl = document.getElementById('widgetName');
+  if (nameEl && cfg.assistantName) nameEl.textContent = cfg.assistantName;
+
+  // Chat bubble label
+  const labelEl = document.getElementById('chatLabelText');
+  if (labelEl && cfg.chatLabel) labelEl.textContent = cfg.chatLabel;
+}
+
+// Apply saved config immediately on load
+try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
+
+// Live sync: apply the moment the dashboard saves
+_vc_channel.onmessage = e => _vc_apply(e.data);
+
+// ─────────────────────────────────────────────────────────────────────────────
 const S = {
   step: -1,
   data: {name:'',firstName:'',service:'',zip:'',urgency:'',budget:'',phone:''},
@@ -380,18 +416,15 @@ function startChat(){
   if(S.step>=0) return;
   $('chatInput').disabled=true; $('sendBtn').disabled=true;
   showTyping();
+  const openMsg = (_vc_config && _vc_config.openingMessage)
+    || "Hi! I'm your virtual assistant. I can get you a free quote in under 60 seconds — what's your full name?";
   setTimeout(()=>{
     removeTyping();
-    addBotMsg("Hi! I'm your virtual assistant, powered by VettoChat.");
-    showTyping();
-    setTimeout(()=>{
-      removeTyping();
-      addBotMsg("I can get you a free quote in under 60 seconds. What's your full name?");
-      S.step=0;
-      updateProgress();
-      $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus();
-    }, 1000);
-  }, 800);
+    addBotMsg(openMsg);
+    S.step=0;
+    updateProgress();
+    $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus();
+  }, 900);
 }
 
 function sendMessage(){
