@@ -1344,7 +1344,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </td>
         <td class="muted">${formattedPhone}</td>
-        <td><strong>${lead.intent}</strong><br><span class="muted">${lead.budget || ''}</span></td>
+        <td><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td><span class="status-dot dot-new"></span>New</td>
         <td class="muted"><span data-ts="${_ts}">Just now</span></td>
@@ -1367,7 +1367,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </td>
         <td class="muted">${formattedPhone}</td>
-        <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong></td>
+        <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
         <td style="font-size:12px;color:var(--muted)">${lead.location || '—'}</td>
         <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
         <td><span class="pill ${badgeClass}">${lead.status}</span></td>

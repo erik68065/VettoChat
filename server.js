@@ -38,8 +38,8 @@ function calculateLeadTier(leadData) {
   let score = 0;
 
   // Point Distribution
-  score += SCORING_MATRIX.urgency[leadData.budget] || 10; 
-  score += SCORING_MATRIX.intent[leadData.intent] || 15;  
+  score += SCORING_MATRIX.urgency[leadData.urgency] || 10;
+  score += SCORING_MATRIX.intent[leadData.intent] || 15;
 
   // Light NLP / Regex overrides for edge cases
   const highIntentKeywords = /(leak|flooding|tree fell|hole|hail|emergency)/i;

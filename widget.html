@@ -479,7 +479,8 @@ async function finishConversation() {
     name: S.data.name || S.data.firstName,
     phone: S.data.phone || 'N/A',
     intent: S.data.service || 'General Inquiry',
-    budget: S.data.urgency || 'Just browsing / Next month', // Aligned with server SCORING_MATRIX.urgency keys
+    urgency: S.data.urgency || 'Just browsing / Next month',
+    budget: S.data.budget || '',
     location: S.data.zip ? resolveCity(S.data.zip) : '',
     source_url: window.location.hostname
   };
