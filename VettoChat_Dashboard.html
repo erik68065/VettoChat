@@ -489,7 +489,7 @@ td.muted{font-size:12px;color:var(--muted)}
       <div class="card" style="margin-bottom:0">
         <div class="card-head">
           <div class="card-head-left"><h3>Recent Leads</h3><p>Automatically qualified and scored by <span data-an-name>(Assistant Name)</span></p></div>
-          <div class="chip chip-green"><div class="live-dot"></div><span data-an-name>(Assistant Name)</span> Active</div>
+          <div class="chip chip-green"><div class="live-dot"></div><span id="activeChipText">(Assistant Name) Active</span></div>
         </div>
         <table class="leads-table">
           <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
@@ -1143,6 +1143,10 @@ function syncAssistantName(raw) {
   document.querySelectorAll('[data-an-name]').forEach(el => {
     el.textContent = display;
   });
+
+  // Active chip — built as one string to avoid double spaces
+  const chipEl = document.getElementById('activeChipText');
+  if (chipEl) chipEl.textContent = `${display} Active`;
 
   // Auto-generate the locked opening message textarea
   const msgEl = document.getElementById('identityMessage');
