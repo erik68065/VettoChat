@@ -470,7 +470,7 @@ td.muted{font-size:12px;color:var(--muted)}
 <div class="main">
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">Overview</div>
-    <div class="topbar-date">Mar 19 – 25, 2025</div>
+    <div class="topbar-date" id="topbarDate"></div>
     <div class="live-chip"><div class="live-dot"></div>Live</div>
     <button class="play-btn" id="playBtn" onclick="startDemo()">
       <div class="play-icon"><svg viewBox="0 0 6 8"><polygon points="0,0 6,4 0,8"/></svg></div>
@@ -1285,9 +1285,24 @@ function saveIdentity() {
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+function setWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun
+  const mon = new Date(now); mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const fmt = (d, showYear) => d.toLocaleDateString('en-US', {month:'short', day:'numeric', ...(showYear ? {year:'numeric'} : {})});
+  const sameMonth = mon.getMonth() === sun.getMonth();
+  const label = sameMonth
+    ? `${fmt(mon)} – ${sun.getDate()}, ${sun.getFullYear()}`
+    : `${fmt(mon)} – ${fmt(sun, true)}`;
+  const el = document.getElementById('topbarDate');
+  if (el) el.textContent = label;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderOverview(null);
   loadIdentityForm();
+  setWeekRange();
   requestAnimationFrame(() => {
     document.getElementById('page-overview').classList.add('visible');
   });
