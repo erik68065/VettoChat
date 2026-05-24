@@ -834,8 +834,44 @@ function setPips(a){DEMO_STEPS.forEach((_,i)=>{const p=document.getElementById('
 function setStep(n){document.getElementById('hudStep').textContent=DEMO_STEPS[n].step;document.getElementById('hudDesc').textContent=DEMO_STEPS[n].desc;setPips(n);}
 function spot(el){const sp=document.getElementById('demoSpot');if(!el){sp.style.opacity='0';return;}const r=el.getBoundingClientRect();Object.assign(sp.style,{opacity:'1',left:(r.left-10)+'px',top:(r.top-10)+'px',width:(r.width+20)+'px',height:(r.height+20)+'px'});}
 function dd(ms){return new Promise(res=>{const t=setTimeout(res,ms);demoTimers.push(t);});}
+
+// Snapshot of real data taken just before demo starts
+let _demoSnapshot = null;
+
+function _captureSnapshot() {
+  const badge = document.getElementById('leadsBadge');
+  const chips = document.getElementById('leadsChips');
+  return {
+    overviewHTML: (document.getElementById('overviewBody') || {}).innerHTML || '',
+    leadsHTML:    (document.getElementById('leadsBody')    || {}).innerHTML || '',
+    sv0: document.getElementById('sv0').innerText,
+    sv1: document.getElementById('sv1').innerText,
+    sv2: document.getElementById('sv2').innerText,
+    sv3: document.getElementById('sv3').innerText,
+    badgeText:    badge ? badge.textContent    : '0',
+    badgeDisplay: badge ? badge.style.display  : 'none',
+    chipsHTML:    chips ? chips.innerHTML      : '',
+  };
+}
+
+function _restoreSnapshot(snap) {
+  if (!snap) return;
+  const tb = document.getElementById('overviewBody'); if (tb) tb.innerHTML = snap.overviewHTML;
+  const lb = document.getElementById('leadsBody');    if (lb) lb.innerHTML = snap.leadsHTML;
+  document.getElementById('sv0').innerText = snap.sv0;
+  document.getElementById('sv1').innerText = snap.sv1;
+  document.getElementById('sv2').innerText = snap.sv2;
+  document.getElementById('sv3').innerText = snap.sv3;
+  const badge = document.getElementById('leadsBadge');
+  if (badge) { badge.textContent = snap.badgeText; badge.style.display = snap.badgeDisplay; }
+  const chips = document.getElementById('leadsChips');
+  if (chips) chips.innerHTML = snap.chipsHTML;
+}
+
 async function startDemo(){
   if(demoActive)return;demoActive=true;
+  // Snapshot real data before touching anything
+  _demoSnapshot = _captureSnapshot();
   showPage('overview');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.querySelectorAll('.nav-item')[0].classList.add('active');renderOverview(null);
   const overlay=document.getElementById('demoOverlay');overlay.style.display='block';buildPips();
   setStep(0);spot(document.querySelector('.stats'));
@@ -849,6 +885,7 @@ async function startDemo(){
   setStep(3);spot(document.getElementById('sc2'));document.getElementById('sc2').classList.add('demo-pop');
   await dd(2600);endDemo();
 }
+
 function endDemo(){
   demoActive=false;
   demoTimers.forEach(t=>clearTimeout(t));
@@ -856,15 +893,9 @@ function endDemo(){
   document.getElementById('demoOverlay').style.display='none';
   document.getElementById('demoSpot').style.opacity='0';
   document.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('demo-pop'));
-  // Reset to clean new-user state so demo is replayable and new users start fresh
-  document.getElementById('sv0').innerText='0';
-  document.getElementById('sv1').innerText='0';
-  document.getElementById('sv2').innerText='0';
-  document.getElementById('sv3').innerText='$0';
-  const tb=document.getElementById('overviewBody'); if(tb) tb.innerHTML='';
-  const lb=document.getElementById('leadsBody');    if(lb) lb.innerHTML='';
-  const badge=document.getElementById('leadsBadge'); if(badge){badge.textContent='0';badge.style.display='none';}
-  const chips=document.getElementById('leadsChips'); if(chips) chips.innerHTML='';
+  // Restore the exact state that existed before the demo started
+  _restoreSnapshot(_demoSnapshot);
+  _demoSnapshot = null;
 }
 
 // ─── BOT CONFIG — QUESTION BUILDER ──────────────────────────────────────────
