@@ -419,8 +419,10 @@ function startChat(){
   if(S.step>=0) return;
   $('chatInput').disabled=true; $('sendBtn').disabled=true;
   showTyping();
-  const openMsg = (_vc_config && _vc_config.openingMessage)
-    || "Hi! I'm your virtual assistant. I can get you a free quote in under 60 seconds — what's your full name?";
+  const openMsg = (_vc_config.openingMessage)
+    || (_vc_config.assistantName
+        ? `Hi! I'm ${_vc_config.assistantName}. I can get you a free quote in under 60 seconds — what's your full name?`
+        : "Hi! I'm your virtual assistant. I can get you a free quote in under 60 seconds — what's your full name?");
   setTimeout(()=>{
     removeTyping();
     addBotMsg(openMsg);
