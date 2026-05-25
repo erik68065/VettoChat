@@ -96,6 +96,7 @@ const { PrismaClient } = require('@prisma/client'); // Connects to our Vault
 
 // 1. Initialize Express & Middleware
 const app = express();
+app.use(express.static(__dirname));
 app.use(express.json());
 app.use(cors({ origin: '*' })); 
 
