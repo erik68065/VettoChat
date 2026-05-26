@@ -219,11 +219,49 @@
 // ─── CONFIG SYNC ─────────────────────────────────────────────────────────────
 let _vc_config = {};
 
+// ── Default roofing conversation flow ────────────────────────────────────────
+const DEFAULT_STEPS = [
+  { key:'name',     type:'text',  question:'',
+    placeholder:'Enter your full name…' },
+  { key:'service',  type:'chips', question:'What roofing service do you need?',
+    placeholder:'Or type your service…',
+    chips:[{label:'Full Replacement'},{label:'Leak Repair'},{label:'Storm Damage'},
+           {label:'New Install'},{label:'Gutters'},{label:'Inspection'}] },
+  { key:'location', type:'text',  question:'What city or zip code are you in?',
+    placeholder:'City or zip code…' },
+  { key:'urgency',  type:'chips', question:'How soon do you need this done?',
+    placeholder:'Or describe urgency…',
+    chips:[{label:'Emergency (Within 24h)'},{label:'This week'},{label:'Just browsing / Next month'}] },
+  { key:'budget',   type:'chips', question:"What's your approximate budget for this project?",
+    placeholder:'Or enter an amount…',
+    chips:[{label:'$15K+'},{label:'$5K–$15K'},{label:'$1K–$5K'},{label:'Under $1K'},{label:'Need Estimate'}] },
+  { key:'phone',    type:'phone', question:'Last step — what number should we call you at?',
+    placeholder:'10-digit phone number…' },
+];
+
+function buildSteps(cfg) {
+  if (cfg && cfg.steps && Array.isArray(cfg.steps) && cfg.steps.length >= 1) {
+    return cfg.steps
+      .filter(s => s.enabled !== false)
+      .map(s => ({
+        key:         s.key,
+        type:        s.type || 'text',
+        question:    s.question || '',
+        placeholder: s.placeholder || 'Type your answer…',
+        chips:       Array.isArray(s.chips)
+          ? s.chips.map(c => ({ label: typeof c === 'string' ? c : c.label }))
+          : []
+      }));
+  }
+  return DEFAULT_STEPS;
+}
+
+let STEPS = DEFAULT_STEPS;
+
 function _vc_apply(cfg) {
   if (!cfg || typeof cfg !== 'object') return;
   _vc_config = cfg;
 
-  // Brand color — derive dark + light shades from single hex
   if (cfg.brandColor && /^#[0-9A-Fa-f]{6}$/.test(cfg.brandColor)) {
     const h = cfg.brandColor;
     const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
@@ -235,55 +273,37 @@ function _vc_apply(cfg) {
     root.style.setProperty('--navy-light', `rgb(${lt})`);
   }
 
-  // Assistant name in chat header
   const nameEl = document.getElementById('widgetName');
   if (nameEl) nameEl.textContent = cfg.assistantName || 'Assistant';
 
-  // Chat bubble label
   const labelEl = document.getElementById('chatLabelText');
   if (labelEl && cfg.chatLabel) labelEl.textContent = cfg.chatLabel;
+
+  STEPS = buildSteps(cfg);
 }
 
-// Apply saved config immediately on load
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
-// Live sync via storage event — fires in THIS tab when ANOTHER tab writes localStorage
 window.addEventListener('storage', e => {
   if (e.key === 'vettochat_config' && e.newValue) {
-    try { _vc_apply(JSON.parse(e.newValue)); } catch(err) {}
+    try {
+      const cfg = JSON.parse(e.newValue);
+      _vc_apply(cfg);
+      if (S.step < 0) {
+        STEPS = buildSteps(cfg);
+        S.data = Object.fromEntries(STEPS.map(s => [s.key, '']));
+      }
+    } catch(err) {}
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 const S = {
   step: -1,
-  data: {name:'',firstName:'',service:'',zip:'',urgency:'',budget:'',phone:''},
+  data: Object.fromEntries(STEPS.map(s => [s.key, ''])),
   done: false,
   opened: false
 };
-
-const STEPS = [
-  { key:'name',    type:'text',   placeholder:'Enter your full name…' },
-  { key:'service', type:'chips',  placeholder:'Or type your service…',
-    chips:[
-      {label:'Full Replacement'},{label:'Leak Repair'},
-      {label:'Storm Damage'},{label:'New Install'},
-      {label:'Gutters'},{label:'Inspection'}
-    ]},
-  { key:'zip',     type:'text',   placeholder:'City or zip code…' },
-  { key:'urgency', type:'chips',  placeholder:'Or describe urgency…',
-    chips:[
-      {label:'Emergency (Within 24h)'},{label:'This week'},
-      {label:'Just browsing / Next month'}
-    ]},
-  { key:'budget',  type:'chips',  placeholder:'Or enter an amount…',
-    chips:[
-      {label:'Under $1K'},{label:'$1K–$5K'},
-      {label:'$5K–$15K'},{label:'$15K+'},
-      {label:'Need Estimate'}
-    ]},
-  { key:'phone',   type:'text',   placeholder:'10-digit phone number…' }
-];
 
 const ZIP_TO_CITY = {
   '75025':'Plano','75023':'Plano','75024':'Plano','75026':'Plano','75074':'Plano','75075':'Plano',
@@ -376,47 +396,44 @@ function selectChip(label, key, wrap){
 }
 
 function updateProgress(){
-  const step=S.step;
-  for(let i=0;i<6;i++){
-    const el=$('ps'+i);
-    if(!el) continue;
-    el.className='prog-step'+(i<step?' done':i===step?' current':'');
+  const step = S.step;
+  const total = STEPS.length;
+  for (let i = 0; i < total; i++) {
+    const el = $('ps' + i);
+    if (!el) continue;
+    el.className = 'prog-step' + (i < step ? ' done' : i === step ? ' current' : '');
   }
-  $('progressLabel').textContent = step>=6 ? 'Complete' : `Step ${step+1} of 6`;
+  const lbl = $('progressLabel');
+  if (lbl) lbl.textContent = step >= total ? 'Complete' : `Step ${step + 1} of ${total}`;
 }
 
 function askStep(step){
-  const cfg=STEPS[step];
-  if(!cfg) return;
-  $('chatInput').placeholder=cfg.placeholder;
-  $('chatInput').disabled=cfg.type==='chips';
-  $('sendBtn').disabled=cfg.type==='chips';
+  const cfg = STEPS[step];
+  if (!cfg) return;
+  $('chatInput').placeholder = cfg.placeholder || 'Type your answer…';
+  const isChips = cfg.type === 'chips';
+  $('chatInput').disabled = isChips;
+  $('sendBtn').disabled = isChips;
 
-  const qMap=[
-    null,
-    `Nice to meet you, <strong>${S.data.firstName}</strong>! What roofing service do you need?`,
-    `Got it — <em>${S.data.service}</em>. What's your city or zip code?<br><small style="color:#94A3B8;font-size:12px">We serve Plano, Frisco, McKinney &amp; surrounding DFW areas.</small>`,
-    `We service ${S.data.zip}. How soon do you need this done?`,
-    `Understood. What's your approximate budget for this project?`,
-    `Almost there. What's the best phone number to reach you?`
-  ];
-
-  if(step>0){
+  if (step > 0) {
     showTyping();
-    setTimeout(()=>{
+    setTimeout(() => {
       removeTyping();
-      addBotMsg(qMap[step]);
-      if(cfg.type==='chips') addChips(cfg.chips, cfg.key);
-      else { $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus(); }
+      addBotMsg(cfg.question || 'Please continue:');
+      if (isChips) addChips(cfg.chips, cfg.key);
+      else { $('chatInput').disabled = false; $('sendBtn').disabled = false; $('chatInput').focus(); }
     }, 850);
   } else {
-    if(cfg.type==='chips') addChips(cfg.chips, cfg.key);
-    else { $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus(); }
+    if (isChips) addChips(cfg.chips, cfg.key);
+    else { $('chatInput').disabled = false; $('sendBtn').disabled = false; $('chatInput').focus(); }
   }
 }
 
 function startChat(){
   if(S.step>=0) return;
+  // Build progress dots for current step count
+  const stepsEl = document.querySelector('.progress-steps');
+  if (stepsEl) stepsEl.innerHTML = STEPS.map((_, i) => `<div class="prog-step" id="ps${i}"></div>`).join('');
   $('chatInput').disabled=true; $('sendBtn').disabled=true;
   showTyping();
   const openMsg = _vc_config.openingMessage
@@ -450,11 +467,11 @@ function advanceStep(val, isChip){
     if(key==='name' && !V.name(val)){
       showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.name,'error'); }, 700); return;
     }
-    if(key==='zip' && !V.zip(val)){
-      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.zip,'error'); }, 700); return;
-    }
-    if(key==='phone' && !V.phone(val)){
+    if((cfg.type==='phone'||key==='phone') && !V.phone(val)){
       showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.phone,'error'); }, 700); return;
+    }
+    if(!val.trim()){
+      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg('Please provide an answer to continue.','error'); }, 700); return;
     }
     S.data[key]=val;
   }
@@ -478,13 +495,13 @@ async function finishConversation() {
   const rawName = S.data.name || S.data.firstName || '';
   const fullName = rawName.replace(/\b\w/g, c => c.toUpperCase());
   const leadPayload = {
-    name:      fullName,
-    firstName: fullName,
-    phone:    S.data.phone || 'N/A',
-    intent:   S.data.service || 'General Inquiry',
-    urgency:  S.data.urgency || 'Just browsing / Next month',
-    budget:   S.data.budget || '',
-    location: S.data.zip ? resolveCity(S.data.zip) : '',
+    name:       fullName,
+    firstName:  fullName,
+    phone:      S.data.phone || 'N/A',
+    intent:     S.data.service || S.data.intent || 'General Inquiry',
+    urgency:    S.data.urgency || 'Not specified',
+    budget:     S.data.budget || '',
+    location:   S.data.location || (S.data.zip ? resolveCity(S.data.zip) : ''),
     source_url: window.location.hostname
   };
 
