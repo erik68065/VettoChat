@@ -1471,11 +1471,36 @@ document.addEventListener('DOMContentLoaded', () => {
     pipelineEl.innerText = '$' + newPipeline.toLocaleString(); // format with commas
   });
 
-  // Tick all live timestamps every 30 seconds
+  // Every 30 seconds: tick timestamps + resync counts from actual DOM state
   setInterval(() => {
+    // 1. Update all relative timestamps
     document.querySelectorAll('[data-ts]').forEach(el => {
       el.textContent = timeAgo(parseInt(el.dataset.ts));
     });
+
+    // 2. Resync leads page chips from what's actually in the table
+    const leadsBody = document.getElementById('leadsBody');
+    const chipsEl   = document.getElementById('leadsChips');
+    if (leadsBody && chipsEl) {
+      const totalRows = leadsBody.querySelectorAll('tr').length;
+      const hotRows   = leadsBody.querySelectorAll('.pill-hot').length;
+      if (totalRows > 0) {
+        chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
+                            `<span class="chip chip-blue">${totalRows} Total</span>`;
+      }
+    }
+
+    // 3. Resync stat cards from actual DOM counts
+    const overviewBody = document.getElementById('overviewBody');
+    const leadsBody2   = document.getElementById('leadsBody');
+    if (overviewBody && leadsBody2) {
+      const totalLeads = leadsBody2.querySelectorAll('tr').length;
+      const hotLeads   = leadsBody2.querySelectorAll('.pill-hot').length;
+      if (totalLeads > 0) {
+        document.getElementById('sv0').innerText = totalLeads;
+        document.getElementById('sv1').innerText = hotLeads;
+      }
+    }
   }, 30000);
 </script>
 </body>
