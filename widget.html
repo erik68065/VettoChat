@@ -475,12 +475,14 @@ async function finishConversation() {
   disableInput();
   showTyping();
   
+  const fullName = S.data.name || S.data.firstName || '';
   const leadPayload = {
-    name: S.data.name || S.data.firstName,
-    phone: S.data.phone || 'N/A',
-    intent: S.data.service || 'General Inquiry',
-    urgency: S.data.urgency || 'Just browsing / Next month',
-    budget: S.data.budget || '',
+    name:      fullName,
+    firstName: fullName,
+    phone:    S.data.phone || 'N/A',
+    intent:   S.data.service || 'General Inquiry',
+    urgency:  S.data.urgency || 'Just browsing / Next month',
+    budget:   S.data.budget || '',
     location: S.data.zip ? resolveCity(S.data.zip) : '',
     source_url: window.location.hostname
   };
