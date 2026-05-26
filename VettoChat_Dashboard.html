@@ -1165,13 +1165,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('new_lead', (lead) => {
     
-    // Resolve display name — new widget sends firstName, old sent name
+    // Resolve display name
     const leadName = lead.name || lead.firstName || 'Unknown';
 
-    // Map status to badge — server may return High/Medium/Low or Hot/Warm/Cold
+    // Map status to badge class and friendly label
     let badgeClass = 'pill-cold';
-    if (lead.status === 'High' || lead.status === 'Hot') badgeClass = 'pill-hot';
-    if (lead.status === 'Medium' || lead.status === 'Warm') badgeClass = 'pill-warm';
+    let badgeLabel = lead.status || 'Cold';
+    if (lead.status === 'Hot'  || lead.status === 'High')   { badgeClass = 'pill-hot';  badgeLabel = 'High'; }
+    if (lead.status === 'Warm' || lead.status === 'Medium') { badgeClass = 'pill-warm'; badgeLabel = 'Medium'; }
+    if (lead.status === 'Cold' || lead.status === 'Low')    { badgeClass = 'pill-cold'; badgeLabel = 'Low'; }
     
     // Format phone number (e.g. 9725551234 -> (972) 555-1234)
     let formattedPhone = lead.phone;

@@ -125,14 +125,30 @@ app.post('/api/leads/capture', async (req, res) => {
     // 1. Fallback for testing (before we create our first real tenant)
     const tenantId = leadData.tenantId || "test-tenant-id"; 
 
-    // 2. Score the Lead
+    // 2. Score the Lead — matches the dashboard scoring UI
     let score = 0;
-    if (leadData.intent && (leadData.intent.toLowerCase().includes('leak') || leadData.intent.toLowerCase().includes('storm'))) score += 40;
-    if (leadData.urgency && (leadData.urgency.toLowerCase().includes('24h') || leadData.urgency.toLowerCase().includes('emergency'))) score += 50;
+
+    const intent  = (leadData.intent  || '').toLowerCase();
+    const urgency = (leadData.urgency || '').toLowerCase();
+    const budget  = (leadData.budget  || '').toLowerCase();
+
+    // Intent scoring
+    if (intent.includes('storm') || intent.includes('full replacement') || intent.includes('emergency')) score += 40;
+    else if (intent.includes('leak') || intent.includes('repair') || intent.includes('new install')) score += 25;
+
+    // Urgency scoring
+    if (urgency.includes('emergency') || urgency.includes('24h')) score += 50;
+    else if (urgency.includes('this week')) score += 30;
+    else score += 10;
+
+    // Budget scoring
+    if (budget.includes('15k') || budget.includes('15,000')) score += 15;
+    else if (budget.includes('5k') || budget.includes('5,000')) score += 10;
+    else if (budget.includes('1k') || budget.includes('1,000')) score += 5;
 
     let status = 'Cold';
-    if (score >= 80) status = 'Hot';
-    else if (score >= 50) status = 'Warm';
+    if (score >= 75) status = 'Hot';
+    else if (score >= 40) status = 'Warm';
 
     // 3. Save to Database (Wrapped in try/catch to not crash if tenant doesn't exist yet)
     let dbLead = null;
@@ -154,8 +170,14 @@ app.post('/api/leads/capture', async (req, res) => {
       console.log("⚠️ Could not save to DB (Tenant likely missing). Proceeding in memory mode.");
     }
 
-    // 4. Enrich payload for the dashboard
-    const enrichedLead = dbLead || { ...leadData, score, status, timestamp: new Date() };
+    // 4. Enrich payload — always include all widget fields so nothing is lost
+    const enrichedLead = {
+      ...leadData,                  // name, budget, location, source_url, etc.
+      score,
+      status,
+      timestamp: new Date(),
+      ...(dbLead ? { id: dbLead.id, createdAt: dbLead.createdAt } : {})
+    };
 
     // 5. Emit instantly to the active VettoChat Dashboard
     // In production, we use: io.to(tenantId).emit('new_lead', enrichedLead);
