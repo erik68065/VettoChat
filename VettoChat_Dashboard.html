@@ -1365,10 +1365,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('new_lead', (lead) => {
     
-    // Map the new High/Medium/Low statuses to your CSS badge colors
-    let badgeClass = 'pill-cold'; // Default to Low
-    if (lead.status === 'High') badgeClass = 'pill-hot';
-    if (lead.status === 'Medium') badgeClass = 'pill-warm';
+    // Resolve display name — new widget sends firstName, old sent name
+    const leadName = lead.name || lead.firstName || 'Unknown';
+
+    // Map status to badge — server may return High/Medium/Low or Hot/Warm/Cold
+    let badgeClass = 'pill-cold';
+    if (lead.status === 'High' || lead.status === 'Hot') badgeClass = 'pill-hot';
+    if (lead.status === 'Medium' || lead.status === 'Warm') badgeClass = 'pill-warm';
     
     // Format phone number (e.g. 9725551234 -> (972) 555-1234)
     let formattedPhone = lead.phone;
@@ -1382,9 +1385,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
         <td>
           <div class="name-cell">
-            <div class="avatar" style="background-color: var(--navy); color: white;">${lead.name.charAt(0).toUpperCase()}</div>
+            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
             <div>
-              <div class="lead-name">${lead.name}</div>
+              <div class="lead-name">${leadName}</div>
               <div class="muted"><span data-ts="${_ts}">Just now</span></div>
             </div>
           </div>
@@ -1406,9 +1409,9 @@ document.addEventListener('DOMContentLoaded', () => {
       <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
         <td>
           <div class="name-cell">
-            <div class="avatar" style="background-color: var(--navy); color: white;">${lead.name.charAt(0).toUpperCase()}</div>
+            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
             <div>
-              <div class="lead-name">${lead.name}</div>
+              <div class="lead-name">${leadName}</div>
             </div>
           </div>
         </td>
@@ -1439,7 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
     totalLeadsEl.innerText = parseInt(totalLeadsEl.innerText) + 1;
 
     // Update Hot Leads counter
-    if (lead.status === 'High') {
+    if (lead.status === 'High' || lead.status === 'Hot') {
       const hotEl = document.getElementById('sv1');
       hotEl.innerText = parseInt(hotEl.innerText) + 1;
     }
