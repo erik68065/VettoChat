@@ -1336,20 +1336,14 @@ function setEditorContent(message, name) {
   const editor = document.getElementById('identityMessage');
   if (!editor) return;
   const display = name || '(Assistant Name)';
-  let before = "Hi! I'm ", after = ". I can get you a free quote in under 60 seconds — what's your full name?";
+  let before = "Hi! I'm", after = ". I can get you a free quote in under 60 seconds — what's your full name?";
   if (message) {
     const i = message.indexOf(name || display);
     if (i !== -1) { before = message.slice(0, i); after = message.slice(i + (name || display).length); }
   }
-  // Peel any leading punctuation into its own non-editable span so the browser
-  // can't inject an implicit space between the name chip and the character after it.
-  const punctMatch = after.match(/^([.!?,;:]+)([\s\S]*)$/);
-  const punct = punctMatch ? punctMatch[1] : '';
-  const afterRest = punctMatch ? punctMatch[2] : after;
   editor.innerHTML = _esc(before) +
     `<span class="an-name-chip" contenteditable="false">${_esc(display)}</span>` +
-    (punct ? `<span contenteditable="false">${_esc(punct)}</span>` : '') +
-    _esc(afterRest);
+    _esc(after);
 }
 
 function syncAssistantName(raw) {
