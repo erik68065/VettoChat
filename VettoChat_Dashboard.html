@@ -134,7 +134,7 @@ td.muted{font-size:12px;color:var(--muted)}
 .field-textarea{min-height:72px;resize:vertical}
 .msg-editor{min-height:120px;white-space:pre-wrap;word-break:break-word;cursor:text;outline:none;line-height:1.6;padding:9px 12px}
 .msg-editor:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.an-name-chip{display:inline;background:#EFF6FF;color:#1E40AF;font-weight:700;border-radius:4px;padding:1px 6px;margin-right:-4px;cursor:not-allowed;user-select:none;font-size:13px}
+.an-name-chip{display:inline;background:#EFF6FF;color:#1E40AF;font-weight:700;border-radius:4px;padding:1px 6px;cursor:not-allowed;user-select:none;font-size:13px}
 .color-preset{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
 .color-preset:hover{transform:scale(1.2);border-color:rgba(0,0,0,0.2)}
 .save-btn{padding:10px 20px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s}
@@ -1341,9 +1341,15 @@ function setEditorContent(message, name) {
     const i = message.indexOf(name || display);
     if (i !== -1) { before = message.slice(0, i); after = message.slice(i + (name || display).length); }
   }
+  // Peel any leading punctuation into its own non-editable span so the browser
+  // can't inject an implicit space between the name chip and the character after it.
+  const punctMatch = after.match(/^([.!?,;:]+)([\s\S]*)$/);
+  const punct = punctMatch ? punctMatch[1] : '';
+  const afterRest = punctMatch ? punctMatch[2] : after;
   editor.innerHTML = _esc(before) +
     `<span class="an-name-chip" contenteditable="false">${_esc(display)}</span>` +
-    _esc(after);
+    (punct ? `<span contenteditable="false">${_esc(punct)}</span>` : '') +
+    _esc(afterRest);
 }
 
 function syncAssistantName(raw) {
