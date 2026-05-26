@@ -1465,11 +1465,33 @@ function loadIdentityForm() {
       if (bcInited) renderQB();
     }
 
+    // Restore which template card should be highlighted
+    if (saved && saved.activeTemplate) {
+      _activeTemplate = saved.activeTemplate;
+      if (bcInited) renderTemplates();
+    }
+
+    // Restore scoring tier assignments (HOT/WARM/COLD) so they survive page reloads
+    if (saved && saved.scoring && Array.isArray(saved.scoring) && saved.scoring.length) {
+      SCORING_QUESTIONS.length = 0;
+      saved.scoring.forEach(sq => {
+        SCORING_QUESTIONS.push({
+          id: sq.id, label: sq.label, question: sq.question,
+          answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+        });
+      });
+    }
+
     // Push defaults to localStorage on first load so the widget gets them immediately
     if (!raw) {
       localStorage.setItem('vettochat_config', JSON.stringify({
         assistantName: name, brandColor: color, chatLabel: label, openingMessage: msg,
-        steps: questionsToSteps(questions)
+        steps: questionsToSteps(questions),
+        activeTemplate: _activeTemplate,
+        scoring: SCORING_QUESTIONS.map(sq => ({
+          id: sq.id, label: sq.label, question: sq.question,
+          answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+        }))
       }));
     }
   } catch(e) {}
@@ -1494,6 +1516,11 @@ function saveIdentity() {
     brandColor:     document.getElementById('identityColor').value.trim(),
     openingMessage: document.getElementById('identityMessage').innerText.trim(),
     steps:          questionsToSteps(questions),
+    activeTemplate: _activeTemplate,
+    scoring:        SCORING_QUESTIONS.map(sq => ({
+      id: sq.id, label: sq.label, question: sq.question,
+      answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+    })),
   };
   // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
