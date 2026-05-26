@@ -899,8 +899,7 @@ function initBotConfig(){
   if(bcInited) return;
   bcInited = true;
   renderTemplates();
-  renderQB();
-  renderScoring();
+  renderQB(); // renderQB calls syncScoringFromQuestions → renderScoring
 }
 
 function renderQB(){
@@ -985,6 +984,7 @@ function renderQB(){
 
     list.appendChild(wrap);
   });
+  syncScoringFromQuestions();
 }
 
 function renderChipEditor(container, q) {
@@ -998,6 +998,7 @@ function renderChipEditor(container, q) {
     inp.oninput = function() {
       this.style.width = Math.max(this.value.length * 7.5, 28) + 'px';
       q.chips[i] = this.value;
+      syncScoringFromQuestions();
     };
     const rm = document.createElement('button');
     rm.className = 'chtag-rm';
@@ -1026,8 +1027,19 @@ function renderChipEditor(container, q) {
   container.appendChild(addBtn);
 }
 
-function updateQText(id, val){ const q = questions.find(x => x.id === id); if(q) q.text = val; }
-function toggleQ(id, el){ const q = questions.find(x => x.id === id); if(!q) return; q.enabled = !q.enabled; el.classList.toggle('on', q.enabled); }
+function updateQText(id, val) {
+  const q = questions.find(x => x.id === id);
+  if (!q) return;
+  q.text = val;
+  syncScoringFromQuestions();
+}
+function toggleQ(id, el) {
+  const q = questions.find(x => x.id === id);
+  if (!q) return;
+  q.enabled = !q.enabled;
+  el.classList.toggle('on', q.enabled);
+  syncScoringFromQuestions();
+}
 function deleteQ(id){ if(questions.length <= 1) return; questions = questions.filter(x => x.id !== id); renderQB(); }
 function addQuestion(){
   const id = nextId++;
@@ -1040,6 +1052,36 @@ function addQuestion(){
 }
 
 // ─── BOT CONFIG — LEAD SCORING ───────────────────────────────────────────────
+let _scoringSyncLocked = false; // applyTemplate sets scoring directly; this prevents overwrite
+
+function syncScoringFromQuestions() {
+  if (_scoringSyncLocked) return;
+
+  // Preserve existing tier assignments by label so edits don't reset HOT/WARM/COLD
+  const tierCache = {};
+  SCORING_QUESTIONS.forEach(sq => {
+    tierCache[sq.id] = {};
+    sq.answers.forEach(a => { tierCache[sq.id][a.label] = a.tier; });
+  });
+
+  // Rebuild from every enabled chips-type question
+  const next = [];
+  questions.forEach(q => {
+    if (q.type !== 'chips' || q.enabled === false || !q.chips.length) return;
+    const cache = tierCache[q.key] || {};
+    next.push({
+      id:       q.key,
+      label:    q.text,
+      question: q.text,
+      answers:  q.chips.map(chip => ({ label: chip, tier: cache[chip] || 'warm' }))
+    });
+  });
+
+  SCORING_QUESTIONS.length = 0;
+  next.forEach(sq => SCORING_QUESTIONS.push(sq));
+  renderScoring();
+}
+
 let SCORING_QUESTIONS = [
   {
     id: 'service', label: 'Service Type',
@@ -1282,7 +1324,9 @@ function applyTemplate(id) {
     });
   });
 
+  _scoringSyncLocked = true;
   renderQB();
+  _scoringSyncLocked = false;
   renderScoring();
   renderTemplates();
 
