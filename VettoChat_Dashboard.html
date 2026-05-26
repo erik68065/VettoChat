@@ -1430,14 +1430,10 @@ function setEditorContent(message, name) {
   const editor = document.getElementById('identityMessage');
   if (!editor) return;
   const display = name || '(Assistant Name)';
-  let before = "Hi! I'm", after = ". I can get you a free quote in under 60 seconds — what's your full name?";
-  if (message) {
-    const i = message.indexOf(name || display);
-    if (i !== -1) { before = message.slice(0, i); after = message.slice(i + (name || display).length); }
-  }
-  editor.innerHTML = _esc(before) +
-    `<span class="an-name-chip" contenteditable="false">${_esc(display)}</span>` +
-    _esc(after);
+  const msg = message || buildOpeningMsg(name);
+  // Preview is fully locked — plain innerHTML, no contenteditable spans, no browser-injected spaces
+  const parts = msg.split(display);
+  editor.innerHTML = parts.map(p => _esc(p)).join(`<span class="an-name-chip">${_esc(display)}</span>`);
 }
 
 function syncAssistantName(raw) {
@@ -1455,13 +1451,8 @@ function syncAssistantName(raw) {
   const q1Chip = document.querySelector('#q1Editor .an-name-chip');
   if (q1Chip) q1Chip.textContent = display;
 
-  // Update the locked opening-message preview below
-  const msgChip = document.querySelector('#identityMessage .an-name-chip');
-  if (msgChip) {
-    msgChip.textContent = display;
-  } else {
-    setEditorContent(buildOpeningMsg(_assistantName), _assistantName);
-  }
+  // Re-render the locked opening-message preview (plain innerHTML, no space issues)
+  setEditorContent(buildOpeningMsg(_assistantName), _assistantName);
 }
 
 function previewColor(val) {
