@@ -119,8 +119,8 @@ io.on('connection', (socket) => {
 // --- CORE INGESTION ENDPOINT ---
 app.post('/api/leads/capture', async (req, res) => {
   try {
-    const leadData = req.body; 
-    console.log("📥 New Lead Captured:", leadData.firstName);
+    const leadData = req.body;
+    console.log("📥 New Lead Captured:", leadData.firstName, "| budget:", leadData.budget, "| location:", leadData.location);
 
     // 1. Fallback for testing (before we create our first real tenant)
     const tenantId = leadData.tenantId || "test-tenant-id"; 
@@ -141,8 +141,8 @@ app.post('/api/leads/capture', async (req, res) => {
     else if (urgency.includes('this week')) score += 30;
     else score += 10;
 
-    // Budget scoring
-    if (budget.includes('15k') || budget.includes('15,000')) score += 15;
+    // Budget scoring — order matters: check '$15k+' before '$5k–$15k' to avoid false matches
+    if (budget.startsWith('$15k') || budget.includes('15,000') || budget.includes('15k+')) score += 15;
     else if (budget.includes('5k') || budget.includes('5,000')) score += 10;
     else if (budget.includes('1k') || budget.includes('1,000')) score += 5;
 
@@ -182,6 +182,7 @@ app.post('/api/leads/capture', async (req, res) => {
     // 5. Emit instantly to the active VettoChat Dashboard
     // In production, we use: io.to(tenantId).emit('new_lead', enrichedLead);
     // For now, we will broadcast so your current dashboard still works!
+    console.log("📤 Emitting to dashboard — budget:", enrichedLead.budget, "| location:", enrichedLead.location);
     io.emit('new_lead', enrichedLead);
     
     return res.status(200).json({ success: true, lead: enrichedLead });

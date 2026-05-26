@@ -1164,7 +1164,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const socket = io(SERVER_URL);
 
   socket.on('new_lead', (lead) => {
-    
+    console.log('[VettoChat] Received lead:', JSON.stringify(lead));
+
     // Resolve display name
     const leadName = lead.name || lead.firstName || 'Unknown';
 
