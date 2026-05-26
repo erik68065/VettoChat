@@ -135,6 +135,8 @@ td.muted{font-size:12px;color:var(--muted)}
 .msg-editor{min-height:120px;white-space:pre-wrap;word-break:break-word;cursor:text;outline:none;line-height:1.6;padding:9px 12px}
 .msg-editor:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
 .an-name-chip{display:inline;background:#EFF6FF;color:#1E40AF;font-weight:700;border-radius:4px;padding:1px 6px;cursor:not-allowed;user-select:none;font-size:13px}
+.color-preset{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
+.color-preset:hover{transform:scale(1.2);border-color:rgba(0,0,0,0.2)}
 .save-btn{padding:10px 20px;background:var(--orange);color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s}
 .save-btn:hover{background:var(--orange-h)}
 .toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
@@ -642,9 +644,27 @@ Phone: (214) 555-0192
                 <label class="field-label">Chat Bubble Label</label>
                 <input class="field-input" id="identityLabel" value="Need a roof inspection?" type="text">
                 <label class="field-label">Brand Color</label>
-                <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
-                  <input class="field-input" id="identityColor" value="#1E40AF" type="text" oninput="previewColor(this.value)" style="margin-bottom:0;flex:1;font-family:'JetBrains Mono',monospace;letter-spacing:.04em">
-                  <div id="colorSwatch" style="width:36px;height:36px;border-radius:6px;background:#1E40AF;flex-shrink:0;border:1px solid var(--border);transition:background .2s"></div>
+                <div style="margin-bottom:14px">
+                  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+                    <input class="field-input" id="identityColor" value="#1E40AF" type="text" oninput="previewColor(this.value)" placeholder="#1E40AF" style="margin-bottom:0;flex:1;font-family:'JetBrains Mono',monospace;letter-spacing:.04em">
+                    <div id="colorSwatch" onclick="document.getElementById('colorPickerNative').click()" title="Click to open color picker" style="width:36px;height:36px;border-radius:6px;background:#1E40AF;flex-shrink:0;border:1px solid var(--border);transition:background .2s;cursor:pointer;position:relative">
+                      <input type="color" id="colorPickerNative" value="#1E40AF" oninput="syncColorPicker(this.value)" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer;border:none;padding:0">
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:7px">
+                    <div class="color-preset" style="background:#1E40AF" onclick="applyPresetColor('#1E40AF')" title="Navy Blue"></div>
+                    <div class="color-preset" style="background:#2563EB" onclick="applyPresetColor('#2563EB')" title="Blue"></div>
+                    <div class="color-preset" style="background:#7C3AED" onclick="applyPresetColor('#7C3AED')" title="Purple"></div>
+                    <div class="color-preset" style="background:#DB2777" onclick="applyPresetColor('#DB2777')" title="Pink"></div>
+                    <div class="color-preset" style="background:#DC2626" onclick="applyPresetColor('#DC2626')" title="Red"></div>
+                    <div class="color-preset" style="background:#EA580C" onclick="applyPresetColor('#EA580C')" title="Orange"></div>
+                    <div class="color-preset" style="background:#D97706" onclick="applyPresetColor('#D97706')" title="Amber"></div>
+                    <div class="color-preset" style="background:#16A34A" onclick="applyPresetColor('#16A34A')" title="Green"></div>
+                    <div class="color-preset" style="background:#0891B2" onclick="applyPresetColor('#0891B2')" title="Cyan"></div>
+                    <div class="color-preset" style="background:#0F172A" onclick="applyPresetColor('#0F172A')" title="Slate"></div>
+                    <div class="color-preset" style="background:#374151" onclick="applyPresetColor('#374151')" title="Gray"></div>
+                    <div class="color-preset" style="background:#111827" onclick="applyPresetColor('#111827')" title="Black"></div>
+                  </div>
                 </div>
               </div>
               <div>
@@ -1257,8 +1277,20 @@ function syncAssistantName(raw) {
 }
 
 function previewColor(val) {
-  if (/^#[0-9A-Fa-f]{6}$/.test(val.trim()))
-    document.getElementById('colorSwatch').style.background = val.trim();
+  const hex = val.trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+    document.getElementById('colorSwatch').style.background = hex;
+    document.getElementById('colorPickerNative').value = hex;
+  }
+}
+function syncColorPicker(hex) {
+  document.getElementById('identityColor').value = hex;
+  document.getElementById('colorSwatch').style.background = hex;
+}
+function applyPresetColor(hex) {
+  document.getElementById('identityColor').value = hex;
+  document.getElementById('colorSwatch').style.background = hex;
+  document.getElementById('colorPickerNative').value = hex;
 }
 
 const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Need a roof inspection?' };
