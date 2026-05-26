@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VettoChat Widget</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<title>VettoChat Widget Only</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Force transparent background so it blends seamlessly into the parent website */
+  /* 1. Force transparent background so it blends into Ironcrest */
   body, html { 
     background: transparent !important; 
     margin: 0; 
@@ -14,487 +14,475 @@
     overflow: hidden; /* Prevents scrollbars in the iframe */
     font-family: 'Inter', sans-serif;
   }
-  
-  *, *::before, *::after { box-sizing: border-box; }
-  
-  :root {
-    --brand-color: #2563EB;
-    --brand-hover: #1E40AF;
-    --bg-light: #F9FAFB;
-    --text-main: #111827;
-    --text-muted: #6B7280;
-    --border: #E5E7EB;
-  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#2563EB;
+  --navy-light:#3B82F6;
+  --navy-dark:#1E40AF;
+  --navy-deeper:#1D3461;
+  --dark:#0B1525;
+  --dark-mid:#111D2E;
+  --dark-card:#162035;
+  --dark-border:#1E3050;
+  --text:#F0F4F8;
+  --text-muted:#8896A7;
+  --text-dim:#4A5568;
+  --green:#10B981;
+  --amber:#F59E0B;
+  --red:#EF4444;
+  --radius:10px;
+}
 
-  /* Chat Button */
-  .chat-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: var(--brand-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 10px 25px rgba(37,99,235,0.3);
-    transition: all 0.3s ease;
-    z-index: 1000;
-  }
-  .chat-btn:hover { transform: scale(1.05); background: var(--brand-hover); }
-  .chat-btn.open { transform: rotate(90deg) scale(0); opacity: 0; pointer-events: none; }
-  .chat-btn svg { width: 28px; height: 28px; fill: #fff; }
+/* ─── CHAT LAUNCHER ─── */
+.chat-launcher{
+  position:fixed;bottom:28px;right:28px;z-index:200;
+  display:flex;flex-direction:column;align-items:flex-end;gap:12px;
+}
+.chat-label{
+  background:var(--dark);color:#fff;
+  padding:10px 16px;font-size:13px;font-weight:600;
+  box-shadow:0 4px 20px rgba(0,0,0,0.35);
+  border:1px solid var(--dark-border);
+  border-radius:8px;cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+  animation:labelPop 0.5s ease 1.5s both;white-space:nowrap;
+}
+@keyframes labelPop{from{opacity:0;transform:scale(0.85) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.chat-label-dot{width:8px;height:8px;background:var(--green);border-radius:50%;flex-shrink:0;animation:greenPulse 2s infinite}
+@keyframes greenPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.5)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
 
-  /* Chat Label (Prompt) */
-  .chat-btn-label {
-    position: fixed;
-    bottom: 32px;
-    right: 95px;
-    background: #fff;
-    color: var(--text-main);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 999;
-    animation: float 3s ease-in-out infinite;
-  }
-  .chat-btn-label::after {
-    content: '';
-    position: absolute;
-    right: -6px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-width: 6px 0 6px 6px;
-    border-style: solid;
-    border-color: transparent transparent transparent #fff;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-  }
+.chat-btn{
+  width:64px;height:64px;
+  background:linear-gradient(135deg,var(--navy-dark),var(--navy));
+  border:none;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 24px rgba(37,99,235,0.55),0 0 0 0 rgba(37,99,235,0.3);
+  transition:transform 0.3s,box-shadow 0.3s;
+  position:relative;
+  animation:bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.5s both;
+}
+@keyframes bounceIn{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+.chat-btn:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(37,99,235,0.7)}
+.chat-btn svg{width:28px;height:28px;color:#fff;transition:transform 0.3s}
+.chat-btn.open svg.icon-chat{display:none}
+.chat-btn.open svg.icon-close{display:block}
+.chat-btn svg.icon-close{display:none}
+.chat-ring{
+  position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid rgba(59,130,246,0.45);
+  animation:ringPulse 2.5s infinite;
+}
+@keyframes ringPulse{0%{transform:scale(1);opacity:0.8}100%{transform:scale(1.5);opacity:0}}
 
-  /* Chat Modal */
-  .chat-modal {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 360px;
-    height: 600px;
-    max-height: calc(100vh - 40px);
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    z-index: 1000;
-    overflow: hidden;
-  }
-  .chat-modal.open {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: all;
-  }
+/* ─── CHAT MODAL ─── */
+.chat-modal{
+  position:fixed;bottom:108px;right:28px;z-index:199;
+  width:360px;background:#fff;
+  box-shadow:0 32px 96px rgba(0,0,0,0.3),0 0 0 1px rgba(0,0,0,0.06);
+  display:flex;flex-direction:column;overflow:hidden;
+  border-radius:16px 16px 4px 4px;
+  transform:scale(0.92) translateY(20px);transform-origin:bottom right;
+  opacity:0;pointer-events:none;
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease;
+  max-height:580px;height:580px;
+}
+.chat-modal.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
 
-  /* Header */
-  .chat-header {
-    background: var(--brand-color);
-    color: #fff;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .header-info { display: flex; align-items: center; gap: 12px; }
-  .bot-avatar {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-  }
-  .header-text h3 { margin: 0; font-size: 16px; font-weight: 600; }
-  .header-text p { margin: 4px 0 0; font-size: 12px; opacity: 0.8; display: flex; align-items: center; gap: 4px; }
-  .status-dot { width: 8px; height: 8px; background: #10B981; border-radius: 50%; }
-  
-  .close-btn {
-    background: none; border: none; color: #fff; font-size: 24px; cursor: pointer;
-    opacity: 0.7; transition: opacity 0.2s;
-  }
-  .close-btn:hover { opacity: 1; }
+.chat-modal-header{
+  background:linear-gradient(135deg,#0B1525 0%,#162035 50%,#1a2a45 100%);
+  padding:18px 20px;flex-shrink:0;display:flex;align-items:center;gap:13px;
+}
+.chat-modal-avatar{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,var(--navy-dark),var(--navy-light));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;border:2px solid rgba(255,255,255,0.15);
+  box-shadow:0 0 0 4px rgba(59,130,246,0.2);
+}
+.chat-modal-avatar svg{width:22px;height:22px;fill:#fff}
+.chat-modal-info{flex:1}
+.chat-modal-info h4{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;color:#fff;letter-spacing:0.03em}
+.online-status{display:flex;align-items:center;gap:6px;margin-top:3px}
+.online-dot{width:7px;height:7px;background:var(--green);border-radius:50%;flex-shrink:0;animation:greenPulse 2s infinite}
+.online-text{font-size:11px;color:rgba(255,255,255,0.5);font-family:'JetBrains Mono',monospace;letter-spacing:0.04em}
+.powered-by{font-size:10px;color:rgba(255,255,255,0.22);font-family:'JetBrains Mono',monospace;letter-spacing:0.04em}
+.powered-by strong{color:var(--navy-light);font-weight:600}
 
-  /* Messages Area */
-  .chat-messages {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background: var(--bg-light);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  /* Bubbles */
-  .msg-row { display: flex; flex-direction: column; }
-  .msg-bot { align-items: flex-start; }
-  .msg-user { align-items: flex-end; }
-  .msg-bubble {
-    max-width: 85%;
-    padding: 12px 16px;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 1.5;
-    animation: popIn 0.3s ease forwards;
-  }
-  @keyframes popIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .msg-bot .msg-bubble {
-    background: #fff;
-    color: var(--text-main);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 4px;
-  }
-  .msg-bot .msg-bubble.success {
-    background: #ECFDF5;
-    border-color: #A7F3D0;
-    color: #065F46;
-  }
-  .msg-user .msg-bubble {
-    background: var(--brand-color);
-    color: #fff;
-    border-bottom-right-radius: 4px;
-  }
+.chat-progress{background:#F0F3F7;padding:11px 20px 9px;flex-shrink:0}
+.progress-steps{display:flex;gap:5px;margin-bottom:6px}
+.prog-step{height:4px;flex:1;background:#DDE1E7;border-radius:2px;transition:background 0.5s ease}
+.prog-step.done{background:var(--navy)}
+.prog-step.current{background:linear-gradient(90deg,var(--navy-dark),var(--navy-light))}
+.progress-label{font-size:11px;color:#94A3B8;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em}
 
-  /* Chips */
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-    animation: popIn 0.3s ease forwards;
-    animation-delay: 0.1s;
-  }
-  .chip {
-    background: #fff;
-    border: 1px solid var(--brand-color);
-    color: var(--brand-color);
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .chip:hover { background: var(--brand-color); color: #fff; }
+.chat-messages{
+  flex:1;overflow-y:auto;padding:18px 16px;
+  display:flex;flex-direction:column;gap:12px;
+  background:#F8FAFC;min-height:0;
+}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:2px}
 
-  /* Input Area */
-  .chat-input-area {
-    padding: 16px;
-    background: #fff;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 12px;
-    align-items: center;
-  }
-  .chat-input-area input {
-    flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .chat-input-area input:focus { border-color: var(--brand-color); }
-  .chat-input-area input:disabled { background: var(--bg-light); cursor: not-allowed; }
-  
-  .send-btn {
-    width: 40px;
-    height: 40px;
-    background: var(--brand-color);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .send-btn:hover:not(:disabled) { background: var(--brand-hover); }
-  .send-btn:disabled { background: #D1D5DB; cursor: not-allowed; }
-  .send-btn svg { width: 18px; height: 18px; fill: #fff; }
+.msg-row{display:flex;gap:9px;align-items:flex-end;animation:msgIn 0.28s cubic-bezier(0.16,1,0.3,1)}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg-row.user{flex-direction:row-reverse}
+.msg-avatar{
+  width:28px;height:28px;background:linear-gradient(135deg,var(--navy-dark),var(--navy));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.msg-avatar svg{width:14px;height:14px;fill:#fff}
+.msg-bubble{max-width:78%;padding:10px 14px;font-size:13.5px;line-height:1.55}
+.msg-bubble.bot{background:#fff;color:#1a1a1a;border:1px solid #E2E8F0;border-radius:4px 14px 14px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.msg-bubble.user{background:linear-gradient(135deg,var(--navy-dark),var(--navy));color:#fff;border-radius:14px 4px 14px 14px;font-weight:500;box-shadow:0 2px 8px rgba(37,99,235,0.3)}
+.msg-bubble.success{background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:1px solid #6EE7B7;color:#065F46;border-radius:4px 14px 14px 14px}
+.msg-bubble.error{background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;border-radius:4px 14px 14px 14px}
 
-  /* Typing Indicator */
-  .typing { display: flex; gap: 4px; padding: 16px; align-items: center; width: 60px; height: 45px;}
-  .dot { width: 6px; height: 6px; background: #9CA3AF; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
-  .dot:nth-child(1) { animation-delay: -0.32s; }
-  .dot:nth-child(2) { animation-delay: -0.16s; }
-  @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-  }
+.chip-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;padding-left:37px;animation:msgIn 0.28s ease both}
+.q-chip{
+  background:#fff;border:1.5px solid #E2E8F0;color:#374151;font-size:12.5px;font-weight:600;padding:7px 13px;
+  border-radius:20px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.06);transition:all 0.18s;
+}
+.q-chip:hover{background:linear-gradient(135deg,var(--navy-dark),var(--navy));border-color:var(--navy);color:#fff;transform:translateY(-2px)}
+
+.typing-row{display:flex;gap:9px;align-items:flex-end;animation:msgIn 0.2s ease}
+.typing-bubble{background:#fff;border:1px solid #E2E8F0;border-radius:4px 14px 14px 14px;padding:11px 16px;display:flex;gap:5px;align-items:center}
+.typing-dot{width:7px;height:7px;background:#94A3B8;border-radius:50%;animation:typingBounce 1.4s ease infinite}
+.typing-dot:nth-child(2){animation-delay:0.18s}
+.typing-dot:nth-child(3){animation-delay:0.36s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.35}30%{transform:translateY(-6px);opacity:1}}
+
+.chat-input-area{padding:12px 14px;background:#fff;border-top:1px solid #E8ECF0;display:flex;gap:9px;flex-shrink:0;align-items:center}
+#chatInput{flex:1;border:1.5px solid #E2E8F0;color:#1a1a1a;padding:10px 14px;font-size:13.5px;outline:none;background:#F8FAFC;border-radius:8px}
+#chatInput:focus{border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+.send-btn{width:40px;height:40px;background:linear-gradient(135deg,var(--navy-dark),var(--navy));border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(37,99,235,0.4);flex-shrink:0}
+.send-btn svg{width:16px;height:16px;color:#fff}
+.send-btn:disabled{background:#DDE1E7;box-shadow:none;cursor:not-allowed}
+
+.chat-footer{padding:8px 16px;background:#F8FAFC;border-top:1px solid #EEF0F3;text-align:center;font-size:10px;color:#B0B7C0;font-family:'JetBrains Mono',monospace}
 </style>
 </head>
 <body>
 
-  <!-- Floating Prompt -->
-  <div class="chat-btn-label" id="chatLabel">
-    <span id="chatLabelText">👋 Need a free quote?</span>
-  </div>
-
-  <!-- Chat Toggle Button -->
-  <div class="chat-btn" id="chatBtn" onclick="toggleChat()">
-    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-  </div>
-
-  <!-- Main Chat Modal -->
-  <div class="chat-modal" id="chatModal">
-    <div class="chat-header">
-      <div class="header-info">
-        <div class="bot-avatar">🤖</div>
-        <div class="header-text">
-          <h3 id="widgetBotName">Vetto Assistant</h3>
-          <p><span class="status-dot"></span> Online - Replies instantly</p>
-        </div>
+  <div id="vettochat-wrapper">
+    <div class="chat-launcher">
+      <div class="chat-label" id="chatLabel" onclick="openChat()">
+        <div class="chat-label-dot"></div>
+        <span id="chatLabelText">Need a roof inspection?</span>
       </div>
-      <button class="close-btn" onclick="toggleChat()">&times;</button>
-    </div>
-    
-    <div class="chat-messages" id="chatMessages">
-      <!-- Messages populate here -->
-    </div>
-    
-    <div class="chat-input-area">
-      <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off">
-      <button class="send-btn" id="sendBtn" onclick="handleSend()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      <button class="chat-btn" id="chatBtn" onclick="toggleChat()">
+        <div class="chat-ring"></div>
+        <svg class="icon-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
+
+    <div class="chat-modal" id="chatModal">
+      <div class="chat-modal-header">
+        <div class="chat-modal-avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        </div>
+        <div class="chat-modal-info">
+          <h4 id="widgetName">Vetto Assistant</h4>
+          <div class="online-status">
+            <div class="online-dot"></div>
+            <div class="online-text">Online</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-progress">
+        <div class="progress-steps">
+          <div class="prog-step" id="ps0"></div>
+          <div class="prog-step" id="ps1"></div>
+          <div class="prog-step" id="ps2"></div>
+          <div class="prog-step" id="ps3"></div>
+          <div class="prog-step" id="ps4"></div>
+          <div class="prog-step" id="ps5"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">Step 1 of 6</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages"></div>
+
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type your message..." disabled />
+        <button id="sendBtn" class="send-btn" onclick="sendMessage()" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+
+      <div class="chat-footer">Powered by <strong>VettoChat</strong></div>
+    </div>
   </div>
 
-<script>
-const $ = id => document.getElementById(id);
-const chatBox = $('chatMessages');
-const chatInput = $('chatInput');
-
-// ─── CONFIG SYNC FROM DASHBOARD ─────────────────────────────────────────────
+  <script>
+// ─── CONFIG SYNC ─────────────────────────────────────────────────────────────
 let _vc_config = {};
 
 function _vc_apply(cfg) {
   if (!cfg || typeof cfg !== 'object') return;
   _vc_config = cfg;
 
-  // Brand color
+  // Brand color — derive dark + light shades from single hex
   if (cfg.brandColor && /^#[0-9A-Fa-f]{6}$/.test(cfg.brandColor)) {
     const h = cfg.brandColor;
     const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
     const dk = [Math.round(r*.75), Math.round(g*.75), Math.round(b*.75)];
     const lt = [Math.min(255,Math.round(r*1.35)), Math.min(255,Math.round(g*1.35)), Math.min(255,Math.round(b*1.35))];
-    document.documentElement.style.setProperty('--brand-color', h);
-    document.documentElement.style.setProperty('--brand-hover', `rgb(${dk})`);
+    const root = document.documentElement;
+    root.style.setProperty('--navy', h);
+    root.style.setProperty('--navy-dark', `rgb(${dk})`);
+    root.style.setProperty('--navy-light', `rgb(${lt})`);
   }
 
-  // Bot name
-  const nameEl = $('widgetBotName');
-  if (nameEl && cfg.assistantName) nameEl.textContent = cfg.assistantName;
+  // Assistant name in chat header
+  const nameEl = document.getElementById('widgetName');
+  if (nameEl) nameEl.textContent = cfg.assistantName || 'Assistant';
 
-  // Chat label
-  const labelEl = $('chatLabelText');
+  // Chat bubble label
+  const labelEl = document.getElementById('chatLabelText');
   if (labelEl && cfg.chatLabel) labelEl.textContent = cfg.chatLabel;
 }
 
+// Apply saved config immediately on load
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
+// Live sync via storage event — fires in THIS tab when ANOTHER tab writes localStorage
 window.addEventListener('storage', e => {
   if (e.key === 'vettochat_config' && e.newValue) {
     try { _vc_apply(JSON.parse(e.newValue)); } catch(err) {}
   }
 });
 
-// ─── CONVERSATION FLOW ENGINE ───────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+const S = {
+  step: -1,
+  data: {name:'',firstName:'',service:'',zip:'',urgency:'',budget:'',phone:''},
+  done: false,
+  opened: false
+};
+
 const STEPS = [
-  { id:'intent', msg:"Hi! What can we help you with today?", type:'chips', options:['Active Leak / Storm Damage','Full Roof Replacement','Minor Repair','Gutter Cleaning'] },
-  { id:'urgency', msg:"Got it. How soon do you need this handled?", type:'chips', options:['Emergency (Within 24h)','This week','Just browsing'] },
-  { id:'name', msg:"Okay, we can help with that. What's your first name?", type:'text' },
-  { id:'phone', msg:"Nice to meet you! What's the best phone number for our team to reach you at?", type:'text' }
+  { key:'name',    type:'text',   placeholder:'Enter your full name…' },
+  { key:'service', type:'chips',  placeholder:'Or type your service…',
+    chips:[
+      {label:'Full Replacement'},{label:'Leak Repair'},
+      {label:'Storm Damage'},{label:'New Install'},
+      {label:'Gutters'},{label:'Inspection'}
+    ]},
+  { key:'zip',     type:'text',   placeholder:'City or zip code…' },
+  { key:'urgency', type:'chips',  placeholder:'Or describe urgency…',
+    chips:[
+      {label:'Emergency (Within 24h)'},{label:'This week'},
+      {label:'Just browsing / Next month'}
+    ]},
+  { key:'budget',  type:'chips',  placeholder:'Or enter an amount…',
+    chips:[
+      {label:'Under $1K'},{label:'$1K–$5K'},
+      {label:'$5K–$15K'},{label:'$15K+'},
+      {label:'Need Estimate'}
+    ]},
+  { key:'phone',   type:'text',   placeholder:'10-digit phone number…' }
 ];
 
-let S = { step: 0, data: {}, done: false, started: false };
+const ZIP_TO_CITY = {
+  '75025':'Plano','75023':'Plano','75024':'Plano','75026':'Plano','75074':'Plano','75075':'Plano',
+  '75013':'Allen','75002':'Allen',
+  '75070':'McKinney','75071':'McKinney',
+  '75034':'Frisco','75035':'Frisco',
+  '75080':'Richardson','75081':'Richardson','75082':'Richardson',
+  '75048':'Garland','75044':'Garland',
+  '75068':'Lewisville','75067':'Lewisville',
+  '75006':'Carrollton','75007':'Carrollton',
+  '76201':'Denton','76205':'Denton',
+  '75078':'Prosper'
+};
+const CITY_NAMES = ['plano','dallas','frisco','richardson','mckinney','allen','garland','mesquite','lewisville','carrollton','denton','prosper'];
 
-// ─── TOGGLE CHAT (IFRAME AWARE) ─────────────────────────────────────────────
-function toggleChat() {
-  const modal = $('chatModal');
-  const btn = $('chatBtn');
-  const label = $('chatLabel');
-  const isOpen = modal.classList.contains('open');
-  
-  if (isOpen) {
-    modal.classList.remove('open');
-    btn.classList.remove('open');
-    label.style.display = 'flex';
-    // Tell parent website to shrink the iframe
-    window.parent.postMessage('vettochat-close', '*');
-  } else {
-    modal.classList.add('open');
-    btn.classList.add('open');
-    label.style.display = 'none';
-    // Tell parent website to expand the iframe
-    window.parent.postMessage('vettochat-open', '*');
-    
-    if(!S.started) {
-      S.started = true;
-      // Show opening message from dashboard config before the first question
-      const name = (_vc_config.assistantName || 'Vetto');
-      const openMsg = _vc_config.openingMessage ||
-        `Hi! I'm ${name}. I can help you get a free roofing quote in under 60 seconds.`;
-      showTyping();
-      setTimeout(() => { removeTyping(); addBotMsg(openMsg); askStep(0); }, 900);
-    }
-    setTimeout(() => chatInput.focus(), 300);
-  }
+function resolveCity(val) {
+  const v = val.trim();
+  if (/^\d{5}$/.test(v)) return (ZIP_TO_CITY[v] || v) + ', TX';
+  const match = CITY_NAMES.find(c => v.toLowerCase().includes(c));
+  if (match) return match.charAt(0).toUpperCase() + match.slice(1) + ', TX';
+  return v;
 }
 
-// ─── UI HELPERS ──────────────────────────────────────────────────────────────
-function scrollBottom() {
-  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+const V = {
+  name:   v => { const p=v.trim().split(/\s+/); return p.length>=2 && p.every(x=>/^[a-zA-Z'-]{2,}$/.test(x)); },
+  zip:    v => {
+    const zips=['75025','75023','75024','75026','75013','75074','75070','75071','75002','75034','75035','75080','75081','75082','75048','75044','75075'];
+    if(/^\d{5}$/.test(v.trim())) return zips.includes(v.trim());
+    return CITY_NAMES.some(c=>v.toLowerCase().includes(c));
+  },
+  phone:  v => v.replace(/\D/g,'').length===10,
+  budget: v => true
+};
+
+const ERR = {
+  name:   "Please enter your first and last name.",
+  zip:    "We may not service that area yet. Try a nearby Plano/DFW city or zip code.",
+  phone:  "Please enter a valid 10-digit phone number (e.g. 972-555-1234)."
+};
+
+const $ = id => document.getElementById(id);
+const msgs = () => $('chatMessages');
+function scrollBottom(){ const m=msgs(); m.scrollTop=m.scrollHeight; }
+
+const avatarHTML = `<div class="msg-avatar"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>`;
+
+function addBotMsg(html, cls=''){
+  const row=document.createElement('div');
+  row.className='msg-row';
+  row.innerHTML=`${avatarHTML}<div class="msg-bubble bot ${cls}">${html}</div>`;
+  msgs().appendChild(row);
+  scrollBottom();
+  return row;
 }
 
-function showTyping() {
-  const div = document.createElement('div');
-  div.className = 'msg-row msg-bot';
-  div.id = 'typingIndicator';
-  div.innerHTML = `<div class="msg-bubble typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-  chatBox.appendChild(div);
+function addUserMsg(text){
+  const row=document.createElement('div');
+  row.className='msg-row user';
+  row.innerHTML=`<div class="msg-bubble user">${text}</div>`;
+  msgs().appendChild(row);
   scrollBottom();
 }
 
-function removeTyping() {
-  const t = $('typingIndicator');
-  if(t) t.remove();
+function showTyping(){
+  const row=document.createElement('div');
+  row.className='typing-row'; row.id='typing';
+  row.innerHTML=`${avatarHTML}<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  msgs().appendChild(row); scrollBottom();
 }
+function removeTyping(){ const t=$('typing'); if(t) t.remove(); }
 
-function addBotMsg(text, type='normal', chips=[]) {
-  const div = document.createElement('div');
-  div.className = 'msg-row msg-bot';
-  let html = `<div class="msg-bubble ${type}">${text}</div>`;
-  
-  if (chips.length > 0) {
-    html += `<div class="chips">` + chips.map(c => `<div class="chip" onclick="handleChip('${c}')">${c}</div>`).join('') + `</div>`;
-  }
-  
-  div.innerHTML = html;
-  chatBox.appendChild(div);
-  scrollBottom();
-}
-
-function addUserMsg(text) {
-  const div = document.createElement('div');
-  div.className = 'msg-row msg-user';
-  div.innerHTML = `<div class="msg-bubble">${text}</div>`;
-  chatBox.appendChild(div);
-  
-  // Disable old chips
-  document.querySelectorAll('.chip').forEach(c => {
-    c.style.pointerEvents = 'none';
-    c.style.opacity = '0.6';
+function addChips(chips, key){
+  const wrap=document.createElement('div');
+  wrap.className='chip-grid'; wrap.id='chipGrid';
+  chips.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='q-chip';
+    btn.innerHTML=c.label;
+    btn.onclick=()=>selectChip(c.label, key, wrap);
+    wrap.appendChild(btn);
   });
-  scrollBottom();
+  msgs().appendChild(wrap); scrollBottom();
 }
 
-// ─── LOGIC ───────────────────────────────────────────────────────────────────
-function askStep(index) {
+function selectChip(label, key, wrap){
+  wrap.remove();
+  S.data[key]=label;
+  addUserMsg(label);
+  advanceStep(label, true);
+}
+
+function updateProgress(){
+  const step=S.step;
+  for(let i=0;i<6;i++){
+    const el=$('ps'+i);
+    if(!el) continue;
+    el.className='prog-step'+(i<step?' done':i===step?' current':'');
+  }
+  $('progressLabel').textContent = step>=6 ? 'Complete' : `Step ${step+1} of 6`;
+}
+
+function askStep(step){
+  const cfg=STEPS[step];
+  if(!cfg) return;
+  $('chatInput').placeholder=cfg.placeholder;
+  $('chatInput').disabled=cfg.type==='chips';
+  $('sendBtn').disabled=cfg.type==='chips';
+
+  const qMap=[
+    null,
+    `Nice to meet you, <strong>${S.data.firstName}</strong>! What roofing service do you need?`,
+    `Got it — <em>${S.data.service}</em>. What's your city or zip code?<br><small style="color:#94A3B8;font-size:12px">We serve Plano, Frisco, McKinney &amp; surrounding DFW areas.</small>`,
+    `We service ${S.data.zip}. How soon do you need this done?`,
+    `Understood. What's your approximate budget for this project?`,
+    `Almost there. What's the best phone number to reach you?`
+  ];
+
+  if(step>0){
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      addBotMsg(qMap[step]);
+      if(cfg.type==='chips') addChips(cfg.chips, cfg.key);
+      else { $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus(); }
+    }, 850);
+  } else {
+    if(cfg.type==='chips') addChips(cfg.chips, cfg.key);
+    else { $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus(); }
+  }
+}
+
+function startChat(){
+  if(S.step>=0) return;
+  $('chatInput').disabled=true; $('sendBtn').disabled=true;
   showTyping();
-  setTimeout(() => {
+  const openMsg = _vc_config.openingMessage
+    || (_vc_config.assistantName
+        ? `Hi! I'm ${_vc_config.assistantName}. I can get you a free quote in under 60 seconds — what's your full name?`
+        : "Hi! I'm your virtual assistant. I can get you a free quote in under 60 seconds — what's your full name?");
+  setTimeout(()=>{
     removeTyping();
-    const step = STEPS[index];
-    if (step.type === 'chips') {
-      addBotMsg(step.msg, 'normal', step.options);
-      chatInput.disabled = true;
-      chatInput.placeholder = 'Please select an option above...';
-    } else {
-      addBotMsg(step.msg);
-      chatInput.disabled = false;
-      chatInput.placeholder = 'Type your answer...';
-      chatInput.focus();
+    addBotMsg(openMsg);
+    S.step=0;
+    updateProgress();
+    $('chatInput').disabled=false; $('sendBtn').disabled=false; $('chatInput').focus();
+  }, 900);
+}
+
+function sendMessage(){
+  if(S.done) return;
+  const input=$('chatInput');
+  const val=input.value.trim();
+  if(!val) return;
+  input.value='';
+  addUserMsg(val);
+  advanceStep(val, false);
+}
+
+function advanceStep(val, isChip){
+  const cfg=STEPS[S.step];
+  const key=cfg.key;
+
+  if(!isChip){
+    if(key==='name' && !V.name(val)){
+      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.name,'error'); }, 700); return;
     }
-  }, 800);
-}
-
-function handleChip(val) {
-  if (S.done) return;
-  addUserMsg(val);
-  processAnswer(STEPS[S.step].id, val);
-}
-
-function handleSend() {
-  if (S.done || chatInput.disabled) return;
-  const val = chatInput.value.trim();
-  if (!val) return;
-  
-  chatInput.value = '';
-  addUserMsg(val);
-  processAnswer(STEPS[S.step].id, val);
-}
-
-function processAnswer(key, val) {
-  // Save Data
-  S.data[key] = val;
-  if(key === 'name') S.data.firstName = val.trim().split(/\s+/)[0];
+    if(key==='zip' && !V.zip(val)){
+      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.zip,'error'); }, 700); return;
+    }
+    if(key==='phone' && !V.phone(val)){
+      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.phone,'error'); }, 700); return;
+    }
+    S.data[key]=val;
+  }
+  if(key==='name') S.data.firstName=val.trim().split(/\s+/)[0];
 
   S.step++;
-  
-  if (S.step >= STEPS.length) {
+  updateProgress();
+
+  if(S.step>=STEPS.length){
     finishConversation();
   } else {
     askStep(S.step);
   }
 }
 
-chatInput.addEventListener('keypress', (e) => {
-  if(e.key === 'Enter') handleSend();
-});
-
-// ─── API SUBMISSION (THE MULTI-TENANT PAYLOAD) ─────────────────────────────
 async function finishConversation() {
   S.done = true;
-  chatInput.disabled = true;
-  $('sendBtn').disabled = true;
-  chatInput.placeholder = 'Thank you!';
-  
+  disableInput();
   showTyping();
-
-  const intent = S.data.intent || 'General Inquiry';
-  const urgency = S.data.urgency || 'Standard';
-
-  // 1. EXTRACT TENANT ID FROM URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const tenantId = urlParams.get('tenantId') || 'test-tenant-id';
-
-  // 2. BUILD THE MULTI-TENANT PAYLOAD
+  
   const leadPayload = {
-    tenantId: tenantId,
-    firstName: S.data.firstName || 'Unknown',
-    phone: S.data.phone || 'No Phone',
-    intent: intent,
-    urgency: urgency,
-    source: window.location.hostname
+    name: S.data.name || S.data.firstName,
+    phone: S.data.phone || 'N/A',
+    intent: S.data.service || 'General Inquiry',
+    urgency: S.data.urgency || 'Just browsing / Next month',
+    budget: S.data.budget || '',
+    location: S.data.zip ? resolveCity(S.data.zip) : '',
+    source_url: window.location.hostname
   };
 
   try {
@@ -516,6 +504,38 @@ async function finishConversation() {
     addBotMsg("Thanks! We've received your info and will be in touch.", "success");
   }
 }
-</script>
+
+function disableInput(){
+  $('chatInput').disabled=true;
+  $('sendBtn').disabled=true;
+  $('chatInput').placeholder='';
+}
+
+function toggleChat(){
+  const modal=$('chatModal');
+  const btn=$('chatBtn');
+  const label=$('chatLabel');
+  const isOpen=modal.classList.contains('open');
+  if(isOpen){
+    modal.classList.remove('open');
+    btn.classList.remove('open');
+    label.style.display='flex';
+  } else {
+    openChat();
+  }
+}
+
+function openChat(){
+  const modal=$('chatModal');
+  const btn=$('chatBtn');
+  $('chatLabel').style.display='none';
+  modal.classList.add('open');
+  btn.classList.add('open');
+  if(!S.opened){ S.opened=true; setTimeout(startChat, 300); }
+}
+
+$('chatInput').addEventListener('keypress', e=>{ if(e.key==='Enter') sendMessage(); });
+  </script>
+
 </body>
 </html>
