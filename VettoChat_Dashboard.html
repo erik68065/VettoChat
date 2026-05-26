@@ -134,6 +134,12 @@ td.muted{font-size:12px;color:var(--muted)}
 .field-textarea{min-height:72px;resize:vertical}
 .msg-editor{min-height:120px;white-space:pre-wrap;word-break:break-word;cursor:default;outline:none;line-height:1.6;padding:9px 12px;background:var(--bg-alt,#F8FAFC);color:var(--navy);user-select:none}
 .msg-editor:focus{border-color:var(--border)}
+.qb-opening-editor{flex:1;border:1px solid transparent;background:transparent;color:var(--navy);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 8px;border-radius:6px;outline:none;transition:all 0.15s;white-space:pre-wrap;word-break:break-word;line-height:1.55;cursor:text;min-width:0}
+.qb-opening-editor:hover{border-color:var(--border);background:var(--bg)}
+.qb-opening-editor:focus{border-color:#2563EB;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.qb-row-opening{align-items:flex-start}
+.qb-row-opening .qb-handle,.qb-row-opening .qb-num{margin-top:5px}
+.qb-row-opening .qb-toggle,.qb-row-opening .qb-delete{margin-top:3px}
 .an-name-chip{display:inline;background:#EFF6FF;color:#1E40AF;font-weight:700;border-radius:4px;padding:1px 6px;cursor:not-allowed;user-select:none;font-size:13px}
 .color-preset{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
 .color-preset:hover{transform:scale(1.2);border-color:rgba(0,0,0,0.2)}
@@ -883,8 +889,10 @@ function endDemo(){
 
 // ─── BOT CONFIG — QUESTION BUILDER ──────────────────────────────────────────
 const QUESTION_TYPES = { text:'text', chips:'chips', phone:'phone' };
+const Q1_DEFAULT_TEXT = "Hi! I'm (Bot Name). I can get you a free quote in under 60 seconds — what's your full name?";
+
 let questions = [
-  {id:1,key:'name',     text:'What is your full name?',                          type:'text',  enabled:true, placeholder:'Enter your full name…',         chips:[]},
+  {id:1,key:'name',     text:Q1_DEFAULT_TEXT,                                    type:'text',  enabled:true, placeholder:'Enter your full name…',         chips:[]},
   {id:2,key:'service',  text:'What type of roofing service do you need?',        type:'chips', enabled:true, placeholder:'Or type your service…',          chips:['Full Replacement','Leak Repair','Storm Damage','New Install','Gutters','Inspection']},
   {id:3,key:'location', text:'What is your city or ZIP code?',                   type:'text',  enabled:true, placeholder:'City or zip code…',              chips:[]},
   {id:4,key:'urgency',  text:'How soon do you need this done?',                  type:'chips', enabled:true, placeholder:'Or describe urgency…',           chips:['Emergency (Within 24h)','This week','Just browsing / Next month']},
@@ -958,6 +966,13 @@ function renderQB(){
       renderQB();
     });
 
+    // Q1 (name key): replace plain input with rich opening-message editor
+    if (q.key === 'name') {
+      row.classList.add('qb-row-opening');
+      const oldInput = row.querySelector('.qb-input');
+      if (oldInput) oldInput.replaceWith(createQ1Editor(q));
+    }
+
     wrap.appendChild(row);
 
     // Chip editor — only for chips type
@@ -985,6 +1000,40 @@ function renderQB(){
     list.appendChild(wrap);
   });
   syncScoringFromQuestions();
+}
+
+function renderQ1EditorContent(ed, name, text) {
+  const display = name || '(Bot Name)';
+  const src = text || Q1_DEFAULT_TEXT;
+  const idx = src.indexOf('(Bot Name)');
+  if (idx !== -1) {
+    ed.innerHTML = _esc(src.slice(0, idx)) +
+      `<span class="an-name-chip" contenteditable="false">${_esc(display)}</span>` +
+      _esc(src.slice(idx + 10));
+  } else {
+    ed.textContent = src;
+  }
+}
+
+function createQ1Editor(q) {
+  const ed = document.createElement('div');
+  ed.className = 'qb-opening-editor';
+  ed.contentEditable = 'true';
+  ed.spellcheck = false;
+  ed.id = 'q1Editor';
+  renderQ1EditorContent(ed, _assistantName, q.text);
+  ed.addEventListener('input', () => {
+    const display = _assistantName || '(Bot Name)';
+    // Store template with placeholder so name is substitutable later
+    q.text = ed.innerText.replace(display, '(Bot Name)').trim();
+    // Sync the locked opening-message preview below
+    updateOpeningPreview();
+  });
+  return ed;
+}
+
+function updateOpeningPreview() {
+  setEditorContent(buildOpeningMsg(_assistantName), _assistantName);
 }
 
 function renderChipEditor(container, q) {
@@ -1301,15 +1350,15 @@ function applyTemplate(id) {
   questions = tmpl.steps.map((s, i) => ({
     id: i + 1,
     key: s.key,
-    text: s.question || (s.key === 'name' ? 'What is your full name?' : s.key),
+    text: s.question || (s.key === 'name' ? Q1_DEFAULT_TEXT : s.key),
     type: s.type,
     enabled: s.enabled !== false,
     placeholder: s.placeholder || '',
     chips: Array.isArray(s.chips) ? [...s.chips] : []
   }));
-  // Fix name step text
-  if (questions[0] && questions[0].key === 'name') {
-    questions[0].text = 'What is your full name?';
+  // Ensure Q1 always carries the opening message template
+  if (questions[0] && questions[0].key === 'name' && !questions[0].text) {
+    questions[0].text = Q1_DEFAULT_TEXT;
   }
   nextId = questions.length + 1;
 
@@ -1371,9 +1420,10 @@ function _esc(s) {
 }
 
 function buildOpeningMsg(name) {
-  return name
-    ? `Hi! I'm ${name}. I can get you a free quote in under 60 seconds — what's your full name?`
-    : '';
+  const q1 = questions.find(q => q.key === 'name');
+  const template = (q1 && q1.text) ? q1.text : Q1_DEFAULT_TEXT;
+  const display = name || '(Bot Name)';
+  return template.replace('(Bot Name)', display);
 }
 
 function setEditorContent(message, name) {
@@ -1401,12 +1451,15 @@ function syncAssistantName(raw) {
   const chipEl = document.getElementById('activeChipText');
   if (chipEl) chipEl.textContent = `${display} Active`;
 
-  // Update ONLY the locked name chip inside the editor — don't touch surrounding text
+  // Update name chip in the Q1 rich editor (Question Builder)
+  const q1Chip = document.querySelector('#q1Editor .an-name-chip');
+  if (q1Chip) q1Chip.textContent = display;
+
+  // Update the locked opening-message preview below
   const msgChip = document.querySelector('#identityMessage .an-name-chip');
   if (msgChip) {
     msgChip.textContent = display;
   } else {
-    // First time (editor is empty) — build the full structure
     setEditorContent(buildOpeningMsg(_assistantName), _assistantName);
   }
 }
@@ -1500,7 +1553,7 @@ function loadIdentityForm() {
 function questionsToSteps(qs) {
   return qs.filter(q => q.enabled).map(q => ({
     key:         q.key || q.text.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20),
-    question:    q.key === 'name' ? '' : q.text,
+    question:    q.text,
     type:        q.type,
     enabled:     q.enabled,
     placeholder: q.placeholder || '',
