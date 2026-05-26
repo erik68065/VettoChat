@@ -491,9 +491,20 @@ async function finishConversation() {
   S.done = true;
   disableInput();
   showTyping();
-  
+
   const rawName = S.data.name || S.data.firstName || '';
   const fullName = rawName.replace(/\b\w/g, c => c.toUpperCase());
+
+  // Preview mode: skip the real API call so no lead is saved or broadcast
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+  if (isPreview) {
+    setTimeout(() => {
+      removeTyping();
+      addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
+    }, 900);
+    return;
+  }
+
   const leadPayload = {
     name:       fullName,
     firstName:  fullName,

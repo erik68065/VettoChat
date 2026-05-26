@@ -1300,8 +1300,8 @@ function openPreview() {
   const bg = document.getElementById('prevBg');
   const frame = document.getElementById('prevFrame');
   if (!bg) return;
-  // Reload iframe to get latest localStorage config
-  if (frame) frame.src = frame.src;
+  // Reload iframe to pick up latest localStorage config, always in preview mode
+  if (frame) frame.src = 'widget.html?preview=true';
   bg.classList.add('open');
 }
 
@@ -1675,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="prev-lbl">Widget Preview — Live</span>
       <button class="prev-x" onclick="closePreview()" title="Close">×</button>
     </div>
-    <iframe id="prevFrame" src="widget.html" title="Widget Preview"></iframe>
+    <iframe id="prevFrame" src="widget.html?preview=true" title="Widget Preview"></iframe>
   </div>
 </div>
 
