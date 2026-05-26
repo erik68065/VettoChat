@@ -1472,89 +1472,96 @@ function applyPresetColor(hex) {
   document.getElementById('colorPickerNative').value = hex;
 }
 
-const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Need a roof inspection?' };
+// Bump CONFIG_VERSION whenever the default setup changes.
+// Any saved config without this exact version is treated as stale
+// and replaced with the clean Roofing + Vetto defaults.
+const CONFIG_VERSION = 1;
+
+const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Get a free roof inspection →' };
+
+function _applyRoofingDefaults(name, color, label) {
+  const roofing = INDUSTRY_TEMPLATES['roofing'];
+  _activeTemplate = 'roofing';
+  questions = roofing.steps.map((s, i) => ({
+    id: i + 1, key: s.key,
+    text: s.key === 'name' ? Q1_DEFAULT_TEXT : s.question,
+    type: s.type, enabled: true,
+    placeholder: s.placeholder || '',
+    chips: Array.isArray(s.chips) ? [...s.chips] : []
+  }));
+  nextId = questions.length + 1;
+  SCORING_QUESTIONS.length = 0;
+  roofing.scoring.forEach(sq => SCORING_QUESTIONS.push({
+    id: sq.id, label: sq.label, question: sq.question,
+    answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+  }));
+  // Persist immediately so the widget gets the defaults right away
+  localStorage.setItem('vettochat_config', JSON.stringify({
+    configVersion: CONFIG_VERSION,
+    assistantName: name, brandColor: color, chatLabel: label,
+    openingMessage: buildOpeningMsg(name),
+    steps: questionsToSteps(questions),
+    activeTemplate: 'roofing',
+    scoring: SCORING_QUESTIONS.map(sq => ({
+      id: sq.id, label: sq.label, question: sq.question,
+      answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+    }))
+  }));
+}
 
 function loadIdentityForm() {
   try {
     const raw   = localStorage.getItem('vettochat_config');
-    const saved = raw ? JSON.parse(raw) : null;
+    const parsed = raw ? JSON.parse(raw) : null;
+
+    // Treat config as stale if it has no version stamp — boot clean Roofing defaults
+    const saved = (parsed && parsed.configVersion === CONFIG_VERSION) ? parsed : null;
 
     const name  = (saved && saved.assistantName) || DEFAULTS.assistantName;
     const color = (saved && saved.brandColor)    || DEFAULTS.brandColor;
     const label = (saved && saved.chatLabel)     || DEFAULTS.chatLabel;
-    const msg   = buildOpeningMsg(name);
 
     document.getElementById('identityName').value  = name;
     document.getElementById('identityLabel').value = label;
     document.getElementById('identityColor').value = color;
     previewColor(color);
-    setEditorContent(msg, name);
+    setEditorContent(buildOpeningMsg(name), name);
     _assistantName = name;
     document.querySelectorAll('[data-an-name]').forEach(el => el.textContent = name);
     const chipEl = document.getElementById('activeChipText');
     if (chipEl) chipEl.textContent = `${name} Active`;
 
-    if (saved && saved.steps && Array.isArray(saved.steps) && saved.steps.length >= 1) {
-      // Restore questions — migrate Q1 if it still has the old stub text
-      questions = saved.steps.map((s, i) => {
-        let text;
-        if (s.key === 'name') {
-          const OLD_STUB = 'What is your full name?';
-          text = (s.question && s.question !== OLD_STUB) ? s.question : Q1_DEFAULT_TEXT;
-        } else {
-          text = s.question || s.key;
-        }
-        return { id: i + 1, key: s.key, text, type: s.type || 'text',
-                 enabled: s.enabled !== false, placeholder: s.placeholder || '',
-                 chips: Array.isArray(s.chips) ? [...s.chips] : [] };
-      });
-      nextId = questions.length + 1;
-      if (bcInited) renderQB();
-    }
-
-    // Restore active template highlight
-    if (saved && saved.activeTemplate) {
-      _activeTemplate = saved.activeTemplate;
-      if (bcInited) renderTemplates();
-    }
-
-    // Restore scoring tier assignments
-    if (saved && saved.scoring && Array.isArray(saved.scoring) && saved.scoring.length) {
-      SCORING_QUESTIONS.length = 0;
-      saved.scoring.forEach(sq => SCORING_QUESTIONS.push({
-        id: sq.id, label: sq.label, question: sq.question,
-        answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
-      }));
-    }
-
-    // First-time load (no saved config): boot with full Roofing template
-    if (!raw) {
-      const roofing = INDUSTRY_TEMPLATES['roofing'];
-      _activeTemplate = 'roofing';
-      questions = roofing.steps.map((s, i) => ({
-        id: i + 1, key: s.key,
-        text: s.key === 'name' ? Q1_DEFAULT_TEXT : s.question,
-        type: s.type, enabled: true, placeholder: s.placeholder || '',
-        chips: Array.isArray(s.chips) ? [...s.chips] : []
-      }));
-      nextId = questions.length + 1;
-      SCORING_QUESTIONS.length = 0;
-      roofing.scoring.forEach(sq => SCORING_QUESTIONS.push({
-        id: sq.id, label: sq.label, question: sq.question,
-        answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
-      }));
-      localStorage.setItem('vettochat_config', JSON.stringify({
-        assistantName: name, brandColor: color, chatLabel: label,
-        openingMessage: buildOpeningMsg(name),
-        steps: questionsToSteps(questions),
-        activeTemplate: 'roofing',
-        scoring: SCORING_QUESTIONS.map(sq => ({
+    if (saved) {
+      // Restore questions from verified saved config
+      if (saved.steps && Array.isArray(saved.steps) && saved.steps.length >= 1) {
+        questions = saved.steps.map((s, i) => ({
+          id: i + 1, key: s.key,
+          text: s.key === 'name' ? (s.question || Q1_DEFAULT_TEXT) : (s.question || s.key),
+          type: s.type || 'text', enabled: s.enabled !== false,
+          placeholder: s.placeholder || '',
+          chips: Array.isArray(s.chips) ? [...s.chips] : []
+        }));
+        nextId = questions.length + 1;
+        if (bcInited) renderQB();
+      }
+      // Restore active template
+      if (saved.activeTemplate) {
+        _activeTemplate = saved.activeTemplate;
+        if (bcInited) renderTemplates();
+      }
+      // Restore scoring tiers
+      if (saved.scoring && Array.isArray(saved.scoring) && saved.scoring.length) {
+        SCORING_QUESTIONS.length = 0;
+        saved.scoring.forEach(sq => SCORING_QUESTIONS.push({
           id: sq.id, label: sq.label, question: sq.question,
           answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
-        }))
-      }));
+        }));
+      }
+    } else {
+      // No valid saved config — apply full Roofing + Vetto defaults
+      _applyRoofingDefaults(name, color, label);
     }
-  } catch(e) {}
+  } catch(e) { _applyRoofingDefaults(DEFAULTS.assistantName, DEFAULTS.brandColor, DEFAULTS.chatLabel); }
 }
 
 function questionsToSteps(qs) {
@@ -1571,6 +1578,7 @@ function questionsToSteps(qs) {
 function saveIdentity() {
   const name = document.getElementById('identityName').value.trim();
   const config = {
+    configVersion:  CONFIG_VERSION,
     assistantName:  name,
     chatLabel:      document.getElementById('identityLabel').value.trim(),
     brandColor:     document.getElementById('identityColor').value.trim(),
