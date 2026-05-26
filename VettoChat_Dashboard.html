@@ -1494,44 +1494,60 @@ function loadIdentityForm() {
     const chipEl = document.getElementById('activeChipText');
     if (chipEl) chipEl.textContent = `${name} Active`;
 
-    // Restore steps from saved config if present
     if (saved && saved.steps && Array.isArray(saved.steps) && saved.steps.length >= 1) {
-      questions = saved.steps.map((s, i) => ({
-        id: i + 1,
-        key: s.key,
-        text: s.key === 'name' ? 'What is your full name?' : (s.question || s.key),
-        type: s.type || 'text',
-        enabled: s.enabled !== false,
-        placeholder: s.placeholder || '',
-        chips: Array.isArray(s.chips) ? [...s.chips] : []
-      }));
+      // Restore questions — migrate Q1 if it still has the old stub text
+      questions = saved.steps.map((s, i) => {
+        let text;
+        if (s.key === 'name') {
+          const OLD_STUB = 'What is your full name?';
+          text = (s.question && s.question !== OLD_STUB) ? s.question : Q1_DEFAULT_TEXT;
+        } else {
+          text = s.question || s.key;
+        }
+        return { id: i + 1, key: s.key, text, type: s.type || 'text',
+                 enabled: s.enabled !== false, placeholder: s.placeholder || '',
+                 chips: Array.isArray(s.chips) ? [...s.chips] : [] };
+      });
       nextId = questions.length + 1;
       if (bcInited) renderQB();
     }
 
-    // Restore which template card should be highlighted
+    // Restore active template highlight
     if (saved && saved.activeTemplate) {
       _activeTemplate = saved.activeTemplate;
       if (bcInited) renderTemplates();
     }
 
-    // Restore scoring tier assignments (HOT/WARM/COLD) so they survive page reloads
+    // Restore scoring tier assignments
     if (saved && saved.scoring && Array.isArray(saved.scoring) && saved.scoring.length) {
       SCORING_QUESTIONS.length = 0;
-      saved.scoring.forEach(sq => {
-        SCORING_QUESTIONS.push({
-          id: sq.id, label: sq.label, question: sq.question,
-          answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
-        });
-      });
+      saved.scoring.forEach(sq => SCORING_QUESTIONS.push({
+        id: sq.id, label: sq.label, question: sq.question,
+        answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+      }));
     }
 
-    // Push defaults to localStorage on first load so the widget gets them immediately
+    // First-time load (no saved config): boot with full Roofing template
     if (!raw) {
+      const roofing = INDUSTRY_TEMPLATES['roofing'];
+      _activeTemplate = 'roofing';
+      questions = roofing.steps.map((s, i) => ({
+        id: i + 1, key: s.key,
+        text: s.key === 'name' ? Q1_DEFAULT_TEXT : s.question,
+        type: s.type, enabled: true, placeholder: s.placeholder || '',
+        chips: Array.isArray(s.chips) ? [...s.chips] : []
+      }));
+      nextId = questions.length + 1;
+      SCORING_QUESTIONS.length = 0;
+      roofing.scoring.forEach(sq => SCORING_QUESTIONS.push({
+        id: sq.id, label: sq.label, question: sq.question,
+        answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+      }));
       localStorage.setItem('vettochat_config', JSON.stringify({
-        assistantName: name, brandColor: color, chatLabel: label, openingMessage: buildOpeningMsg(name),
+        assistantName: name, brandColor: color, chatLabel: label,
+        openingMessage: buildOpeningMsg(name),
         steps: questionsToSteps(questions),
-        activeTemplate: _activeTemplate,
+        activeTemplate: 'roofing',
         scoring: SCORING_QUESTIONS.map(sq => ({
           id: sq.id, label: sq.label, question: sq.question,
           answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
