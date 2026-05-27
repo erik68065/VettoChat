@@ -21,14 +21,27 @@ io.on('connection', (socket) => {
 
 // 2. Lead Capture & Scoring Endpoint
 app.post('/api/leads/capture', async (req, res) => {
-  // We extract tenantId (from your widget) and map it to orgId (your DB schema)
+  // Extract tenantId (from embed.js) and map it to orgId
   const { tenantId, orgId, firstName, phone, intent, urgency } = req.body;
   
-  // Safely assign the organization ID
-  const activeOrgId = orgId || tenantId || 'test-org-id';
+  // The exact ID coming from your test frontend
+  const activeOrgId = orgId || tenantId || 'test-tenant-id';
 
   try {
-    // Phase 1 Scoring Math (Eventually we will pull scoreThresholdHot from WidgetConfig)
+    // 🔴 THE FIX: Auto-provision the Organization so the Foreign Key never fails
+    await prisma.organization.upsert({
+      where: { id: activeOrgId },
+      update: {}, // If it exists, do nothing
+      create: {
+        id: activeOrgId,
+        name: "Demo Contractor LLC",
+        ownerName: "Demo User",
+        ownerPhone: "Not Provided",
+        industry: "Home Services"
+      }
+    });
+
+    // Phase 1 Scoring Math
     let score = 0;
     if (urgency === "Emergency (Within 24h)") score += 50;
     if (urgency === "This week") score += 30;
@@ -36,7 +49,7 @@ app.post('/api/leads/capture', async (req, res) => {
     
     const status = score >= 50 ? 'Hot' : (score >= 20 ? 'Warm' : 'Cold');
 
-    // 3. Write strictly mapping to your Prisma schema columns
+    // Write strictly mapping to your Prisma schema columns
     const dbLead = await prisma.lead.create({
       data: {
         orgId: activeOrgId,
@@ -49,8 +62,8 @@ app.post('/api/leads/capture', async (req, res) => {
       }
     });
 
-    // 4. Fire Real-Time Alert to Dashboard
-    console.log(`✅ Lead [${dbLead.firstName}] secured in DB! Emitting to dashboard.`);
+    // Fire Real-Time Alert to Dashboard
+    console.log(`✅ Lead [${dbLead.firstName}] secured! Org: ${activeOrgId}`);
     io.emit('new_lead', dbLead); 
     
     return res.status(200).json({ success: true, lead: dbLead });
