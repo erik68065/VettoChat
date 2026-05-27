@@ -518,7 +518,7 @@ async function finishConversation() {
 
   try {
     // Auto-detect server URL so the widget works from any device on the network
-    const SERVER_URL = (window.location.protocol === 'file:') ? 'http://localhost:8080' : window.location.origin;
+    const SERVER_URL = "https://vettochat-backend.onrender.com"
     const response = await fetch(`${SERVER_URL}/api/leads/capture`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

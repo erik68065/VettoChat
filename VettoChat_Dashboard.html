@@ -1652,8 +1652,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2. Connect to Local Engine
   // Auto-detect server URL so the dashboard works from any device on the network
-  const SERVER_URL = (window.location.protocol === 'file:') ? 'http://localhost:8080' : window.location.origin;
-  const socket = io(SERVER_URL);
+  const socket = io('https://vettochat-backend.onrender.com', {
+  transports: ['websocket', 'polling'] // Ensures fallback stability
+});
 
   socket.on('new_lead', (lead) => {
     console.log('[VettoChat] Received lead:', JSON.stringify(lead));
