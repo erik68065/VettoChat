@@ -599,18 +599,19 @@ async function _submitOutOfArea(location) {
   if (isPreview) return;
   const rawName = S.data.name || S.data.firstName || '';
   const fullName = rawName.replace(/\b\w/g, c => c.toUpperCase());
+
+  // Write to filtered (not main) localStorage so the dashboard tracks it separately
   try {
-    await fetch('https://vettochat-backend.onrender.com/api/leads/capture', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: fullName, firstName: fullName,
-        phone: S.data.phone || '', intent: S.data.service || 'General Inquiry',
-        urgency: S.data.urgency || '', budget: S.data.budget || '',
-        location, out_of_area: true, source_url: window.location.hostname,
-      }),
-    });
-  } catch(e) {}
+    localStorage.setItem('vettochat_filtered_lead', JSON.stringify({
+      name:     fullName,
+      phone:    S.data.phone || '',
+      location,
+      service:  S.data.service || '',
+      reason:   'out_of_area',
+      _nonce:   Date.now().toString(36) + Math.random().toString(36).slice(2),
+      _ts:      Date.now()
+    }));
+  } catch (_) {}
 }
 
 async function finishConversation() {

@@ -571,6 +571,17 @@ td.muted{font-size:12px;color:var(--muted)}
 .crm-save-lead-btn:hover{background:#1D4ED8}
 /* Status manager */
 .crm-status-mgr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px}
+.crm-filtered-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.crm-filtered-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;transition:background .12s}
+.crm-filtered-header:hover{background:#F8FAFC}
+.crm-filtered-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--navy)}
+.crm-filtered-badge{background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
+.crm-filtered-chevron{font-size:11px;color:var(--muted);transition:transform .2s}
+.crm-filtered-chevron.open{transform:rotate(180deg)}
+.crm-filtered-body{border-top:1px solid var(--border)}
+.crm-filtered-reason{display:inline-flex;align-items:center;background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600}
+.crm-filtered-clear{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.crm-filtered-clear:hover{border-color:#EF4444;color:#EF4444}
 .crm-status-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
 .crm-status-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px}
 .crm-status-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
@@ -1004,6 +1015,38 @@ Phone: (214) 555-0192
           </div>
           <div class="crm-status-list" id="crmStatusList"></div>
           <button class="crm-add-status-btn" onclick="addCRMStatus()">+ Add Status</button>
+        </div>
+
+        <!-- Filtered / Disqualified Leads -->
+        <div class="crm-filtered-wrap">
+          <div class="crm-filtered-header" onclick="toggleFilteredSection()">
+            <div class="crm-filtered-title">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#92400E" stroke-width="1.6"><path d="M1 2h12l-4.5 5.5V12l-3-1.5V7.5L1 2z" stroke-linejoin="round"/></svg>
+              Filtered Leads
+              <span class="crm-filtered-badge" id="filteredBadge">0</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:var(--muted)">Out-of-area &amp; disqualified — not in main pipeline</span>
+              <span class="crm-filtered-chevron" id="filteredChevron">▾</span>
+            </div>
+          </div>
+          <div class="crm-filtered-body" id="filteredBody" style="display:none">
+            <table class="crm-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Location</th>
+                  <th>Reason</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="filteredTableBody"></tbody>
+            </table>
+            <div style="padding:12px 20px;display:flex;justify-content:flex-end;border-top:1px solid var(--border)">
+              <button class="crm-filtered-clear" onclick="clearFilteredLeads()">Clear All Filtered</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1976,6 +2019,7 @@ let crmActiveLead = null;  // id of currently open lead
 let crmInited   = false;
 let crmSortKey  = 'created';
 let crmSortDir  = 'desc';
+let filteredLeads = {};  // { [id]: { name, phone, location, reason, created } }
 
 function setCRMSort(key) {
   if (crmSortKey === key) { crmSortDir = crmSortDir === 'asc' ? 'desc' : 'asc'; }
@@ -2000,6 +2044,75 @@ function loadCRMData() {
 function saveCRMLeads()    { localStorage.setItem('vettochat_leads',         JSON.stringify(crmLeads)); }
 function saveCRMStatuses() { localStorage.setItem('vettochat_lead_statuses', JSON.stringify(crmStatuses)); updateCRMBadge(); }
 
+function loadFilteredLeads() {
+  try { filteredLeads = JSON.parse(localStorage.getItem('vettochat_filtered_leads') || '{}'); }
+  catch(_) { filteredLeads = {}; }
+}
+function saveFilteredLeads() {
+  localStorage.setItem('vettochat_filtered_leads', JSON.stringify(filteredLeads));
+}
+
+const FILTERED_REASON_LABELS = {
+  out_of_area: 'Out of Service Area',
+  invalid:     'Invalid Info',
+  spam:        'Spam / Bot',
+};
+
+function ingestFilteredLead(lead) {
+  const id  = 'flt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  const now = Date.now();
+  filteredLeads[id] = {
+    id,
+    name:     lead.name     || lead.firstName || 'Unknown',
+    phone:    (lead.phone   || '').replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'),
+    location: lead.location || lead.city || lead.zip || '',
+    service:  lead.service  || lead.intent || '',
+    reason:   lead.reason   || 'out_of_area',
+    created:  now
+  };
+  saveFilteredLeads();
+  renderFilteredTable();
+}
+
+function renderFilteredTable() {
+  const tbody = document.getElementById('filteredTableBody');
+  const badge = document.getElementById('filteredBadge');
+  const items = Object.values(filteredLeads).sort((a, b) => b.created - a.created);
+  if (badge) badge.textContent = items.length;
+  if (!tbody) return;
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;font-size:13px">No filtered leads</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = items.map(l => {
+    const date = l.created ? new Date(l.created).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
+    const label = FILTERED_REASON_LABELS[l.reason] || l.reason || 'Disqualified';
+    return `<tr>
+      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px;opacity:.6">${initials(l.name)}</div><span class="lead-name" style="color:var(--muted)">${_esc(l.name || '—')}</span></div></td>
+      <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
+      <td style="font-size:12px;color:var(--muted)">${_esc(l.location || '—')}</td>
+      <td><span class="crm-filtered-reason">${_esc(label)}</span></td>
+      <td style="font-size:12px;color:var(--muted)">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleFilteredSection() {
+  const body    = document.getElementById('filteredBody');
+  const chevron = document.getElementById('filteredChevron');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display  = open ? 'none' : '';
+  if (chevron) chevron.classList.toggle('open', !open);
+}
+
+function clearFilteredLeads() {
+  if (!confirm('Clear all filtered leads? This cannot be undone.')) return;
+  filteredLeads = {};
+  saveFilteredLeads();
+  renderFilteredTable();
+}
+
 function updateCRMBadge() {
   const badge = document.getElementById('crmBadge');
   if (!badge) return;
@@ -2013,6 +2126,7 @@ function initCRM() {
   renderCRMStatusFilter();
   renderCRMTable();
   renderCRMStatusManager();
+  renderFilteredTable();
   updateCRMBadge();
 }
 
@@ -2378,6 +2492,13 @@ function renderOverviewFromCRM() {
 
 // Cross-tab real-time sync via storage events
 window.addEventListener('storage', (e) => {
+  // Filtered/disqualified lead written by widget (e.g. out-of-area)
+  if (e.key === 'vettochat_filtered_lead') {
+    try {
+      const lead = JSON.parse(e.newValue || '{}');
+      if (lead.name) ingestFilteredLead(lead);
+    } catch (_) {}
+  }
   // Widget wrote a completed lead directly to localStorage — ingest it immediately
   // with all field names intact, before the backend's socket event can arrive.
   if (e.key === 'vettochat_pending_lead' && !demoActive) {
@@ -2478,8 +2599,14 @@ function _parseBudgetToValue(raw) {
 function crmIngestLead(lead) {
   if (!crmInited) loadCRMData();
 
+  // Drop clearly invalid/spam leads before any processing
+  const rawName  = (lead.name || lead.firstName || '').trim();
+  const rawPhone = (lead.phone || '').replace(/\D/g, '');
+  if (!rawName || rawName.length < 2)            return { id: null, blocked: true, reason: 'invalid' };
+  if (rawPhone.length > 0 && rawPhone.length !== 10) return { id: null, blocked: true, reason: 'invalid' };
+
   // Format phone
-  let phone = (lead.phone || '').replace(/\D/g, '');
+  let phone = rawPhone;
   if (phone.length === 10) phone = `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
   else phone = lead.phone || '';
 
@@ -3069,6 +3196,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadContactData();
   loadSAConfig();
   loadCRMData();
+  loadFilteredLeads();
   updateCRMBadge();
   setWeekRange();
   loadWidgetStatus();
