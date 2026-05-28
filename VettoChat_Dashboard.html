@@ -3656,6 +3656,10 @@ function saveCFM() {
 
 // ─── ONBOARDING ──────────────────────────────────────────────────────────────
 function checkOnboarding() {
+  // ?new_user=1 in the URL resets onboarding for testing/demos
+  if (new URLSearchParams(window.location.search).get('new_user') === '1') {
+    localStorage.removeItem('vettochat_onboarding_done');
+  }
   if (localStorage.getItem('vettochat_onboarding_done')) return;
   document.getElementById('obOverlay').style.display = 'flex';
 }
