@@ -175,7 +175,7 @@ td.muted{font-size:12px;color:var(--muted)}
 .pip{width:22px;height:3px;border-radius:2px;background:var(--border);transition:all 0.3s}
 .pip.done{background:rgba(37,99,235,0.35)}
 .pip.active{background:#2563EB;width:30px}
-.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 16px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;width:340px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none}
+.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 18px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:12px;width:420px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast-icon{font-size:16px;flex-shrink:0}
 .toast strong{font-size:13px;font-weight:700;color:var(--navy);display:block}
@@ -1890,7 +1890,7 @@ function _doApplyTemplate(id) {
   const toast = document.getElementById('tmplToast');
   if (toast) {
     toast.querySelector('strong').textContent = `${tmpl.icon} ${tmpl.name} template applied`;
-    toast.querySelector('span').textContent = 'Hit Save All Changes to push to your chatbot';
+    toast.querySelector('span').textContent = 'Click Save All Changes to apply';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3500);
   }
@@ -3015,7 +3015,7 @@ const _US_STATES = [
   {abbr:'WV',name:'West Virginia'},{abbr:'WI',name:'Wisconsin'},{abbr:'WY',name:'Wyoming'}
 ];
 
-const _SA_DEFAULT_DECLINE = "Unfortunately, we do not currently service your area. If you believe this was a mistake, please give us a call and we'd be happy to help.";
+const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later! If you believe this was a mistake, please give us a call and we'd be happy to help.";
 
 const DEFAULT_SA_CONFIG = {
   enabled: false,
@@ -3045,7 +3045,7 @@ function saveSAConfig() {
   const t = document.getElementById('tmplToast');
   if (t) {
     t.querySelector('strong').textContent = '✓ Service area saved';
-    t.querySelector('span').textContent = 'Existing leads re-evaluated against new service area';
+    t.querySelector('span').textContent = 'Existing leads re-checked against updated service area';
     t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
   }
 }
@@ -3646,7 +3646,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div class="toast" id="tmplToast" style="border-left-color:#059669">
   <span class="toast-icon">✓</span>
-  <div><strong id="tmplToastTitle">Template applied</strong><span id="tmplToastSub">Hit Save All Changes to push to your chatbot</span></div>
+  <div><strong id="tmplToastTitle">Template applied</strong><span id="tmplToastSub">Click Save All Changes to apply</span></div>
 </div>
 
 <!-- ── CRM LEAD DETAIL PANEL ── -->
