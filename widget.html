@@ -641,15 +641,8 @@ function showCityPicker(key){
     backRow.appendChild(backBtn);
     wrap.appendChild(backRow);
 
-    // Filter: if service area is configured, only show whitelisted cities for this state
-    let cities;
-    try {
-      const sa = JSON.parse(localStorage.getItem('vettochat_service_area') || '{}');
-      if (sa.enabled && Array.isArray(sa.cities) && sa.cities.length) {
-        cities = sa.cities.filter(c => c.endsWith(', ' + state.abbr));
-      }
-    } catch(_) {}
-    if (!cities) cities = _CITIES.filter(c => c.endsWith(', ' + state.abbr));
+    // Always show all cities for the selected state — SA validation happens after selection
+    const cities = _CITIES.filter(c => c.endsWith(', ' + state.abbr));
 
     if (!cities.length) {
       const lbl = document.createElement('div');
