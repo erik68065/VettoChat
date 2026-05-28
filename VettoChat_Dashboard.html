@@ -450,6 +450,26 @@ td.muted{font-size:12px;color:var(--muted)}
 .cfm-logo-preview img{width:100%;height:100%;object-fit:contain}
 .cfm-logo-hint{font-size:11px;color:var(--muted);line-height:1.5}
 
+/* ── SERVICE AREA ── */
+.sa-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid var(--border)}
+.sa-toggle-info h4{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 3px}
+.sa-toggle-info p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
+.sa-body{padding:20px 24px;display:flex;flex-direction:column;gap:18px}
+.sa-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
+.sa-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sa-tag{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#1E40AF}
+.sa-tag button{background:none;border:none;cursor:pointer;color:#93C5FD;font-size:13px;line-height:1;padding:0;transition:color .15s;display:flex;align-items:center}
+.sa-tag button:hover{color:#1E40AF}
+.sa-add-input{display:flex;gap:6px;align-items:center}
+.sa-add-input input{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:7px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:border-color .2s;flex:1;min-width:120px;max-width:200px}
+.sa-add-input input:focus{border-color:#2563EB}
+.sa-add-btn{padding:7px 13px;background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.sa-add-btn:hover{background:#DBEAFE;border-color:#93C5FD}
+.sa-radius-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.sa-radius-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sa-radius-row label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.sa-oor-badge{display:inline-flex;align-items:center;gap:4px;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.04em}
+
 /* ── CONTACT FIELD MANAGER ── */
 .cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;opacity:0;pointer-events:none;transition:opacity 0.25s}
 .cfm-overlay.open{opacity:1;pointer-events:all}
@@ -823,7 +843,83 @@ Phone: (214) 555-0192
           </div>
         </div>
 
-        <!-- ════ SECTION 5: WIDGET STATUS ════ -->
+        <!-- ════ SECTION 5: SERVICE AREA ════ -->
+        <div class="card">
+          <div class="sa-toggle-row">
+            <div class="sa-toggle-info">
+              <h4>Service Area Qualification</h4>
+              <p>Automatically validate leads against your service area. Out-of-area inquiries are politely declined in the chatbot and marked in the CRM.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)" id="saToggleLabel">Disabled</span>
+              <div class="toggle" id="saToggle" onclick="toggleSA()" title="Toggle service area qualification">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="sa-body" id="saBody" style="display:none">
+            <!-- Cities -->
+            <div>
+              <div class="sa-section-label">Service Cities</div>
+              <div class="sa-tags" id="saCityTags"></div>
+              <div class="sa-add-input" style="margin-top:8px">
+                <input id="saNewCity" type="text" placeholder="e.g. Plano" onkeydown="if(event.key==='Enter')addSAItem('city')">
+                <button class="sa-add-btn" onclick="addSAItem('city')">+ Add City</button>
+              </div>
+            </div>
+            <!-- ZIPs -->
+            <div>
+              <div class="sa-section-label">ZIP Codes</div>
+              <div class="sa-tags" id="saZipTags"></div>
+              <div class="sa-add-input" style="margin-top:8px">
+                <input id="saNewZip" type="text" placeholder="e.g. 75025" maxlength="5" onkeydown="if(event.key==='Enter')addSAItem('zip')">
+                <button class="sa-add-btn" onclick="addSAItem('zip')">+ Add ZIP</button>
+              </div>
+            </div>
+            <!-- Counties -->
+            <div>
+              <div class="sa-section-label">Counties / Regions</div>
+              <div class="sa-tags" id="saCountyTags"></div>
+              <div class="sa-add-input" style="margin-top:8px">
+                <input id="saNewCounty" type="text" placeholder="e.g. Collin County" onkeydown="if(event.key==='Enter')addSAItem('county')">
+                <button class="sa-add-btn" onclick="addSAItem('county')">+ Add County</button>
+              </div>
+            </div>
+            <!-- Radius -->
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
+              <div class="sa-radius-row">
+                <label style="font-size:13px;font-weight:600;color:var(--navy)">Radius-based coverage</label>
+                <div class="toggle" id="saRadiusToggle" onclick="toggleSARadius()" style="width:34px;height:18px" title="Enable radius validation">
+                  <div class="toggle-thumb" style="width:14px;height:14px;top:2px;left:2px"></div>
+                </div>
+              </div>
+              <div id="saRadiusBody" style="display:none">
+                <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Leads within the specified radius of a center ZIP will be marked serviceable.</p>
+                <div class="sa-radius-grid">
+                  <div>
+                    <label class="field-label">Center ZIP Code</label>
+                    <input class="field-input" id="saRadiusZip" type="text" placeholder="e.g. 75025" maxlength="5" style="margin-bottom:0">
+                  </div>
+                  <div>
+                    <label class="field-label">Radius (miles)</label>
+                    <input class="field-input" id="saRadiusMiles" type="number" placeholder="25" min="1" max="500" style="margin-bottom:0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Decline message -->
+            <div>
+              <label class="field-label">Out-of-Area Message <span style="font-size:10px;font-weight:500;color:var(--muted)">shown to customers outside your service area</span></label>
+              <textarea class="field-input field-textarea" id="saDeclineMsg" rows="3" style="resize:vertical;margin-bottom:0"></textarea>
+            </div>
+            <div style="display:flex;justify-content:flex-end">
+              <button class="save-btn" onclick="saveSAConfig()">Save Service Area</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ SECTION 6: WIDGET STATUS ════ -->
+
         <div class="card">
           <div class="bc-card-head">
             <div>
@@ -1858,12 +1954,13 @@ const CRM_STATUS_COLORS = {
 };
 
 const DEFAULT_STATUSES = [
-  { id:'new',            label:'New',            color:'blue'   },
-  { id:'called',         label:'Called',         color:'purple' },
-  { id:'quoted',         label:'Quoted',         color:'orange' },
-  { id:'sold',           label:'Sold',           color:'green'  },
-  { id:'not_interested', label:'Not Interested', color:'red'    },
-  { id:'follow_up',      label:'Follow Up',      color:'gray'   },
+  { id:'new',            label:'New',                  color:'blue'   },
+  { id:'called',         label:'Called',               color:'purple' },
+  { id:'quoted',         label:'Quoted',               color:'orange' },
+  { id:'sold',           label:'Sold',                 color:'green'  },
+  { id:'not_interested', label:'Not Interested',       color:'red'    },
+  { id:'follow_up',      label:'Follow Up',            color:'gray'   },
+  { id:'out_of_area',    label:'Out of Service Area',  color:'red'    },
 ];
 
 let crmLeads    = {};  // { [id]: lead }
@@ -1982,8 +2079,9 @@ function renderCRMTable() {
     const date  = l.created ? new Date(l.created).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : '—';
     const val   = l.budget  || (l.value ? '$' + Number(l.value).toLocaleString() : '—');
     const notes = (l.notes  || '').replace(/<[^>]*>/g, '').slice(0, 60) || '—';
-    return `<tr onclick="openCRMPanel('${l.id}')">
-      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><span class="lead-name">${_esc(l.name || '—')}</span></div></td>
+    const isOOA = l.status === 'out_of_area';
+    return `<tr onclick="openCRMPanel('${l.id}')" style="${isOOA ? 'opacity:0.7' : ''}">
+      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><div><span class="lead-name">${_esc(l.name || '—')}</span>${isOOA ? '<div style="margin-top:2px"><span class="sa-oor-badge">⊗ Out of Area</span></div>' : ''}</div></div></td>
       <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
       <td style="font-size:12px">${_esc(l.service || '—')}</td>
       <td class="crm-val">${val}</td>
@@ -2227,12 +2325,13 @@ function createNewLead() {
 function syncStatsFromCRM() {
   if (demoActive) return; // never overwrite demo UI mid-run
   const leads = Object.values(crmLeads);
-  const total    = leads.length;
-  const hot      = leads.filter(l => l.priority === 'hot').length;
-  // "Needs follow-up" = leads not marked sold/closed/not-interested
-  const deadSet  = new Set(crmStatuses.filter(s => s.color === 'red' || s.id === 'sold' || s.id === 'not_interested').map(s => s.id));
-  const followUp = leads.filter(l => !deadSet.has(l.status)).length;
-  const pipeline = leads.reduce((sum, l) => sum + (l.value || 0), 0);
+  // Exclude out-of-area leads from all stats
+  const qualified = leads.filter(l => l.status !== 'out_of_area');
+  const total    = qualified.length;
+  const hot      = qualified.filter(l => l.priority === 'hot').length;
+  const deadSet  = new Set(crmStatuses.filter(s => s.color === 'red' || s.id === 'sold' || s.id === 'not_interested' || s.id === 'out_of_area').map(s => s.id));
+  const followUp = qualified.filter(l => !deadSet.has(l.status)).length;
+  const pipeline = qualified.reduce((sum, l) => sum + (l.value || 0), 0);
 
   const el = id => document.getElementById(id);
   if (el('sv0')) el('sv0').innerText = total;
@@ -2281,6 +2380,10 @@ window.addEventListener('storage', (e) => {
   }
   if (e.key === 'vettochat_config' && !demoActive) {
     loadIdentityForm();
+  }
+  if (e.key === 'vettochat_service_area') {
+    try { const p = JSON.parse(e.newValue || '{}'); _saConfig = { ...DEFAULT_SA_CONFIG, ...p, radius: { ...DEFAULT_SA_CONFIG.radius, ...(p.radius||{}) } }; } catch {}
+    renderSAUI();
   }
   if (e.key === 'vettochat_widget_live') {
     _widgetLive = e.newValue !== 'false';
@@ -2358,13 +2461,20 @@ function crmIngestLead(lead) {
   // Parse budget into numeric value for sorting/stats
   const value = _parseBudgetToValue(budgetRaw);
 
-  // All chatbot-captured leads always start at 'new' regardless of priority score.
-  // Priority (hot/warm/cold) only affects stat counters, not the CRM pipeline stage.
-  const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
-  const crmStatus = newStatus?.id || 'new';
-
   const ls = (lead.status || '').toLowerCase();
   const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
+
+  // All chatbot-captured leads always start at 'new' unless service area validation overrides.
+  const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
+  let crmStatus = newStatus?.id || 'new';
+
+  // If widget already flagged as out-of-area, or dashboard validates it now
+  const isOOA = lead.out_of_area === true;
+  const saResult = isOOA ? { serviceable: false } : _saValidate(location);
+  if (saResult.serviceable === false) {
+    const ooa = crmStatuses.find(s => s.id === 'out_of_area');
+    crmStatus = ooa ? ooa.id : (crmStatuses.find(s => s.color === 'red')?.id || 'out_of_area');
+  }
 
   const id  = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
   const now = Date.now();
@@ -2391,6 +2501,305 @@ function crmIngestLead(lead) {
   saveCRMLeads(); updateCRMBadge();
   if (crmInited) renderCRMTable();
   return { id, value, priority };
+}
+
+// ─── SERVICE AREA ─────────────────────────────────────────────────────────────
+// Compact ZIP centroid table (lat, lng) for radius validation
+const _ZIP_LL = {
+  // DFW Metro
+  '75001':[32.95,-96.83],'75002':[33.11,-96.68],'75006':[32.98,-96.90],'75007':[32.99,-96.87],
+  '75013':[33.11,-96.65],'75019':[32.98,-97.01],'75022':[33.03,-97.07],'75023':[33.04,-96.73],
+  '75024':[33.07,-96.77],'75025':[33.07,-96.73],'75028':[33.05,-97.08],'75034':[33.12,-96.82],
+  '75035':[33.13,-96.78],'75038':[32.87,-96.99],'75039':[32.87,-96.96],'75040':[32.91,-96.63],
+  '75044':[32.96,-96.63],'75048':[32.94,-96.55],'75050':[32.79,-97.04],'75051':[32.74,-97.01],
+  '75052':[32.72,-97.02],'75060':[32.81,-96.99],'75061':[32.83,-96.97],'75062':[32.85,-96.97],
+  '75063':[32.91,-96.99],'75065':[33.05,-97.05],'75067':[33.05,-97.00],'75068':[33.09,-97.02],
+  '75069':[33.20,-96.61],'75070':[33.19,-96.66],'75071':[33.21,-96.70],'75074':[33.02,-96.69],
+  '75075':[33.03,-96.74],'75078':[33.24,-96.85],'75080':[32.98,-96.73],'75081':[32.95,-96.72],
+  '75082':[32.97,-96.69],'75094':[33.02,-96.65],'75098':[33.01,-96.55],'75115':[32.67,-96.88],
+  '75134':[32.63,-96.84],'75150':[32.82,-96.68],'75154':[32.59,-96.80],'75180':[32.76,-96.59],
+  '75201':[32.79,-96.81],'75204':[32.80,-96.79],'75205':[32.83,-96.79],'75206':[32.82,-96.77],
+  '75209':[32.84,-96.85],'75214':[32.82,-96.75],'75218':[32.84,-96.68],'75220':[32.86,-96.88],
+  '75225':[32.87,-96.80],'75229':[32.90,-96.87],'75230':[32.90,-96.80],'75231':[32.87,-96.75],
+  '75234':[32.92,-96.90],'75240':[32.93,-96.81],'75243':[32.90,-96.75],'75244':[32.92,-96.84],
+  '75248':[32.96,-96.79],'75251':[32.91,-96.77],'75252':[32.97,-96.77],'75254':[32.94,-96.79],
+  // Houston Metro
+  '77002':[29.75,-95.37],'77005':[29.72,-95.42],'77006':[29.74,-95.39],'77007':[29.77,-95.40],
+  '77008':[29.79,-95.41],'77009':[29.78,-95.38],'77018':[29.82,-95.42],'77019':[29.75,-95.42],
+  '77024':[29.77,-95.49],'77027':[29.75,-95.44],'77030':[29.70,-95.40],'77040':[29.86,-95.50],
+  '77042':[29.74,-95.55],'77055':[29.80,-95.48],'77056':[29.75,-95.46],'77057':[29.74,-95.48],
+  '77063':[29.73,-95.53],'77064':[29.89,-95.51],'77070':[29.94,-95.57],'77077':[29.74,-95.59],
+  '77079':[29.77,-95.56],'77080':[29.82,-95.51],'77084':[29.80,-95.63],'77094':[29.77,-95.62],
+  '77095':[29.85,-95.60],'77098':[29.73,-95.40],'77099':[29.70,-95.60],
+  // Austin
+  '78701':[30.27,-97.74],'78703':[30.29,-97.76],'78704':[30.24,-97.75],'78705':[30.29,-97.74],
+  '78723':[30.30,-97.68],'78726':[30.43,-97.80],'78727':[30.42,-97.73],'78729':[30.44,-97.77],
+  '78731':[30.34,-97.77],'78741':[30.23,-97.72],'78745':[30.21,-97.78],'78748':[30.17,-97.81],
+  '78750':[30.44,-97.81],'78752':[30.32,-97.71],'78753':[30.38,-97.67],'78758':[30.38,-97.71],
+  // San Antonio
+  '78201':[29.46,-98.54],'78207':[29.42,-98.54],'78209':[29.47,-98.44],'78212':[29.44,-98.50],
+  '78213':[29.50,-98.53],'78216':[29.52,-98.51],'78217':[29.53,-98.46],'78229':[29.50,-98.56],
+  '78230':[29.53,-98.55],'78232':[29.57,-98.51],'78233':[29.55,-98.41],'78240':[29.51,-98.60],
+  '78248':[29.60,-98.53],'78249':[29.56,-98.62],'78250':[29.48,-98.66],'78258':[29.61,-98.50],
+  // Atlanta
+  '30301':[33.75,-84.39],'30305':[33.83,-84.38],'30306':[33.77,-84.35],'30307':[33.76,-84.32],
+  '30308':[33.76,-84.36],'30309':[33.79,-84.38],'30312':[33.74,-84.36],'30314':[33.77,-84.42],
+  '30315':[33.71,-84.38],'30318':[33.79,-84.43],'30319':[33.86,-84.34],'30324':[33.81,-84.36],
+  '30326':[33.84,-84.36],'30327':[33.86,-84.41],'30328':[33.92,-84.37],'30329':[33.83,-84.32],
+  '30338':[33.94,-84.33],'30340':[33.90,-84.29],'30342':[33.88,-84.37],'30346':[33.91,-84.33],
+  '30350':[33.97,-84.30],'30360':[33.94,-84.27],
+  // Chicago
+  '60601':[41.88,-87.62],'60605':[41.87,-87.62],'60607':[41.88,-87.66],'60608':[41.85,-87.66],
+  '60610':[41.90,-87.63],'60611':[41.89,-87.62],'60612':[41.88,-87.69],'60613':[41.95,-87.65],
+  '60614':[41.92,-87.65],'60615':[41.80,-87.60],'60616':[41.84,-87.62],'60618':[41.95,-87.69],
+  '60620':[41.74,-87.65],'60622':[41.90,-87.68],'60625':[41.97,-87.70],'60626':[42.00,-87.67],
+  '60629':[41.77,-87.71],'60630':[41.98,-87.77],'60632':[41.80,-87.73],'60634':[41.93,-87.81],
+  '60637':[41.78,-87.61],'60640':[41.97,-87.66],'60641':[41.94,-87.76],'60647':[41.92,-87.70],
+  '60657':[41.94,-87.65],'60660':[41.99,-87.67],
+  // Los Angeles
+  '90001':[33.97,-118.25],'90004':[34.08,-118.31],'90006':[34.05,-118.31],'90007':[34.02,-118.27],
+  '90011':[34.00,-118.26],'90012':[34.06,-118.24],'90015':[34.04,-118.27],'90019':[34.05,-118.35],
+  '90024':[34.06,-118.43],'90025':[34.05,-118.44],'90026':[34.08,-118.27],'90027':[34.10,-118.29],
+  '90028':[34.10,-118.33],'90034':[34.02,-118.40],'90036':[34.07,-118.35],'90039':[34.11,-118.27],
+  '90041':[34.13,-118.20],'90046':[34.10,-118.37],'90049':[34.07,-118.47],'90064':[34.03,-118.42],
+  '90066':[34.00,-118.43],'90068':[34.12,-118.35],'90069':[34.09,-118.38],'90077':[34.11,-118.46],
+  // New York
+  '10001':[40.75,-74.00],'10002':[40.72,-73.99],'10003':[40.73,-73.99],'10007':[40.71,-74.01],
+  '10009':[40.73,-73.98],'10010':[40.74,-73.98],'10011':[40.74,-74.00],'10012':[40.73,-74.00],
+  '10014':[40.73,-74.00],'10016':[40.75,-73.98],'10019':[40.77,-73.98],'10021':[40.77,-73.96],
+  '10022':[40.76,-73.97],'10023':[40.78,-73.98],'10024':[40.79,-73.98],'10025':[40.80,-73.96],
+  '10028':[40.78,-73.95],'10036':[40.76,-73.99],'10065':[40.77,-73.96],'10128':[40.78,-73.95],
+  '10301':[40.64,-74.09],'10304':[40.62,-74.09],'10305':[40.60,-74.08],
+  // Miami
+  '33101':[25.77,-80.19],'33125':[25.77,-80.23],'33126':[25.76,-80.30],'33127':[25.80,-80.20],
+  '33129':[25.75,-80.21],'33130':[25.75,-80.19],'33131':[25.76,-80.19],'33132':[25.78,-80.18],
+  '33133':[25.73,-80.23],'33134':[25.75,-80.28],'33137':[25.81,-80.19],'33138':[25.85,-80.18],
+  '33139':[25.78,-80.13],'33140':[25.80,-80.14],'33143':[25.70,-80.27],'33145':[25.75,-80.23],
+  '33146':[25.72,-80.27],'33150':[25.86,-80.21],'33155':[25.74,-80.32],'33156':[25.68,-80.29],
+  '33161':[25.89,-80.18],'33162':[25.92,-80.18],'33166':[25.82,-80.31],'33172':[25.77,-80.39],
+  '33176':[25.66,-80.33],'33180':[25.96,-80.15],
+  // Phoenix
+  '85006':[33.46,-112.05],'85008':[33.47,-111.98],'85012':[33.49,-112.07],'85013':[33.51,-112.08],
+  '85014':[33.51,-112.06],'85015':[33.50,-112.10],'85016':[33.49,-111.99],'85018':[33.47,-111.97],
+  '85020':[33.55,-112.05],'85021':[33.55,-112.08],'85022':[33.60,-112.02],'85028':[33.56,-111.99],
+  '85032':[33.58,-111.97],'85040':[33.36,-112.05],'85044':[33.35,-111.99],'85048':[33.31,-111.98],
+  '85050':[33.66,-111.97],'85083':[33.73,-112.09],'85085':[33.71,-112.11],'85086':[33.79,-112.10],
+  // Seattle
+  '98101':[47.61,-122.33],'98102':[47.63,-122.32],'98103':[47.67,-122.34],'98105':[47.66,-122.30],
+  '98107':[47.67,-122.37],'98109':[47.63,-122.36],'98112':[47.63,-122.30],'98115':[47.69,-122.30],
+  '98117':[47.69,-122.37],'98122':[47.61,-122.31],'98125':[47.72,-122.32],'98126':[47.56,-122.37],
+  '98133':[47.74,-122.34],'98144':[47.59,-122.30],'98177':[47.74,-122.38],'98199':[47.65,-122.40],
+  // Denver
+  '80202':[39.75,-104.99],'80203':[39.73,-104.98],'80204':[39.74,-105.02],'80205':[39.76,-104.97],
+  '80206':[39.73,-104.95],'80209':[39.70,-104.97],'80210':[39.68,-104.97],'80211':[39.77,-105.01],
+  '80218':[39.73,-104.97],'80219':[39.71,-105.03],'80220':[39.73,-104.93],'80221':[39.82,-105.00],
+  '80222':[39.68,-104.94],'80226':[39.71,-105.07],'80227':[39.67,-105.07],'80229':[39.87,-104.99],
+  '80231':[39.68,-104.90],'80233':[39.89,-104.95],'80234':[39.91,-105.01],'80238':[39.77,-104.89],
+  // Boston
+  '02108':[42.36,-71.07],'02109':[42.36,-71.05],'02113':[42.37,-71.05],'02114':[42.37,-71.07],
+  '02115':[42.34,-71.10],'02116':[42.35,-71.08],'02118':[42.34,-71.07],'02119':[42.32,-71.09],
+  '02122':[42.30,-71.06],'02125':[42.32,-71.06],'02127':[42.34,-71.04],'02128':[42.37,-71.03],
+  '02129':[42.38,-71.06],'02130':[42.31,-71.11],'02134':[42.35,-71.13],'02215':[42.35,-71.10],
+  // Nashville
+  '37201':[36.17,-86.78],'37203':[36.15,-86.79],'37204':[36.13,-86.79],'37205':[36.12,-86.85],
+  '37206':[36.17,-86.74],'37207':[36.21,-86.78],'37208':[36.19,-86.82],'37209':[36.16,-86.86],
+  '37210':[36.14,-86.76],'37211':[36.09,-86.74],'37212':[36.13,-86.81],'37214':[36.16,-86.68],
+  '37215':[36.09,-86.81],'37216':[36.21,-86.73],'37217':[36.11,-86.71],'37221':[36.08,-86.93],
+  // Portland OR
+  '97201':[45.51,-122.68],'97202':[45.49,-122.65],'97203':[45.60,-122.73],'97206':[45.48,-122.62],
+  '97209':[45.53,-122.69],'97210':[45.54,-122.70],'97211':[45.57,-122.65],'97212':[45.55,-122.63],
+  '97213':[45.53,-122.60],'97214':[45.51,-122.65],'97217':[45.59,-122.68],'97219':[45.45,-122.70],
+  '97221':[45.51,-122.74],'97222':[45.44,-122.62],'97223':[45.44,-122.77],'97225':[45.51,-122.79],
+  '97229':[45.54,-122.82],'97230':[45.55,-122.51],'97239':[45.49,-122.68],
+  // Las Vegas
+  '89101':[36.17,-115.14],'89102':[36.15,-115.18],'89103':[36.10,-115.19],'89104':[36.16,-115.12],
+  '89106':[36.19,-115.17],'89109':[36.12,-115.17],'89117':[36.16,-115.25],'89118':[36.09,-115.20],
+  '89119':[36.08,-115.15],'89121':[36.10,-115.07],'89123':[36.02,-115.13],'89128':[36.21,-115.23],
+  '89129':[36.24,-115.25],'89134':[36.21,-115.30],'89135':[36.17,-115.33],'89141':[36.00,-115.20],
+  '89144':[36.18,-115.30],'89145':[36.21,-115.27],'89146':[36.16,-115.22],'89147':[36.13,-115.23],
+  '89148':[36.10,-115.26],'89149':[36.27,-115.24],
+  // Minneapolis
+  '55401':[44.98,-93.27],'55403':[44.97,-93.28],'55404':[44.96,-93.27],'55405':[44.97,-93.30],
+  '55406':[44.94,-93.23],'55408':[44.94,-93.28],'55409':[44.93,-93.29],'55410':[44.92,-93.31],
+  '55411':[44.99,-93.30],'55412':[45.00,-93.31],'55413':[44.99,-93.24],'55414':[44.98,-93.23],
+  '55416':[44.95,-93.33],'55417':[44.91,-93.24],'55419':[44.91,-93.28],'55420':[44.87,-93.34],
+  '55421':[45.03,-93.25],'55422':[45.01,-93.34],'55423':[44.90,-93.31],'55426':[44.94,-93.37],
+  '55427':[45.00,-93.38],'55431':[44.86,-93.36],'55435':[44.89,-93.35],'55437':[44.88,-93.40],
+  '55441':[45.01,-93.42],'55447':[45.02,-93.47],
+};
+
+const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later!";
+
+const DEFAULT_SA_CONFIG = {
+  enabled: false,
+  cities: [], zips: [], counties: [],
+  radius: { enabled: false, centerZip: '', miles: 25 },
+  declineMessage: _SA_DEFAULT_DECLINE,
+};
+let _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } };
+
+function loadSAConfig() {
+  try {
+    const raw = localStorage.getItem('vettochat_service_area');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      _saConfig = { ...DEFAULT_SA_CONFIG, ...parsed, radius: { ...DEFAULT_SA_CONFIG.radius, ...(parsed.radius || {}) } };
+    } else {
+      _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } };
+    }
+  } catch(e) { _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } }; }
+  renderSAUI();
+}
+
+function saveSAConfig() {
+  _saConfig.declineMessage = (document.getElementById('saDeclineMsg')?.value || '').trim() || _SA_DEFAULT_DECLINE;
+  _saConfig.radius.centerZip = (document.getElementById('saRadiusZip')?.value || '').trim();
+  _saConfig.radius.miles = parseInt(document.getElementById('saRadiusMiles')?.value || '25') || 25;
+  localStorage.setItem('vettochat_service_area', JSON.stringify(_saConfig));
+  const t = document.getElementById('tmplToast');
+  if (t) {
+    t.querySelector('strong').textContent = '✓ Service area saved';
+    t.querySelector('span').textContent = 'Lead qualification rules updated';
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+  }
+}
+
+function toggleSA() {
+  _saConfig.enabled = !_saConfig.enabled;
+  renderSAUI();
+  saveSAConfig();
+}
+
+function toggleSARadius() {
+  _saConfig.radius.enabled = !_saConfig.radius.enabled;
+  renderSAUI();
+}
+
+function renderSAUI() {
+  const tog = document.getElementById('saToggle');
+  const lbl = document.getElementById('saToggleLabel');
+  const body = document.getElementById('saBody');
+  const radTog = document.getElementById('saRadiusToggle');
+  const radBody = document.getElementById('saRadiusBody');
+  if (tog) { tog.classList.toggle('on', _saConfig.enabled); }
+  if (lbl) { lbl.textContent = _saConfig.enabled ? 'Enabled' : 'Disabled'; lbl.style.color = _saConfig.enabled ? 'var(--green)' : 'var(--muted)'; }
+  if (body) body.style.display = _saConfig.enabled ? '' : 'none';
+  if (radTog) radTog.classList.toggle('on', _saConfig.radius.enabled);
+  if (radBody) radBody.style.display = _saConfig.radius.enabled ? '' : 'none';
+  // Render tag lists
+  _renderSATags('city',   'saCityTags',   _saConfig.cities);
+  _renderSATags('zip',    'saZipTags',    _saConfig.zips);
+  _renderSATags('county', 'saCountyTags', _saConfig.counties);
+  // Populate inputs
+  const dm = document.getElementById('saDeclineMsg');
+  if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
+  const rz = document.getElementById('saRadiusZip');
+  if (rz) rz.value = _saConfig.radius.centerZip || '';
+  const rm = document.getElementById('saRadiusMiles');
+  if (rm) rm.value = _saConfig.radius.miles || 25;
+}
+
+function _renderSATags(type, containerId, items) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = (items || []).map((item, i) =>
+    `<span class="sa-tag">${_esc(item)}<button onclick="removeSAItem('${type}',${i})" title="Remove">×</button></span>`
+  ).join('');
+}
+
+function addSAItem(type) {
+  const inputId = { city:'saNewCity', zip:'saNewZip', county:'saNewCounty' }[type];
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const val = inp.value.trim();
+  if (!val) return;
+  if (type === 'zip' && !/^\d{5}$/.test(val)) { inp.style.borderColor='#EF4444'; setTimeout(()=>inp.style.borderColor='',1500); return; }
+  const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
+  if (!arr.includes(val)) arr.push(val);
+  inp.value = '';
+  _renderSATags(type, { city:'saCityTags', zip:'saZipTags', county:'saCountyTags' }[type], arr);
+}
+
+function removeSAItem(type, index) {
+  const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
+  arr.splice(index, 1);
+  _renderSATags(type, { city:'saCityTags', zip:'saZipTags', county:'saCountyTags' }[type], arr);
+}
+
+// Haversine distance in miles
+function _haversineMiles(lat1, lng1, lat2, lng2) {
+  const R = 3958.8, toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Extract ZIP and city from casual text ("near downtown Dallas", "about 20 min from Plano")
+function _parseLocationText(str) {
+  if (!str) return {};
+  const s = str.trim();
+  const zipM = s.match(/\b(\d{5})\b/);
+  const zip = zipM ? zipM[1] : null;
+  // Strip directional noise, extract city-like word(s)
+  const cleaned = s
+    .replace(/\b(?:near|around|in|by|from|outside|close\s+to|about\s+\d+\s+(?:min(?:utes?)?|miles?)\s+from)\b/gi, '')
+    .replace(/\b(?:downtown|uptown|north|south|east|west|central|greater)\b/gi, '')
+    .trim();
+  const cityM = cleaned.match(/^([A-Za-z][A-Za-z\s'-]{1,25}?)(?:\s*,?\s*(?:[A-Z]{2}|\d{5}))?\s*$/);
+  const city = cityM ? cityM[1].trim() : null;
+  return { zip, city };
+}
+
+// Returns { serviceable: true|false|null, matchType, matched }
+// null = location too ambiguous to decide (ask clarification)
+function _saValidate(locationStr) {
+  if (!_saConfig.enabled) return { serviceable: true };
+  const hasRules = _saConfig.cities.length || _saConfig.zips.length || _saConfig.counties.length ||
+                   (_saConfig.radius.enabled && _saConfig.radius.centerZip);
+  if (!hasRules) return { serviceable: true }; // enabled but no rules yet → allow all
+
+  if (!locationStr || !locationStr.trim()) return { serviceable: null };
+
+  const loc = locationStr.toLowerCase();
+  const { zip, city } = _parseLocationText(locationStr);
+
+  // 1. Exact ZIP match
+  if (zip && _saConfig.zips.includes(zip)) return { serviceable: true, matchType:'zip', matched:zip };
+
+  // 2. City match (partial, case-insensitive)
+  for (const c of _saConfig.cities) {
+    const cl = c.toLowerCase();
+    if (loc.includes(cl) || (city && city.toLowerCase().includes(cl))) {
+      return { serviceable: true, matchType:'city', matched:c };
+    }
+  }
+
+  // 3. County/region match
+  for (const county of _saConfig.counties) {
+    if (loc.includes(county.toLowerCase())) return { serviceable: true, matchType:'county', matched:county };
+  }
+
+  // 4. Radius match (ZIP centroid lookup)
+  if (_saConfig.radius.enabled && _saConfig.radius.centerZip && zip) {
+    const center = _ZIP_LL[_saConfig.radius.centerZip];
+    const target = _ZIP_LL[zip];
+    if (center && target) {
+      const dist = _haversineMiles(center[0], center[1], target[0], target[1]);
+      if (dist <= (_saConfig.radius.miles || 25)) {
+        return { serviceable: true, matchType:'radius', matched:zip, dist: Math.round(dist) };
+      }
+      // ZIP found in table but outside radius → definitely outside
+      return { serviceable: false };
+    }
+  }
+
+  // 5. Nothing matched → outside (if we have explicit rules and nothing fit)
+  if (_saConfig.zips.length || _saConfig.cities.length || _saConfig.counties.length) {
+    return { serviceable: false };
+  }
+
+  // Radius-only mode with no ZIP in table → ambiguous
+  return { serviceable: null };
 }
 
 // ─── ACCOUNT PROFILE ─────────────────────────────────────────────────────────
@@ -2606,6 +3015,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderOverview(null);
   loadIdentityForm();
   loadContactData();
+  loadSAConfig();
   loadCRMData();
   updateCRMBadge();
   setWeekRange();

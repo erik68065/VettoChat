@@ -305,43 +305,131 @@ const S = {
   opened: false
 };
 
-const ZIP_TO_CITY = {
-  '75025':'Plano','75023':'Plano','75024':'Plano','75026':'Plano','75074':'Plano','75075':'Plano',
-  '75013':'Allen','75002':'Allen',
-  '75070':'McKinney','75071':'McKinney',
-  '75034':'Frisco','75035':'Frisco',
-  '75080':'Richardson','75081':'Richardson','75082':'Richardson',
-  '75048':'Garland','75044':'Garland',
-  '75068':'Lewisville','75067':'Lewisville',
-  '75006':'Carrollton','75007':'Carrollton',
-  '76201':'Denton','76205':'Denton',
-  '75078':'Prosper'
+// ─── SERVICE AREA ENGINE ─────────────────────────────────────────────────────
+const _W_ZIP_LL = {
+  '75001':[32.95,-96.83],'75002':[33.11,-96.68],'75006':[32.98,-96.90],'75007':[32.99,-96.87],
+  '75013':[33.11,-96.65],'75019':[32.98,-97.01],'75022':[33.03,-97.07],'75023':[33.04,-96.73],
+  '75024':[33.07,-96.77],'75025':[33.07,-96.73],'75028':[33.05,-97.08],'75034':[33.12,-96.82],
+  '75035':[33.13,-96.78],'75038':[32.87,-96.99],'75040':[32.91,-96.63],'75044':[32.96,-96.63],
+  '75048':[32.94,-96.55],'75050':[32.79,-97.04],'75051':[32.74,-97.01],'75052':[32.72,-97.02],
+  '75060':[32.81,-96.99],'75061':[32.83,-96.97],'75062':[32.85,-96.97],'75063':[32.91,-96.99],
+  '75065':[33.05,-97.05],'75067':[33.05,-97.00],'75068':[33.09,-97.02],'75069':[33.20,-96.61],
+  '75070':[33.19,-96.66],'75071':[33.21,-96.70],'75074':[33.02,-96.69],'75075':[33.03,-96.74],
+  '75078':[33.24,-96.85],'75080':[32.98,-96.73],'75081':[32.95,-96.72],'75082':[32.97,-96.69],
+  '75094':[33.02,-96.65],'75098':[33.01,-96.55],'75115':[32.67,-96.88],'75134':[32.63,-96.84],
+  '75150':[32.82,-96.68],'75201':[32.79,-96.81],'75205':[32.83,-96.79],'75214':[32.82,-96.75],
+  '75225':[32.87,-96.80],'75229':[32.90,-96.87],'75230':[32.90,-96.80],'75240':[32.93,-96.81],
+  '75248':[32.96,-96.79],'75252':[32.97,-96.77],'75254':[32.94,-96.79],
+  '77002':[29.75,-95.37],'77005':[29.72,-95.42],'77006':[29.74,-95.39],'77007':[29.77,-95.40],
+  '77008':[29.79,-95.41],'77018':[29.82,-95.42],'77024':[29.77,-95.49],'77027':[29.75,-95.44],
+  '77040':[29.86,-95.50],'77055':[29.80,-95.48],'77056':[29.75,-95.46],'77063':[29.73,-95.53],
+  '77077':[29.74,-95.59],'77084':[29.80,-95.63],'77094':[29.77,-95.62],'77095':[29.85,-95.60],
+  '78701':[30.27,-97.74],'78703':[30.29,-97.76],'78704':[30.24,-97.75],'78723':[30.30,-97.68],
+  '78729':[30.44,-97.77],'78745':[30.21,-97.78],'78752':[30.32,-97.71],'78758':[30.38,-97.71],
+  '78201':[29.46,-98.54],'78209':[29.47,-98.44],'78216':[29.52,-98.51],'78229':[29.50,-98.56],
+  '78233':[29.55,-98.41],'78249':[29.56,-98.62],'78258':[29.61,-98.50],
+  '30301':[33.75,-84.39],'30309':[33.79,-84.38],'30318':[33.79,-84.43],'30326':[33.84,-84.36],
+  '30338':[33.94,-84.33],'30342':[33.88,-84.37],'30350':[33.97,-84.30],
+  '60601':[41.88,-87.62],'60610':[41.90,-87.63],'60614':[41.92,-87.65],'60622':[41.90,-87.68],
+  '60625':[41.97,-87.70],'60640':[41.97,-87.66],'60657':[41.94,-87.65],
+  '90004':[34.08,-118.31],'90024':[34.06,-118.43],'90026':[34.08,-118.27],'90036':[34.07,-118.35],
+  '90046':[34.10,-118.37],'90066':[34.00,-118.43],'90068':[34.12,-118.35],
+  '10001':[40.75,-74.00],'10010':[40.74,-73.98],'10019':[40.77,-73.98],'10023':[40.78,-73.98],
+  '10036':[40.76,-73.99],'10128':[40.78,-73.95],
+  '33101':[25.77,-80.19],'33129':[25.75,-80.21],'33139':[25.78,-80.13],'33143':[25.70,-80.27],
+  '33161':[25.89,-80.18],'33176':[25.66,-80.33],
+  '85012':[33.49,-112.07],'85018':[33.47,-111.97],'85022':[33.60,-112.02],'85044':[33.35,-111.99],
+  '85085':[33.71,-112.11],
+  '98101':[47.61,-122.33],'98103':[47.67,-122.34],'98109':[47.63,-122.36],'98115':[47.69,-122.30],
+  '98117':[47.69,-122.37],'98133':[47.74,-122.34],'98199':[47.65,-122.40],
+  '80202':[39.75,-104.99],'80206':[39.73,-104.95],'80218':[39.73,-104.97],'80220':[39.73,-104.93],
+  '80226':[39.71,-105.07],'80234':[39.91,-105.01],
+  '02108':[42.36,-71.07],'02115':[42.34,-71.10],'02116':[42.35,-71.08],'02125':[42.32,-71.06],
+  '02129':[42.38,-71.06],'02134':[42.35,-71.13],'02215':[42.35,-71.10],
+  '37204':[36.13,-86.79],'37209':[36.16,-86.86],'37211':[36.09,-86.74],'37215':[36.09,-86.81],
+  '97201':[45.51,-122.68],'97206':[45.48,-122.62],'97214':[45.51,-122.65],'97219':[45.45,-122.70],
+  '97225':[45.51,-122.79],'97229':[45.54,-122.82],'97239':[45.49,-122.68],
+  '89102':[36.15,-115.18],'89109':[36.12,-115.17],'89119':[36.08,-115.15],'89129':[36.24,-115.25],
+  '89144':[36.18,-115.30],'89147':[36.13,-115.23],
+  '55401':[44.98,-93.27],'55405':[44.97,-93.30],'55408':[44.94,-93.28],'55416':[44.95,-93.33],
+  '55420':[44.87,-93.34],'55426':[44.94,-93.37],'55431':[44.86,-93.36],'55441':[45.01,-93.42],
 };
-const CITY_NAMES = ['plano','dallas','frisco','richardson','mckinney','allen','garland','mesquite','lewisville','carrollton','denton','prosper'];
+
+const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area — but we hope to expand soon!";
+
+let _sa_cfg = null;
+
+function _loadSA() {
+  try { const r = localStorage.getItem('vettochat_service_area'); _sa_cfg = r ? JSON.parse(r) : null; } catch { _sa_cfg = null; }
+}
+
+function _wHaversine(lat1, lng1, lat2, lng2) {
+  const R = 3958.8, tr = x => x * Math.PI / 180;
+  const dLat = tr(lat2-lat1), dLng = tr(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(tr(lat1)) * Math.cos(tr(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function _extractLoc(str) {
+  const zipM = str.match(/\b(\d{5})\b/);
+  const cleaned = str
+    .replace(/\b(?:near|around|in|by|from|close\s+to|about\s+\d+\s+(?:min(?:utes?)?|miles?)\s+from)\b/gi,'')
+    .replace(/\b(?:downtown|uptown|north|south|east|west|central|greater)\b/gi,'').trim();
+  const cityM = cleaned.match(/^([A-Za-z][A-Za-z\s'-]{1,25}?)(?:\s*,?\s*(?:[A-Z]{2}|\d{5}))?\s*$/);
+  return { zip: zipM ? zipM[1] : null, city: cityM ? cityM[1].trim() : null };
+}
+
+// Returns { serviceable: true|false|null, message }
+function _saCheck(locationStr) {
+  _loadSA();
+  const cfg = _sa_cfg;
+  if (!cfg || !cfg.enabled) return { serviceable: true };
+  const hasRules = (cfg.cities||[]).length || (cfg.zips||[]).length || (cfg.counties||[]).length ||
+                   (cfg.radius?.enabled && cfg.radius?.centerZip);
+  if (!hasRules) return { serviceable: true };
+
+  const loc = (locationStr||'').toLowerCase().trim();
+  if (!loc) return { serviceable: null };
+  const { zip, city } = _extractLoc(locationStr);
+
+  if (zip && (cfg.zips||[]).includes(zip)) return { serviceable: true };
+  for (const c of (cfg.cities||[])) {
+    if (loc.includes(c.toLowerCase()) || (city && city.toLowerCase().includes(c.toLowerCase()))) return { serviceable: true };
+  }
+  for (const co of (cfg.counties||[])) {
+    if (loc.includes(co.toLowerCase())) return { serviceable: true };
+  }
+  if (cfg.radius?.enabled && cfg.radius?.centerZip && zip) {
+    const center = _W_ZIP_LL[cfg.radius.centerZip], target = _W_ZIP_LL[zip];
+    if (center && target) {
+      if (_wHaversine(center[0],center[1],target[0],target[1]) <= (cfg.radius.miles||25)) return { serviceable: true };
+      return { serviceable: false, message: cfg.declineMessage || _SA_DEFAULT_DECLINE };
+    }
+  }
+  if ((cfg.zips||[]).length || (cfg.cities||[]).length || (cfg.counties||[]).length) {
+    return { serviceable: false, message: cfg.declineMessage || _SA_DEFAULT_DECLINE };
+  }
+  return { serviceable: null };
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 function resolveCity(val) {
   const v = val.trim();
-  if (/^\d{5}$/.test(v)) return (ZIP_TO_CITY[v] || v) + ', TX';
-  const match = CITY_NAMES.find(c => v.toLowerCase().includes(c));
-  if (match) return match.charAt(0).toUpperCase() + match.slice(1) + ', TX';
+  if (/^\d{5}$/.test(v)) {
+    // Build ZIP→city from ZIP_LL keys (approximation for display only)
+    return v;
+  }
   return v;
 }
 
 const V = {
-  name:   v => { const p=v.trim().split(/\s+/); return p.length>=2 && p.every(x=>/^[a-zA-Z'-]{2,}$/.test(x)); },
-  zip:    v => {
-    const zips=['75025','75023','75024','75026','75013','75074','75070','75071','75002','75034','75035','75080','75081','75082','75048','75044','75075'];
-    if(/^\d{5}$/.test(v.trim())) return zips.includes(v.trim());
-    return CITY_NAMES.some(c=>v.toLowerCase().includes(c));
-  },
-  phone:  v => v.replace(/\D/g,'').length===10,
-  budget: v => true
+  name:  v => { const p=v.trim().split(/\s+/); return p.length>=2 && p.every(x=>/^[a-zA-Z'-]{2,}$/.test(x)); },
+  phone: v => v.replace(/\D/g,'').length===10,
 };
 
 const ERR = {
-  name:   "Please enter your first and last name.",
-  zip:    "We may not service that area yet. Try a nearby Plano/DFW city or zip code.",
-  phone:  "Please enter a valid 10-digit phone number (e.g. 972-555-1234)."
+  name:  "Please enter your first and last name.",
+  phone: "Please enter a valid 10-digit phone number (e.g. 972-555-1234).",
 };
 
 const $ = id => document.getElementById(id);
@@ -477,14 +565,52 @@ function advanceStep(val, isChip){
   }
   if(key==='name') S.data.firstName=val.trim().split(/\s+/)[0];
 
+  // ── Service area check after location is collected ──
+  if(key==='location' || key==='zip' || key==='city'){
+    const saResult = _saCheck(val);
+    if(saResult.serviceable === null){
+      // Location too ambiguous — ask for a city or ZIP
+      showTyping();
+      setTimeout(()=>{ removeTyping(); addBotMsg("Could you clarify your location? A city name or 5-digit ZIP code works best.", 'error'); }, 750);
+      return;
+    }
+    if(saResult.serviceable === false){
+      S.done = true;
+      S.data.out_of_area = true;
+      disableInput();
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addBotMsg(saResult.message || _SA_DEFAULT_DECLINE, 'error');
+        // Still submit to backend with out_of_area flag for CRM record-keeping
+        _submitOutOfArea(val);
+      }, 900);
+      return;
+    }
+  }
+
   S.step++;
   updateProgress();
+  if(S.step>=STEPS.length){ finishConversation(); } else { askStep(S.step); }
+}
 
-  if(S.step>=STEPS.length){
-    finishConversation();
-  } else {
-    askStep(S.step);
-  }
+async function _submitOutOfArea(location) {
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+  if (isPreview) return;
+  const rawName = S.data.name || S.data.firstName || '';
+  const fullName = rawName.replace(/\b\w/g, c => c.toUpperCase());
+  try {
+    await fetch('https://vettochat-backend.onrender.com/api/leads/capture', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: fullName, firstName: fullName,
+        phone: S.data.phone || '', intent: S.data.service || 'General Inquiry',
+        urgency: S.data.urgency || '', budget: S.data.budget || '',
+        location, out_of_area: true, source_url: window.location.hostname,
+      }),
+    });
+  } catch(e) {}
 }
 
 async function finishConversation() {
