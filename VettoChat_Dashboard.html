@@ -460,6 +460,9 @@ td.muted{font-size:12px;color:var(--muted)}
 .sa-tag{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#1E40AF}
 .sa-tag button{background:none;border:none;cursor:pointer;color:#93C5FD;font-size:13px;line-height:1;padding:0;transition:color .15s;display:flex;align-items:center}
 .sa-tag button:hover{color:#1E40AF}
+.sa-tag-zip{background:#F0FDF4;border-color:#86EFAC;color:#15803D}
+.sa-tag-zip button{color:#6EE7B7}
+.sa-tag-zip button:hover{color:#15803D}
 .sa-add-input{display:flex;gap:6px;align-items:center}
 .sa-add-input input{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:7px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:border-color .2s;flex:1;min-width:120px;max-width:200px}
 .sa-add-input input:focus{border-color:#2563EB}
@@ -871,23 +874,16 @@ Phone: (214) 555-0192
               </div>
             </div>
 
-            <!-- Cities -->
+            <!-- Unified Service Locations -->
             <div>
-              <div class="sa-section-label">Cities You Service</div>
-              <div class="sa-tags" id="saCityTags" style="margin-bottom:8px"></div>
-              <div class="sa-add-input">
-                <input id="saNewCity" type="text" placeholder="Type a city and press Enter" onkeydown="if(event.key==='Enter')addSAItem('city')">
-                <button class="sa-add-btn" onclick="addSAItem('city')">+ Add</button>
+              <div class="sa-section-label">Service Locations</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+                Type a <strong>city &amp; state</strong> (e.g. <em>Dallas TX</em>) or a <strong>ZIP code</strong> (e.g. <em>75025</em>) — we'll detect it automatically.
               </div>
-            </div>
-
-            <!-- ZIP Codes -->
-            <div>
-              <div class="sa-section-label">ZIP Codes You Service</div>
-              <div class="sa-tags" id="saZipTags" style="margin-bottom:8px"></div>
+              <div class="sa-tags" id="saLocationTags" style="margin-bottom:10px;min-height:12px"></div>
               <div class="sa-add-input">
-                <input id="saNewZip" type="text" placeholder="5-digit ZIP, e.g. 75025" maxlength="5" onkeydown="if(event.key==='Enter')addSAItem('zip')">
-                <button class="sa-add-btn" onclick="addSAItem('zip')">+ Add</button>
+                <input id="saNewLocation" type="text" placeholder="Dallas TX  or  75025" onkeydown="if(event.key==='Enter')addSALocation()" style="max-width:260px">
+                <button class="sa-add-btn" onclick="addSALocation()">+ Add</button>
               </div>
             </div>
 
@@ -2483,12 +2479,11 @@ function crmIngestLead(lead) {
   const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
   let crmStatus = newStatus?.id || 'new';
 
-  // If widget already flagged as out-of-area, or dashboard validates it now
+  // If widget already flagged as out-of-area, or dashboard validates it now — drop entirely
   const isOOA = lead.out_of_area === true;
   const saResult = isOOA ? { serviceable: false } : _saValidate(location);
   if (saResult.serviceable === false) {
-    const ooa = crmStatuses.find(s => s.id === 'out_of_area');
-    crmStatus = ooa ? ooa.id : (crmStatuses.find(s => s.color === 'red')?.id || 'out_of_area');
+    return { id: null, value: 0, priority: 'cold', blocked: true };
   }
 
   const id  = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
@@ -2705,9 +2700,8 @@ function renderSAUI() {
   if (body) body.style.display = _saConfig.enabled ? '' : 'none';
   if (radTog) radTog.classList.toggle('on', _saConfig.radius.enabled);
   if (radBody) radBody.style.display = _saConfig.radius.enabled ? '' : 'none';
-  // Render tag lists
-  _renderSATags('city', 'saCityTags', _saConfig.cities);
-  _renderSATags('zip',  'saZipTags',  _saConfig.zips);
+  // Render unified location tag list
+  _renderSALocationTags();
   // Populate inputs
   const dm = document.getElementById('saDeclineMsg');
   if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
@@ -2725,23 +2719,37 @@ function _renderSATags(type, containerId, items) {
   ).join('');
 }
 
-function addSAItem(type) {
-  const inputId = { city:'saNewCity', zip:'saNewZip' }[type];
-  const inp = document.getElementById(inputId);
+function addSALocation() {
+  const inp = document.getElementById('saNewLocation');
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) return;
-  if (type === 'zip' && !/^\d{5}$/.test(val)) { inp.style.borderColor='#EF4444'; setTimeout(()=>inp.style.borderColor='',1500); return; }
-  const arr = type === 'city' ? _saConfig.cities : _saConfig.zips;
-  if (!arr.includes(val)) arr.push(val);
+  const isZip = /^\d{5}$/.test(val);
+  if (isZip) {
+    if (!_saConfig.zips.includes(val)) _saConfig.zips.push(val);
+  } else {
+    if (!_saConfig.cities.includes(val)) _saConfig.cities.push(val);
+  }
   inp.value = '';
-  _renderSATags(type, { city:'saCityTags', zip:'saZipTags' }[type], arr);
+  _renderSALocationTags();
+}
+
+function _renderSALocationTags() {
+  const el = document.getElementById('saLocationTags');
+  if (!el) return;
+  const cityTags = (_saConfig.cities || []).map((c, i) =>
+    `<span class="sa-tag">🏙 ${_esc(c)}<button onclick="removeSAItem('city',${i})" title="Remove">×</button></span>`
+  );
+  const zipTags = (_saConfig.zips || []).map((z, i) =>
+    `<span class="sa-tag sa-tag-zip"># ${_esc(z)}<button onclick="removeSAItem('zip',${i})" title="Remove">×</button></span>`
+  );
+  el.innerHTML = [...cityTags, ...zipTags].join('');
 }
 
 function removeSAItem(type, index) {
   const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
   arr.splice(index, 1);
-  _renderSATags(type, { city:'saCityTags', zip:'saZipTags' }[type], arr);
+  _renderSALocationTags();
 }
 
 // Haversine distance in miles
