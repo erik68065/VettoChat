@@ -995,38 +995,25 @@ function dd(ms){return new Promise(res=>{const t=setTimeout(res,ms);demoTimers.p
 let _demoSnapshot = null;
 
 function _captureSnapshot() {
-  const badge = document.getElementById('leadsBadge');
-  const chips = document.getElementById('leadsChips');
   return {
     overviewHTML: (document.getElementById('overviewBody') || {}).innerHTML || '',
-    leadsHTML:    (document.getElementById('leadsBody')    || {}).innerHTML || '',
-    sv0: document.getElementById('sv0').innerText,
-    sv1: document.getElementById('sv1').innerText,
-    sv2: document.getElementById('sv2').innerText,
-    sv3: document.getElementById('sv3').innerText,
-    badgeText:    badge ? badge.textContent    : '0',
-    badgeDisplay: badge ? badge.style.display  : 'none',
-    chipsHTML:    chips ? chips.innerHTML      : '',
     localConfig:  localStorage.getItem('vettochat_config') || '',
   };
 }
 
 function _restoreSnapshot(snap) {
   if (!snap) return;
-  const tb = document.getElementById('overviewBody'); if (tb) tb.innerHTML = snap.overviewHTML;
-  const lb = document.getElementById('leadsBody');    if (lb) lb.innerHTML = snap.leadsHTML;
-  document.getElementById('sv0').innerText = snap.sv0;
-  document.getElementById('sv1').innerText = snap.sv1;
-  document.getElementById('sv2').innerText = snap.sv2;
-  document.getElementById('sv3').innerText = snap.sv3;
-  const badge = document.getElementById('leadsBadge');
-  if (badge) { badge.textContent = snap.badgeText; badge.style.display = snap.badgeDisplay; }
-  const chips = document.getElementById('leadsChips');
-  if (chips) chips.innerHTML = snap.chipsHTML;
+  // Restore overview HTML (removes fake demo lead)
+  const tb = document.getElementById('overviewBody');
+  if (tb) tb.innerHTML = snap.overviewHTML;
+  // Restore bot config if changed during demo
   if (snap.localConfig !== undefined) {
     if (snap.localConfig) localStorage.setItem('vettochat_config', snap.localConfig);
     else localStorage.removeItem('vettochat_config');
   }
+  // Always derive stats from real CRM data — never restore demo-inflated numbers
+  syncStatsFromCRM();
+  updateCRMBadge();
 }
 
 async function startDemo(){
@@ -2186,6 +2173,72 @@ function createNewLead() {
   }
 }
 
+// ─── STATS & OVERVIEW FROM CRM ───────────────────────────────────────────────
+function syncStatsFromCRM() {
+  if (demoActive) return; // never overwrite demo UI mid-run
+  const leads = Object.values(crmLeads);
+  const total    = leads.length;
+  const hot      = leads.filter(l => l.priority === 'hot').length;
+  // "Needs follow-up" = leads not marked sold/closed/not-interested
+  const deadSet  = new Set(crmStatuses.filter(s => s.color === 'red' || s.id === 'sold' || s.id === 'not_interested').map(s => s.id));
+  const followUp = leads.filter(l => !deadSet.has(l.status)).length;
+  const pipeline = leads.reduce((sum, l) => sum + (l.value || 0), 0);
+
+  const el = id => document.getElementById(id);
+  if (el('sv0')) el('sv0').innerText = total;
+  if (el('sv1')) el('sv1').innerText = hot;
+  if (el('sv2')) el('sv2').innerText = followUp;
+  if (el('sv3')) el('sv3').innerText = pipeline > 0 ? '$' + pipeline.toLocaleString() : '$0';
+}
+
+function renderOverviewFromCRM() {
+  if (demoActive) return;
+  const tbody = document.getElementById('overviewBody');
+  if (!tbody) return;
+  const leads = Object.values(crmLeads).sort((a, b) => b.created - a.created).slice(0, 8);
+  if (!leads.length) { tbody.innerHTML = ''; return; }
+
+  tbody.innerHTML = leads.map(l => {
+    const badgeClass = l.priority === 'hot' ? 'pill-hot' : l.priority === 'warm' ? 'pill-warm' : 'pill-cold';
+    const badgeLabel = l.priority === 'hot' ? 'High'     : l.priority === 'warm' ? 'Medium'    : 'Low';
+    const stLabel    = (crmStatuses.find(s => s.id === l.status) || {}).label || 'New';
+    const stDotCls   = l.status === 'sold' ? 'dot-called' : l.status === 'called' || l.status === 'quoted' ? 'dot-follow' : 'dot-new';
+    const phone      = l.phone ? `<a href="tel:${l.phone.replace(/\D/g,'')}" style="color:inherit;text-decoration:none">${_esc(l.phone)}</a>` : '—';
+    return `<tr>
+      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><span class="lead-name">${_esc(l.name||'Unknown')}</span></div></td>
+      <td style="font-size:12px;color:var(--muted)">${phone}</td>
+      <td style="font-size:13px">${_esc(l.service||'—')}</td>
+      <td><span class="pill ${badgeClass}">${badgeLabel}</span></td>
+      <td style="font-size:12px;color:var(--muted)"><span class="status-dot ${stDotCls}"></span>${_esc(stLabel)}</td>
+      <td class="muted"><span data-ts="${l.created}">${timeAgo(l.created)}</span></td>
+      <td><button class="call-btn" onclick="if('${l.phone||''}')window.location='tel:${l.phone?l.phone.replace(/\D/g,''):''}'" >Call</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Cross-tab real-time sync via storage events
+window.addEventListener('storage', (e) => {
+  if (e.key === 'vettochat_leads' && !demoActive) {
+    try { crmLeads = e.newValue ? JSON.parse(e.newValue) : {}; } catch {}
+    updateCRMBadge();
+    syncStatsFromCRM();
+    renderOverviewFromCRM();
+    if (crmInited) renderCRMTable();
+  }
+  if (e.key === 'vettochat_lead_statuses') {
+    try { crmStatuses = e.newValue ? JSON.parse(e.newValue) : DEFAULT_STATUSES.map(s => ({...s})); } catch {}
+    if (crmInited) { renderCRMStatusManager(); renderCRMStatusFilter(); renderCRMTable(); }
+  }
+  if (e.key === 'vettochat_config' && !demoActive) {
+    loadIdentityForm();
+  }
+});
+
+// Warn before leaving with unsaved CRM edits
+window.addEventListener('beforeunload', (e) => {
+  if (crmActiveLead) { e.preventDefault(); e.returnValue = ''; }
+});
+
 // Hook: save incoming socket.io leads to CRM automatically
 function crmIngestLead(lead) {
   if (!crmInited) loadCRMData();
@@ -2217,6 +2270,8 @@ function crmIngestLead(lead) {
 
   const id  = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
   const now = Date.now();
+  const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
+
   crmLeads[id] = {
     id,
     name:     lead.name || lead.firstName || 'Unknown',
@@ -2228,6 +2283,7 @@ function crmIngestLead(lead) {
     urgency:  lead.urgency   || '',
     budget:   budgetRaw,
     score:    lead.score     || 0,
+    priority,
     notes:    '',
     status:   crmStatus,
     created:  now,
@@ -2237,6 +2293,7 @@ function crmIngestLead(lead) {
 
   saveCRMLeads(); updateCRMBadge();
   if (crmInited) renderCRMTable();
+  return { id, value, priority };
 }
 
 // ─── ACCOUNT PROFILE ─────────────────────────────────────────────────────────
@@ -2359,23 +2416,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-  // 1. Reset Dashboard to Zero for the Demo
+  // Restore persistent state from CRM on every load (never reset to zero)
   document.addEventListener('DOMContentLoaded', () => {
-    // Clear both tables
-    const tbody = document.getElementById('overviewBody');
-    if(tbody) tbody.innerHTML = '';
-    const leadsBody = document.getElementById('leadsBody');
-    if(leadsBody) leadsBody.innerHTML = '';
-    
-    // Reset the top Stat Boxes to zero
-    document.getElementById('sv0').innerText = '0';   // New Leads
-    document.getElementById('sv1').innerText = '0';   // Hot Leads
-    document.getElementById('sv2').innerText = '0';   // Needs Follow-up
-    document.getElementById('sv3').innerText = '$0';  // Pipeline Value
-
-    // Clear leads page chips until leads arrive
-    const chipsEl = document.getElementById('leadsChips');
-    if (chipsEl) chipsEl.innerHTML = '';
+    syncStatsFromCRM();
+    renderOverviewFromCRM();
   });
 
   // 2. Connect to Local Engine
@@ -2386,146 +2430,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('new_lead', (lead) => {
     console.log('[VettoChat] Received lead:', JSON.stringify(lead));
-    crmIngestLead(lead);
 
-    // Resolve display name
+    // Save to CRM first — all data persisted before touching UI
+    const ingested = crmIngestLead(lead);
+
     const leadName = lead.name || lead.firstName || 'Unknown';
+    const ls       = (lead.status || '').toLowerCase();
+    const badgeClass = (ls === 'hot' || ls === 'high') ? 'pill-hot' : (ls === 'warm' || ls === 'medium') ? 'pill-warm' : 'pill-cold';
+    const badgeLabel = (ls === 'hot' || ls === 'high') ? 'High'     : (ls === 'warm' || ls === 'medium') ? 'Medium'    : 'Low';
 
-    // Map status to badge class and friendly label
-    let badgeClass = 'pill-cold';
-    let badgeLabel = lead.status || 'Cold';
-    if (lead.status === 'Hot'  || lead.status === 'High')   { badgeClass = 'pill-hot';  badgeLabel = 'High'; }
-    if (lead.status === 'Warm' || lead.status === 'Medium') { badgeClass = 'pill-warm'; badgeLabel = 'Medium'; }
-    if (lead.status === 'Cold' || lead.status === 'Low')    { badgeClass = 'pill-cold'; badgeLabel = 'Low'; }
-    
-    // Format phone number (e.g. 9725551234 -> (972) 555-1234)
-    let formattedPhone = lead.phone;
-    if (lead.phone && lead.phone.length === 10) {
-      formattedPhone = `(${lead.phone.substring(0,3)}) ${lead.phone.substring(3,6)}-${lead.phone.substring(6,10)}`;
-    }
-    
-    // 3. Inject Row into Table
+    let formattedPhone = (lead.phone || '').replace(/\D/g,'');
+    if (formattedPhone.length === 10)
+      formattedPhone = `(${formattedPhone.slice(0,3)}) ${formattedPhone.slice(3,6)}-${formattedPhone.slice(6)}`;
+    else formattedPhone = lead.phone || '';
+
+    // Inject into overview table (real-time row)
     const _ts = Date.now();
     const newRow = `
-      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
-        <td>
-          <div class="name-cell">
-            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
-            <div>
-              <div class="lead-name">${leadName}</div>
-              <div class="muted"><span data-ts="${_ts}">Just now</span></div>
-            </div>
-          </div>
-        </td>
-        <td class="muted">${formattedPhone}</td>
-        <td><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
-        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
-        <td><span class="status-dot dot-new"></span>New</td>
-        <td class="muted"><span data-ts="${_ts}">Just now</span></td>
-        <td><button class="call-btn">1-Click Call</button></td>
-      </tr>
-    `;
-
-    const tbody = document.getElementById('overviewBody');
-    if (tbody) tbody.insertAdjacentHTML('afterbegin', newRow);
-
-    // Also add to Leads page
-    const leadsRow = `
-      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
-        <td>
-          <div class="name-cell">
-            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
-            <div>
-              <div class="lead-name">${leadName}</div>
-            </div>
-          </div>
-        </td>
-        <td class="muted">${formattedPhone}</td>
-        <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
-        <td style="font-size:12px;color:var(--muted)">${lead.location || '—'}</td>
-        <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
-        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
+      <tr class="new-row" style="animation:rowIn 0.4s ease-out forwards;background:#f8fafc">
+        <td><div class="name-cell">
+          <div class="avatar" style="background:${avatarColor(leadName)};font-size:11px">${initials(leadName)}</div>
+          <div><div class="lead-name">${leadName}</div><div class="muted"><span data-ts="${_ts}">Just now</span></div></div>
+        </div></td>
+        <td style="font-size:12px;color:var(--muted)">${formattedPhone || '—'}</td>
+        <td><strong>${_esc(lead.intent||'—')}</strong></td>
+        <td><span class="pill ${badgeClass}">${badgeLabel}</span></td>
         <td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>New</td>
         <td class="muted"><span data-ts="${_ts}">Just now</span></td>
-        <td><button class="call-btn">1-Click Call</button></td>
-      </tr>
-    `;
-    const leadsBody = document.getElementById('leadsBody');
-    if (leadsBody) leadsBody.insertAdjacentHTML('afterbegin', leadsRow);
+        <td><button class="call-btn" onclick="window.location='tel:${(lead.phone||'').replace(/\D/g,'')}'" >Call</button></td>
+      </tr>`;
+    const tbody = document.getElementById('overviewBody');
+    if (tbody && !demoActive) tbody.insertAdjacentHTML('afterbegin', newRow);
 
-    // Update leads badge
-    const badge = document.getElementById('leadsBadge');
-    if (badge) {
-      const count = parseInt(badge.textContent) + 1;
-      badge.textContent = count;
-      badge.style.display = 'flex';
-    }
-
-    // 4. LIVE UPDATE THE STAT BOXES
-    // Update Total Leads
-    const totalLeadsEl = document.getElementById('sv0');
-    totalLeadsEl.innerText = parseInt(totalLeadsEl.innerText) + 1;
-
-    // Update Hot Leads counter
-    if (lead.status === 'High' || lead.status === 'Hot') {
-      const hotEl = document.getElementById('sv1');
-      hotEl.innerText = parseInt(hotEl.innerText) + 1;
-    }
-
-    // Update Leads page header chips
-    const chipsEl = document.getElementById('leadsChips');
-    if (chipsEl) {
-      const totalRows = document.getElementById('leadsBody')?.querySelectorAll('tr').length || 0;
-      const hotRows   = document.getElementById('leadsBody')?.querySelectorAll('.pill-hot').length || 0;
-      chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
-                          `<span class="chip chip-blue">${totalRows} Total</span>`;
-    }
-
-    // Every new lead needs a follow-up call
-    const followUpEl = document.getElementById('sv2');
-    followUpEl.innerText = parseInt(followUpEl.innerText) + 1;
-
-    // Estimate & Add Pipeline Value based on intent
-    let addedValue = 1500; // Default base value
-    if (lead.intent.includes('Replacement') || lead.intent.includes('Storm')) addedValue = 12000;
-    if (lead.intent.includes('Repair')) addedValue = 3500;
-    
-    const pipelineEl = document.getElementById('sv3');
-    let currentPipeline = parseInt(pipelineEl.innerText.replace(/\D/g, '')) || 0; // strip non-digits
-    let newPipeline = currentPipeline + addedValue;
-    pipelineEl.innerText = '$' + newPipeline.toLocaleString(); // format with commas
+    // Recompute all stats from ground truth (CRM) — no hardcoded estimates
+    syncStatsFromCRM();
   });
 
-  // Every 30 seconds: tick timestamps + resync counts from actual DOM state
+  // Every 30 seconds: refresh relative timestamps + resync stats from CRM ground truth
   setInterval(() => {
-    // 1. Update all relative timestamps
     document.querySelectorAll('[data-ts]').forEach(el => {
       el.textContent = timeAgo(parseInt(el.dataset.ts));
     });
-
-    // 2. Resync leads page chips from what's actually in the table
-    const leadsBody = document.getElementById('leadsBody');
-    const chipsEl   = document.getElementById('leadsChips');
-    if (leadsBody && chipsEl) {
-      const totalRows = leadsBody.querySelectorAll('tr').length;
-      const hotRows   = leadsBody.querySelectorAll('.pill-hot').length;
-      if (totalRows > 0) {
-        chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
-                            `<span class="chip chip-blue">${totalRows} Total</span>`;
-      }
-    }
-
-    // 3. Resync stat cards from actual DOM counts
-    const overviewBody = document.getElementById('overviewBody');
-    const leadsBody2   = document.getElementById('leadsBody');
-    if (overviewBody && leadsBody2) {
-      const totalLeads = leadsBody2.querySelectorAll('tr').length;
-      const hotLeads   = leadsBody2.querySelectorAll('.pill-hot').length;
-      if (totalLeads > 0) {
-        document.getElementById('sv0').innerText = totalLeads;
-        document.getElementById('sv1').innerText = hotLeads;
-      }
-    }
+    if (!demoActive) syncStatsFromCRM();
   }, 30000);
 </script>
 
