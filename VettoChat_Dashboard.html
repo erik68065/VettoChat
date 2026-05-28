@@ -2200,7 +2200,7 @@ function seedCRMFromStaticLeads() {
     crmLeads[id] = {
       id, name:l.name, phone:l.service, email:'', service:l.service,
       location:l.location || '', urgency:'', budget:l.budget || '',
-      value: l.budget ? (parseInt(l.budget.replace(/\D/g,'')) || 0) : 0,
+      value: 0,
       status: l.quality === 'hot' ? 'new' : l.quality === 'warm' ? 'called' : 'follow_up',
       notes:'', created:l.ts, updated:l.ts,
       activity:[{ type:'created', text:'Lead imported from dashboard', ts:l.ts }]
@@ -2358,9 +2358,8 @@ function saveCRMLead() {
   lead.location = document.getElementById('cpLocation').value.trim();
   lead.urgency  = document.getElementById('cpUrgency').value.trim();
   lead.budget   = document.getElementById('cpBudget').value.trim();
-  // Parse value from explicit value field or budget string
   const rawVal = document.getElementById('cpValue').value;
-  lead.value = rawVal ? (parseFloat(rawVal) || 0) : _parseBudgetToValue(lead.budget);
+  lead.value = rawVal ? (parseFloat(rawVal) || 0) : (lead.value || 0);
   lead.status   = document.getElementById('crmPanelStatus').value;
   const newNotes = document.getElementById('cpNotes').innerHTML;
   if (newNotes !== lead.notes) {
@@ -2687,8 +2686,7 @@ function crmIngestLead(lead) {
     lead.projectBudget || lead.estimate || ''
   ).trim();
 
-  // Parse budget into numeric value for sorting/stats
-  const value = _parseBudgetToValue(budgetRaw);
+  const value = 0; // starts at $0 until user sets it manually
 
   const ls = (lead.status || '').toLowerCase();
   const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
