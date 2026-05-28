@@ -299,10 +299,11 @@ window.addEventListener('storage', e => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 const S = {
-  step: -1,
-  data: Object.fromEntries(STEPS.map(s => [s.key, ''])),
-  done: false,
-  opened: false
+  step:    -1,
+  data:    Object.fromEntries(STEPS.map(s => [s.key, ''])),
+  done:    false,
+  opened:  false,
+  strikes: 0   // spam strike counter for this session
 };
 
 // ─── SERVICE AREA ENGINE ─────────────────────────────────────────────────────
@@ -432,6 +433,87 @@ const ERR = {
   phone: "Please enter a valid 10-digit phone number (e.g. 972-555-1234).",
 };
 
+// ─── ANTI-SPAM ENGINE ─────────────────────────────────────────────────────────
+let _spamCfg = { sensitivity:'medium', validateNames:true, validatePhone:true, detectKeyboard:true };
+try { Object.assign(_spamCfg, JSON.parse(localStorage.getItem('vettochat_spam_config') || '{}')); } catch(_e) {}
+window.addEventListener('storage', _e => {
+  if (_e.key === 'vettochat_spam_config')
+    try { Object.assign(_spamCfg, JSON.parse(_e.newValue || '{}')); } catch(_) {}
+});
+
+const _SPAM_MAX = { low: 3, medium: 2, high: 1 };
+
+function _spamPhone(digits) {
+  if (/^(\d)\1{9}$/.test(digits)) return 'repeated';          // 1111111111
+  if (/^[01]/.test(digits)) return 'invalid_area';             // starts with 0 or 1
+  // Sequential run anywhere in 0123456789 or reverse
+  if ('01234567899876543210'.includes(digits)) return 'sequential';
+  if (/^555(?:01\d\d|5{4})/.test(digits)) return 'known_fake'; // Hollywood 555
+  if (/^(\d{3})\1{2}/.test(digits)) return 'repeated_blocks'; // (333) 333-3xxx
+  return null;
+}
+
+function _spamName(name) {
+  const n = name.trim().toLowerCase();
+  if (/\d/.test(n)) return 'has_numbers';
+  const parts = n.split(/\s+/).filter(Boolean);
+  if (parts.some(p => p.length > 1 && /^(.)\1+$/.test(p))) return 'repeated_chars';
+  const KB = ['qwerty','asdfgh','zxcvbn','qazwsx','asdfg','qweasd','poiuyt'];
+  if (KB.some(p => n.replace(/\s/g,'').includes(p))) return 'keyboard';
+  const FAKES = ['test test','john doe','jane doe','fake name','asdf asdf','foo bar',
+                 'test user','abc abc','aaa bbb','hello world','first last','name here','your name'];
+  if (FAKES.includes(n)) return 'known_fake';
+  if (!/^[a-z\s''-]+$/.test(n)) return 'invalid_chars';
+  return null;
+}
+
+function _spamText(val) {
+  const v = val.trim().toLowerCase();
+  if (!v) return 'empty';
+  if (v.length >= 4 && /^(.)\1+$/.test(v)) return 'repeated_chars';
+  const KB = ['asdf','qwer','zxcv','jjjj','kkkk','llll','aaaa','ssss','dddd','ffff','hhhh'];
+  if (KB.some(p => v.includes(p) && v.length < 12)) return 'keyboard';
+  return null;
+}
+
+const _SPAM_MSGS = {
+  phone:   { retry: "That doesn't look like a real phone number. Please enter a valid 10-digit number so we can reach you.",
+             end:   "We weren't able to verify your contact information. If you'd like to get a quote, give us a call directly — we'd love to help!" },
+  name:    { retry: "Could you double-check your name? We just need your first and last name to get started.",
+             end:   "We weren't able to verify your information. Feel free to reach out to us directly — we're happy to help!" },
+  general: { retry: "That response doesn't look quite right. Could you try again with a more specific answer?",
+             end:   "We weren't able to complete your request. Please reach out to us directly and we'll take care of you!" }
+};
+
+function _handleSpamHit(category) {
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+  if (isPreview) return false; // never block previews
+  S.strikes++;
+  const max  = _SPAM_MAX[_spamCfg.sensitivity] || 2;
+  const msgs = _SPAM_MSGS[category] || _SPAM_MSGS.general;
+  if (S.strikes >= max) {
+    S.done = true;
+    disableInput();
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addBotMsg(msgs.end, 'error');
+      try {
+        const rawName = (S.data.name || S.data.firstName || 'Unknown').replace(/\b\w/g, c => c.toUpperCase());
+        localStorage.setItem('vettochat_filtered_lead', JSON.stringify({
+          name: rawName, phone: S.data.phone || '', location: S.data.location || '',
+          service: S.data.service || '', reason: 'spam',
+          _nonce: Date.now().toString(36) + Math.random().toString(36).slice(2), _ts: Date.now()
+        }));
+      } catch(_) {}
+    }, 900);
+    return true;
+  }
+  showTyping();
+  setTimeout(() => { removeTyping(); addBotMsg(msgs.retry, 'error'); }, 700);
+  return true;
+}
+
 const $ = id => document.getElementById(id);
 const msgs = () => $('chatMessages');
 function scrollBottom(){ const m=msgs(); m.scrollTop=m.scrollHeight; }
@@ -552,14 +634,27 @@ function advanceStep(val, isChip){
   const key=cfg.key;
 
   if(!isChip){
+    if(!val.trim()){
+      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg('Please provide an answer to continue.','error'); }, 700); return;
+    }
+    // ── Format validation ──
     if(key==='name' && !V.name(val)){
       showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.name,'error'); }, 700); return;
     }
     if((cfg.type==='phone'||key==='phone') && !V.phone(val)){
       showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg(ERR.phone,'error'); }, 700); return;
     }
-    if(!val.trim()){
-      showTyping(); setTimeout(()=>{ removeTyping(); addBotMsg('Please provide an answer to continue.','error'); }, 700); return;
+    // ── Anti-spam: phone pattern check ──
+    if(_spamCfg.validatePhone && (cfg.type==='phone'||key==='phone')){
+      if(_spamPhone(val.replace(/\D/g,'')) && _handleSpamHit('phone')) return;
+    }
+    // ── Anti-spam: name quality check ──
+    if(_spamCfg.validateNames && key==='name'){
+      if(_spamName(val) && _handleSpamHit('name')) return;
+    }
+    // ── Anti-spam: keyboard/repetitive text (medium & high only) ──
+    if(_spamCfg.detectKeyboard && cfg.type==='text' && key!=='location' && _spamCfg.sensitivity!=='low'){
+      if(_spamText(val) && _handleSpamHit('general')) return;
     }
     S.data[key]=val;
   }

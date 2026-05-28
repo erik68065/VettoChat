@@ -571,6 +571,14 @@ td.muted{font-size:12px;color:var(--muted)}
 .crm-save-lead-btn:hover{background:#1D4ED8}
 /* Status manager */
 .crm-status-mgr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px}
+.spam-sensitivity{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content}
+.spam-sensitivity button{padding:7px 18px;border:none;background:var(--bg);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.spam-sensitivity button:not(:last-child){border-right:1px solid var(--border)}
+.spam-sensitivity button.active{background:#1E3A5F;color:#fff}
+.spam-check-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.spam-check-row:last-child{border-bottom:none}
+.spam-check-info{font-size:13px;font-weight:600;color:var(--navy)}
+.spam-check-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .crm-filtered-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .crm-filtered-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;transition:background .12s}
 .crm-filtered-header:hover{background:#F8FAFC}
@@ -956,6 +964,65 @@ Phone: (214) 555-0192
                 <div class="toggle-thumb"></div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- ════ SECTION 7: ANTI-SPAM ════ -->
+
+        <div class="card">
+          <div class="bc-card-head">
+            <div>
+              <h3>Lead Quality &amp; Anti-Spam</h3>
+              <p>Control how aggressively the chatbot filters fake submissions. Qualified leads always get through — this protects your pipeline from spam without blocking real customers.</p>
+            </div>
+          </div>
+
+          <!-- Sensitivity -->
+          <div style="padding:20px 24px;border-bottom:1px solid var(--border)">
+            <div class="sa-section-label" style="margin-bottom:10px">Spam Sensitivity</div>
+            <div class="spam-sensitivity" id="spamSensitivity">
+              <button id="spamBtnLow"    onclick="setSpamSensitivity('low')">Low</button>
+              <button id="spamBtnMedium" onclick="setSpamSensitivity('medium')" class="active">Medium</button>
+              <button id="spamBtnHigh"   onclick="setSpamSensitivity('high')">High</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:10px" id="spamSensDesc">
+              Catches fake phone patterns, keyboard-spam names, and obviously fake info. Recommended for most businesses.
+            </div>
+          </div>
+
+          <!-- Individual checks -->
+          <div style="padding:4px 24px 12px">
+            <div class="spam-check-row">
+              <div>
+                <div class="spam-check-info">Validate Phone Numbers</div>
+                <div class="spam-check-sub">Blocks repeated digits (1111111111), sequential patterns, and invalid area codes</div>
+              </div>
+              <div class="toggle on" id="spamPhoneToggle" onclick="toggleSpamCheck('validatePhone')" title="Toggle phone validation">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="spam-check-row">
+              <div>
+                <div class="spam-check-info">Validate Name Quality</div>
+                <div class="spam-check-sub">Flags numeric names, known test names, and keyboard spam like "asdfgh"</div>
+              </div>
+              <div class="toggle on" id="spamNameToggle" onclick="toggleSpamCheck('validateNames')" title="Toggle name validation">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+            <div class="spam-check-row">
+              <div>
+                <div class="spam-check-info">Detect Keyboard Spam</div>
+                <div class="spam-check-sub">Catches repetitive or nonsense text responses in open fields</div>
+              </div>
+              <div class="toggle on" id="spamKeyboardToggle" onclick="toggleSpamCheck('detectKeyboard')" title="Toggle keyboard spam detection">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:0 24px 20px;display:flex;justify-content:flex-end">
+            <button class="save-btn" onclick="saveSpamConfig()">Save Settings</button>
           </div>
         </div>
 
@@ -2534,6 +2601,10 @@ window.addEventListener('storage', (e) => {
     _widgetLive = e.newValue !== 'false';
     applyWidgetStatus();
   }
+  if (e.key === 'vettochat_spam_config') {
+    try { _spamConfig = { ...DEFAULT_SPAM_CONFIG, ...JSON.parse(e.newValue || '{}') }; } catch(_) {}
+    renderSpamUI();
+  }
   if (e.key === 'vettochat_profile') {
     try { accountProfile = e.newValue ? { ...DEFAULT_PROFILE, ...JSON.parse(e.newValue) } : { ...DEFAULT_PROFILE }; } catch {}
     updateSbProfile();
@@ -3113,6 +3184,59 @@ function applyCompanyBranding() {
 }
 
 // ─── WIDGET STATUS ────────────────────────────────────────────────────────────
+// ─── SPAM CONFIG ──────────────────────────────────────────────────────────────
+const DEFAULT_SPAM_CONFIG = { sensitivity:'medium', validateNames:true, validatePhone:true, detectKeyboard:true };
+let _spamConfig = { ...DEFAULT_SPAM_CONFIG };
+
+const _SPAM_SENS_DESC = {
+  low:    'Only catches the most obvious spam — all-same-digit numbers and keyboard-mashed names. Great if you don\'t want to risk blocking anyone.',
+  medium: 'Catches fake phone patterns, keyboard-spam names, and obviously fake info. Recommended for most businesses.',
+  high:   'Strict mode — flags suspicious responses after a single bad answer. Best for high-volume forms with lots of bot traffic.'
+};
+
+function loadSpamConfig() {
+  try { _spamConfig = { ...DEFAULT_SPAM_CONFIG, ...JSON.parse(localStorage.getItem('vettochat_spam_config') || '{}') }; }
+  catch(_) { _spamConfig = { ...DEFAULT_SPAM_CONFIG }; }
+  renderSpamUI();
+}
+
+function saveSpamConfig() {
+  localStorage.setItem('vettochat_spam_config', JSON.stringify(_spamConfig));
+  renderSpamUI();
+  const t = document.getElementById('tmplToast');
+  if (t) {
+    t.querySelector('strong').textContent = '✓ Spam settings saved';
+    t.querySelector('span').textContent = 'Chatbot lead quality settings updated';
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+  }
+}
+
+function setSpamSensitivity(level) {
+  _spamConfig.sensitivity = level;
+  renderSpamUI();
+}
+
+function toggleSpamCheck(key) {
+  _spamConfig[key] = !_spamConfig[key];
+  renderSpamUI();
+}
+
+function renderSpamUI() {
+  const btns = { low:'spamBtnLow', medium:'spamBtnMedium', high:'spamBtnHigh' };
+  Object.entries(btns).forEach(([lvl, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', _spamConfig.sensitivity === lvl);
+  });
+  const desc = document.getElementById('spamSensDesc');
+  if (desc) desc.textContent = _SPAM_SENS_DESC[_spamConfig.sensitivity] || '';
+
+  const checks = { validatePhone:'spamPhoneToggle', validateNames:'spamNameToggle', detectKeyboard:'spamKeyboardToggle' };
+  Object.entries(checks).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('on', !!_spamConfig[key]);
+  });
+}
+
 function loadWidgetStatus() {
   const stored = localStorage.getItem('vettochat_widget_live');
   _widgetLive = stored === null ? true : stored === 'true';
@@ -3195,6 +3319,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadIdentityForm();
   loadContactData();
   loadSAConfig();
+  loadSpamConfig();
   loadCRMData();
   loadFilteredLeads();
   updateCRMBadge();
