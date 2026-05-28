@@ -295,7 +295,18 @@ function _vc_apply(cfg) {
 
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
+// ─── WIDGET LIVE / OFFLINE ────────────────────────────────────────────────────
+function _applyWidgetLive() {
+  const isLive = localStorage.getItem('vettochat_widget_live') !== 'false';
+  const wrapper = document.getElementById('vettochat-wrapper');
+  if (wrapper) wrapper.style.display = isLive ? '' : 'none';
+}
+_applyWidgetLive();
+
 window.addEventListener('storage', e => {
+  if (e.key === 'vettochat_widget_live') {
+    _applyWidgetLive();
+  }
   if (e.key === 'vettochat_config' && e.newValue) {
     try {
       const cfg = JSON.parse(e.newValue);
