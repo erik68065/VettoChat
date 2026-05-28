@@ -175,7 +175,7 @@ td.muted{font-size:12px;color:var(--muted)}
 .pip{width:22px;height:3px;border-radius:2px;background:var(--border);transition:all 0.3s}
 .pip.done{background:rgba(37,99,235,0.35)}
 .pip.active{background:#2563EB;width:30px}
-.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 16px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;max-width:360px;opacity:0;transform:translateY(10px);transition:opacity 0.3s,transform 0.3s;pointer-events:none}
+.toast{position:fixed;top:76px;right:24px;z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 16px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;max-width:320px;opacity:0;transform:translateY(-8px);transition:opacity 0.3s,transform 0.3s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast-icon{font-size:16px;flex-shrink:0}
 .toast strong{font-size:13px;font-weight:700;color:var(--navy);display:block}
@@ -3067,15 +3067,39 @@ function _evaluateLeadServiceability(locationStr) {
 function requalifyAllLeads() {
   const shouldEval = _saConfig.enabled && (_saConfig.cities || []).filter(Boolean).length > 0;
   let changed = false;
+  const toFilter = [];
+
   Object.values(crmLeads).forEach(lead => {
     const prev = lead.serviceable;
     lead.serviceable = shouldEval ? _evaluateLeadServiceability(lead.location || '') : null;
     if (lead.serviceable !== prev) changed = true;
+    // If newly flagged as out-of-area, queue for move to filtered leads
+    if (shouldEval && lead.serviceable === false && prev !== false) {
+      toFilter.push(lead);
+    }
   });
+
+  // Move out-of-area leads out of the main CRM into Filtered Leads
+  if (toFilter.length) {
+    if (!crmInited) loadCRMData();
+    toFilter.forEach(lead => {
+      ingestFilteredLead({
+        name:     lead.name,
+        phone:    lead.phone || '',
+        location: lead.location || '',
+        service:  lead.service || '',
+        reason:   'out_of_area',
+      });
+      delete crmLeads[lead.id];
+    });
+    changed = true;
+  }
+
   if (changed) {
     saveCRMLeads();
-    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); }
+    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); renderFilteredTable(); }
     syncStatsFromCRM();
+    updateCRMBadge();
   }
 }
 
@@ -3622,7 +3646,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div class="toast" id="tmplToast" style="border-left-color:#059669">
   <span class="toast-icon">✓</span>
-  <div><strong>Template applied</strong><span id="tmplToastSub">Hit Save Configuration to push to chatbot</span></div>
+  <div><strong id="tmplToastTitle">Template applied</strong><span id="tmplToastSub">Hit Save All Changes to push to your chatbot</span></div>
 </div>
 
 <!-- ── CRM LEAD DETAIL PANEL ── -->
