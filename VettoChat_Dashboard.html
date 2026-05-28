@@ -2643,6 +2643,7 @@ window.addEventListener('storage', (e) => {
   }
   if (e.key === 'vettochat_config' && !demoActive) {
     loadIdentityForm();
+    rescoreAllLeads(); // scoring rules may have changed from another tab
   }
   if (e.key === 'vettochat_service_area') {
     try { const p = JSON.parse(e.newValue || '{}'); _saConfig = { ...DEFAULT_SA_CONFIG, ...p, radius: { ...DEFAULT_SA_CONFIG.radius, ...(p.radius||{}) } }; } catch {}
@@ -2747,8 +2748,12 @@ function crmIngestLead(lead) {
 
   const value = 0; // starts at $0 until user sets it manually
 
-  const ls = (lead.status || '').toLowerCase();
-  const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
+  // Score the lead against current SCORING_QUESTIONS rules
+  const priority = _scoreLead({
+    service: lead.intent || lead.service || lead.serviceType || '',
+    urgency: lead.urgency || lead.timeline || lead.timeframe || '',
+    budget:  budgetRaw,
+  }) || 'cold';
 
   // All chatbot-captured leads always start at 'new' unless service area validation overrides.
   const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
@@ -2787,6 +2792,43 @@ function crmIngestLead(lead) {
   saveCRMLeads(); updateCRMBadge();
   if (crmInited) renderCRMTable();
   return { id, value, priority };
+}
+
+// ─── LEAD SCORING ─────────────────────────────────────────────────────────────
+// Score a lead object against the current SCORING_QUESTIONS rules.
+// Returns 'hot' | 'warm' | 'cold' | null (if no answers matched).
+function _scoreLead(lead) {
+  const tiers = { hot: 3, warm: 2, cold: 1 };
+  let total = 0, count = 0;
+  SCORING_QUESTIONS.forEach(sq => {
+    const answer = (lead[sq.id] || '').trim().toLowerCase();
+    if (!answer) return;
+    const match = sq.answers.find(a => a.label.trim().toLowerCase() === answer);
+    if (match) { total += tiers[match.tier] || 1; count++; }
+  });
+  if (!count) return null;
+  const avg = total / count;
+  return avg >= 2.5 ? 'hot' : avg >= 1.5 ? 'warm' : 'cold';
+}
+
+// Re-score all existing CRM leads against the current SCORING_QUESTIONS.
+// Called whenever scoring rules are saved so every lead immediately reflects
+// the new Hot / Warm / Cold thresholds.
+function rescoreAllLeads() {
+  if (!Object.keys(crmLeads).length) return;
+  let changed = false;
+  Object.values(crmLeads).forEach(lead => {
+    const newPriority = _scoreLead(lead) || lead.priority || 'cold';
+    if (newPriority !== lead.priority) {
+      lead.priority = newPriority;
+      changed = true;
+    }
+  });
+  if (changed) {
+    saveCRMLeads();
+    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); }
+    syncStatsFromCRM();
+  }
 }
 
 // ─── SERVICE AREA ─────────────────────────────────────────────────────────────
@@ -3422,6 +3464,7 @@ function saveAllBotConfig() {
   saveIdentity();
   saveSpamConfig();
   saveSAConfig();
+  rescoreAllLeads(); // re-evaluate every lead against new scoring rules
   _botConfigDirty = false;
   const hint = document.getElementById('identitySyncStatus');
   if (hint) hint.style.display = 'none';
@@ -3535,6 +3578,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSAConfig();
   loadSpamConfig();
   loadCRMData();
+  rescoreAllLeads(); // apply current scoring rules to any existing leads on load
   loadFilteredLeads();
   updateCRMBadge();
   setWeekRange();
