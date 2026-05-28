@@ -423,6 +423,33 @@ td.muted{font-size:12px;color:var(--muted)}
 .prev-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:transparent;border:1.5px solid #2563EB;color:#2563EB;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0}
 .prev-btn:hover{background:#EFF6FF;border-color:#1E40AF;color:#1E40AF}
 
+/* ── WIDGET OFFLINE BADGE + BANNER ── */
+.widget-offline-badge{display:flex;align-items:center;gap:6px;background:#FEF2F2;border:1px solid #FCA5A5;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;color:#B91C1C;animation:blink 2s infinite}
+.offline-banner{background:#FEF2F2;border-bottom:1px solid #FCA5A5;padding:9px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.offline-banner span{font-size:13px;font-weight:500;color:#B91C1C}
+.offline-banner button{padding:6px 14px;background:#DC2626;color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+.offline-banner button:hover{background:#B91C1C}
+/* Widget status toggle card */
+.widget-status-card{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px}
+.widget-status-info h4{font-size:14px;font-weight:700;color:var(--navy);margin:0 0 4px}
+.widget-status-info p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
+.widget-toggle-wrap{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.widget-toggle-label{font-size:13px;font-weight:700;min-width:50px;text-align:right}
+.widget-toggle-label.live{color:#16A34A}
+.widget-toggle-label.offline{color:#DC2626}
+/* Company logo in sidebar */
+.sb-client-logo{width:26px;height:26px;border-radius:5px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center}
+.sb-client-logo img{width:100%;height:100%;object-fit:cover}
+/* Company section divider in cfm */
+.cfm-divider{height:1px;background:var(--border);margin:18px 0}
+.cfm-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+/* Company logo upload in cfm */
+.cfm-logo-upload{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.cfm-logo-preview{width:56px;height:56px;border-radius:10px;border:1.5px dashed var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color .15s}
+.cfm-logo-preview:hover{border-color:#2563EB}
+.cfm-logo-preview img{width:100%;height:100%;object-fit:contain}
+.cfm-logo-hint{font-size:11px;color:var(--muted);line-height:1.5}
+
 /* ── CONTACT FIELD MANAGER ── */
 .cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;opacity:0;pointer-events:none;transition:opacity 0.25s}
 .cfm-overlay.open{opacity:1;pointer-events:all}
@@ -544,8 +571,11 @@ td.muted{font-size:12px;color:var(--muted)}
     <div class="sb-logo-text">Vetto<span>Chat</span></div>
   </div>
   <div class="sb-client">
-    <div class="sb-client-name">ABC Roofing & Exteriors</div>
-    <div class="sb-client-sub">Plano, TX · Pro Plan</div>
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px">
+      <div class="sb-client-logo" id="sbClientLogo" style="display:none"><img id="sbClientLogoImg" src="" alt=""></div>
+      <div class="sb-client-name" id="sbClientName">ABC Roofing &amp; Exteriors</div>
+    </div>
+    <div class="sb-client-sub">Pro Plan</div>
   </div>
   <nav class="sb-nav">
     <div class="sb-section">Main</div>
@@ -578,11 +608,17 @@ td.muted{font-size:12px;color:var(--muted)}
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">Overview</div>
     <div class="topbar-date" id="topbarDate"></div>
-    <div class="live-chip"><div class="live-dot"></div>Live</div>
+    <div class="live-chip" id="liveChip"><div class="live-dot"></div>Live</div>
+    <div class="widget-offline-badge" id="widgetOfflineBadge" style="display:none">⚠ Widget Offline</div>
     <button class="play-btn" id="playBtn" onclick="startDemo()">
       <div class="play-icon"><svg viewBox="0 0 6 8"><polygon points="0,0 6,4 0,8"/></svg></div>
       Play Demo
     </button>
+  </div>
+
+  <div class="offline-banner" id="offlineBanner" style="display:none">
+    <span>⚠ Your widget is currently offline — new leads will not be captured until you go live.</span>
+    <button onclick="setWidgetStatus(true)">Go Live</button>
   </div>
 
   <div class="pages">
@@ -783,6 +819,28 @@ Phone: (214) 555-0192
             <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
               <span id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none">Syncing…</span>
               <button class="save-btn" id="saveIdentityBtn" onclick="saveIdentity()">Save Changes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ SECTION 5: WIDGET STATUS ════ -->
+        <div class="card">
+          <div class="bc-card-head">
+            <div>
+              <h3>Widget Status</h3>
+              <p>Toggle your chatbot live or offline. When offline, the widget is hidden from visitors and no new leads will be captured.</p>
+            </div>
+          </div>
+          <div class="widget-status-card">
+            <div class="widget-status-info">
+              <h4 id="widgetStatusHeading">Widget is Live</h4>
+              <p id="widgetStatusDesc">Your chatbot is active and capturing leads from your website.</p>
+            </div>
+            <div class="widget-toggle-wrap">
+              <span class="widget-toggle-label live" id="widgetToggleLabel">LIVE</span>
+              <div class="toggle on" id="widgetToggle" onclick="setWidgetStatus(!_widgetLive)" title="Toggle widget live/offline">
+                <div class="toggle-thumb"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -2232,6 +2290,15 @@ window.addEventListener('storage', (e) => {
   if (e.key === 'vettochat_config' && !demoActive) {
     loadIdentityForm();
   }
+  if (e.key === 'vettochat_widget_live') {
+    _widgetLive = e.newValue !== 'false';
+    applyWidgetStatus();
+  }
+  if (e.key === 'vettochat_profile') {
+    try { accountProfile = e.newValue ? { ...DEFAULT_PROFILE, ...JSON.parse(e.newValue) } : { ...DEFAULT_PROFILE }; } catch {}
+    updateSbProfile();
+    applyCompanyBranding();
+  }
 });
 
 // Warn before leaving with unsaved CRM edits
@@ -2297,8 +2364,11 @@ function crmIngestLead(lead) {
 }
 
 // ─── ACCOUNT PROFILE ─────────────────────────────────────────────────────────
-const DEFAULT_PROFILE = { name:'Jason Miller', role:'Account Owner', email:'', phone:'', photo:'' };
+const DEFAULT_PROFILE = { name:'Jason Miller', role:'Account Owner', email:'', phone:'', photo:'', companyName:'', companyLogo:'' };
 let accountProfile = { ...DEFAULT_PROFILE };
+
+// ─── WIDGET STATUS ────────────────────────────────────────────────────────────
+let _widgetLive = true;
 
 function loadContactData() {
   try {
@@ -2306,6 +2376,7 @@ function loadContactData() {
     accountProfile = raw ? { ...DEFAULT_PROFILE, ...JSON.parse(raw) } : { ...DEFAULT_PROFILE };
   } catch(e) { accountProfile = { ...DEFAULT_PROFILE }; }
   updateSbProfile();
+  applyCompanyBranding();
 }
 
 function updateSbProfile() {
@@ -2329,10 +2400,19 @@ function updateSbProfile() {
 }
 
 function openCFM() {
-  document.getElementById('cfmName').value  = accountProfile.name  || '';
-  document.getElementById('cfmRole').value  = accountProfile.role  || '';
-  document.getElementById('cfmEmail').value = accountProfile.email || '';
-  document.getElementById('cfmPhone').value = accountProfile.phone || '';
+  document.getElementById('cfmName').value        = accountProfile.name        || '';
+  document.getElementById('cfmRole').value        = accountProfile.role        || '';
+  document.getElementById('cfmEmail').value       = accountProfile.email       || '';
+  document.getElementById('cfmPhone').value       = accountProfile.phone       || '';
+  document.getElementById('cfmCompanyName').value = accountProfile.companyName || '';
+  const lp = document.getElementById('cfmLogoPreview');
+  if (lp) {
+    if (accountProfile.companyLogo) {
+      lp.innerHTML = `<img src="${accountProfile.companyLogo}" style="width:100%;height:100%;object-fit:contain;border-radius:8px">`;
+    } else {
+      lp.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>`;
+    }
+  }
   updateCFMPreview();
   document.getElementById('cfmOverlay').classList.add('open');
   document.getElementById('cfmPanel').classList.add('open');
@@ -2370,13 +2450,103 @@ function handleCFMPhoto(input) {
   reader.readAsDataURL(file);
 }
 
+function handleCFMLogo(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    accountProfile.companyLogo = e.target.result;
+    const lp = document.getElementById('cfmLogoPreview');
+    if (lp) lp.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:contain;border-radius:8px">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeCFMLogo() {
+  accountProfile.companyLogo = '';
+  const lp = document.getElementById('cfmLogoPreview');
+  if (lp) lp.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>`;
+  const li = document.getElementById('cfmLogoInput');
+  if (li) li.value = '';
+}
+
+function applyCompanyBranding() {
+  const name = (accountProfile.companyName || '').trim();
+  const logo = accountProfile.companyLogo || '';
+
+  // Sidebar company name
+  const sbName = document.getElementById('sbClientName');
+  if (sbName) sbName.textContent = name || 'ABC Roofing & Exteriors';
+
+  // Sidebar company logo
+  const sbLogo = document.getElementById('sbClientLogo');
+  const sbLogoImg = document.getElementById('sbClientLogoImg');
+  if (sbLogo) {
+    if (logo) {
+      sbLogoImg.src = logo;
+      sbLogo.style.display = 'flex';
+    } else {
+      sbLogo.style.display = 'none';
+    }
+  }
+
+  // Browser tab title
+  document.title = `VettoChat${name ? ' — ' + name : ''}`;
+}
+
+// ─── WIDGET STATUS ────────────────────────────────────────────────────────────
+function loadWidgetStatus() {
+  const stored = localStorage.getItem('vettochat_widget_live');
+  _widgetLive = stored === null ? true : stored === 'true';
+  applyWidgetStatus();
+}
+
+function setWidgetStatus(live) {
+  _widgetLive = !!live;
+  localStorage.setItem('vettochat_widget_live', String(_widgetLive));
+  applyWidgetStatus();
+}
+
+function applyWidgetStatus() {
+  const badge   = document.getElementById('widgetOfflineBadge');
+  const chip    = document.getElementById('liveChip');
+  const banner  = document.getElementById('offlineBanner');
+  const toggle  = document.getElementById('widgetToggle');
+  const label   = document.getElementById('widgetToggleLabel');
+  const heading = document.getElementById('widgetStatusHeading');
+  const desc    = document.getElementById('widgetStatusDesc');
+  const prevBtn = document.querySelector('.prev-btn');
+
+  if (_widgetLive) {
+    if (badge)   badge.style.display   = 'none';
+    if (chip)    chip.style.display    = 'flex';
+    if (banner)  banner.style.display  = 'none';
+    if (toggle)  { toggle.classList.add('on'); toggle.style.background = ''; }
+    if (label)   { label.textContent = 'LIVE';    label.className = 'widget-toggle-label live'; }
+    if (heading) heading.textContent = 'Widget is Live';
+    if (desc)    desc.textContent = 'Your chatbot is active and capturing leads from your website.';
+    if (prevBtn) { prevBtn.style.opacity = ''; prevBtn.style.pointerEvents = ''; }
+  } else {
+    if (badge)   badge.style.display   = 'flex';
+    if (chip)    chip.style.display    = 'none';
+    if (banner)  banner.style.display  = 'flex';
+    if (toggle)  { toggle.classList.remove('on'); toggle.style.background = '#EF4444'; }
+    if (label)   { label.textContent = 'OFFLINE'; label.className = 'widget-toggle-label offline'; }
+    if (heading) heading.textContent = 'Widget is Offline';
+    if (desc)    desc.textContent = 'Your chatbot is hidden from visitors. Go live to start capturing leads.';
+    if (prevBtn) { prevBtn.style.opacity = '0.45'; prevBtn.style.pointerEvents = 'none'; }
+  }
+}
+
 function saveCFM() {
-  accountProfile.name  = document.getElementById('cfmName').value.trim()  || DEFAULT_PROFILE.name;
-  accountProfile.role  = document.getElementById('cfmRole').value.trim()  || DEFAULT_PROFILE.role;
-  accountProfile.email = document.getElementById('cfmEmail').value.trim();
-  accountProfile.phone = document.getElementById('cfmPhone').value.trim();
+  accountProfile.name        = document.getElementById('cfmName').value.trim()        || DEFAULT_PROFILE.name;
+  accountProfile.role        = document.getElementById('cfmRole').value.trim()        || DEFAULT_PROFILE.role;
+  accountProfile.email       = document.getElementById('cfmEmail').value.trim();
+  accountProfile.phone       = document.getElementById('cfmPhone').value.trim();
+  accountProfile.companyName = document.getElementById('cfmCompanyName').value.trim();
   localStorage.setItem('vettochat_profile', JSON.stringify(accountProfile));
   updateSbProfile();
+  applyCompanyBranding();
   closeCFM();
   const t = document.getElementById('tmplToast');
   if (t) {
@@ -2409,6 +2579,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCRMData();
   updateCRMBadge();
   setWeekRange();
+  loadWidgetStatus();
   requestAnimationFrame(() => {
     document.getElementById('page-overview').classList.add('visible');
   });
@@ -2570,8 +2741,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="cfm-overlay" id="cfmOverlay" onclick="if(event.target===this)closeCFM()"></div>
 <div class="cfm-panel" id="cfmPanel">
   <div class="cfm-head">
-    <h2>Account Profile</h2>
-    <p>Update your name, role, and profile photo.</p>
+    <h2>Account &amp; Company</h2>
+    <p>Update your profile and company details.</p>
     <button class="cfm-close" onclick="closeCFM()" title="Close">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2l11 11M13 2L2 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
     </button>
@@ -2599,7 +2770,22 @@ document.addEventListener('DOMContentLoaded', () => {
     <label class="field-label">Email Address</label>
     <input class="field-input" id="cfmEmail" type="email" placeholder="you@company.com">
     <label class="field-label">Phone Number</label>
-    <input class="field-input" id="cfmPhone" type="tel" placeholder="+1 (000) 000-0000" style="margin-bottom:0">
+    <input class="field-input" id="cfmPhone" type="tel" placeholder="+1 (000) 000-0000">
+    <div class="cfm-divider"></div>
+    <div class="cfm-section-title">Company</div>
+    <label class="field-label">Company Name</label>
+    <input class="field-input" id="cfmCompanyName" type="text" placeholder="e.g. ABC Roofing & Exteriors" oninput="updateCFMPreview()">
+    <label class="field-label">Company Logo</label>
+    <div class="cfm-logo-upload">
+      <label for="cfmLogoInput" class="cfm-logo-preview" id="cfmLogoPreview" title="Upload logo">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>
+      </label>
+      <input type="file" id="cfmLogoInput" accept="image/*" style="display:none" onchange="handleCFMLogo(this)">
+      <div>
+        <div class="cfm-logo-hint">Square image recommended.<br>Shown in the sidebar and dashboard header.</div>
+        <button type="button" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer" onclick="removeCFMLogo()">Remove</button>
+      </div>
+    </div>
   </div>
   <div class="cfm-footer">
     <button class="cfm-cancel-btn" onclick="closeCFM()">Cancel</button>
