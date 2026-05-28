@@ -151,6 +151,9 @@
 .city-chip-btn{background:#fff;border:1.5px solid #CBD5E1;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#334155;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Inter',sans-serif}
 .city-chip-btn:hover{background:var(--navy);border-color:var(--navy);color:#fff}
 .city-no-results{font-size:12px;color:#94A3B8;padding:8px 4px}
+.loc-back-btn{background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;line-height:1.4}
+.loc-back-btn:hover{background:#DBEAFE;border-color:#93C5FD}
+.loc-step-label{font-size:10px;font-weight:700;color:#94A3B8;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
 
 .typing-row{display:flex;gap:9px;align-items:flex-end;animation:msgIn 0.2s ease}
 .typing-bubble{background:#fff;border:1px solid #E2E8F0;border-radius:4px 14px 14px 14px;padding:11px 16px;display:flex;gap:5px;align-items:center}
@@ -313,6 +316,27 @@ const S = {
   opened:  false,
   strikes: 0   // spam strike counter for this session
 };
+
+// ─── US STATES ───────────────────────────────────────────────────────────────
+const _US_STATES = [
+  {abbr:'AL',name:'Alabama'},{abbr:'AK',name:'Alaska'},{abbr:'AZ',name:'Arizona'},
+  {abbr:'AR',name:'Arkansas'},{abbr:'CA',name:'California'},{abbr:'CO',name:'Colorado'},
+  {abbr:'CT',name:'Connecticut'},{abbr:'DC',name:'Washington DC'},{abbr:'DE',name:'Delaware'},
+  {abbr:'FL',name:'Florida'},{abbr:'GA',name:'Georgia'},{abbr:'HI',name:'Hawaii'},
+  {abbr:'ID',name:'Idaho'},{abbr:'IL',name:'Illinois'},{abbr:'IN',name:'Indiana'},
+  {abbr:'IA',name:'Iowa'},{abbr:'KS',name:'Kansas'},{abbr:'KY',name:'Kentucky'},
+  {abbr:'LA',name:'Louisiana'},{abbr:'ME',name:'Maine'},{abbr:'MD',name:'Maryland'},
+  {abbr:'MA',name:'Massachusetts'},{abbr:'MI',name:'Michigan'},{abbr:'MN',name:'Minnesota'},
+  {abbr:'MS',name:'Mississippi'},{abbr:'MO',name:'Missouri'},{abbr:'MT',name:'Montana'},
+  {abbr:'NE',name:'Nebraska'},{abbr:'NV',name:'Nevada'},{abbr:'NH',name:'New Hampshire'},
+  {abbr:'NJ',name:'New Jersey'},{abbr:'NM',name:'New Mexico'},{abbr:'NY',name:'New York'},
+  {abbr:'NC',name:'North Carolina'},{abbr:'ND',name:'North Dakota'},{abbr:'OH',name:'Ohio'},
+  {abbr:'OK',name:'Oklahoma'},{abbr:'OR',name:'Oregon'},{abbr:'PA',name:'Pennsylvania'},
+  {abbr:'RI',name:'Rhode Island'},{abbr:'SC',name:'South Carolina'},{abbr:'SD',name:'South Dakota'},
+  {abbr:'TN',name:'Tennessee'},{abbr:'TX',name:'Texas'},{abbr:'UT',name:'Utah'},
+  {abbr:'VT',name:'Vermont'},{abbr:'VA',name:'Virginia'},{abbr:'WA',name:'Washington'},
+  {abbr:'WV',name:'West Virginia'},{abbr:'WI',name:'Wisconsin'},{abbr:'WY',name:'Wyoming'}
+];
 
 // ─── CITY LIST ───────────────────────────────────────────────────────────────
 const _CITIES = [
@@ -554,40 +578,88 @@ function selectChip(label, key, wrap){
 function showCityPicker(key){
   const wrap = document.createElement('div');
   wrap.className = 'city-picker-wrap'; wrap.id = 'cityPickerWrap';
-
-  const inp = document.createElement('input');
-  inp.className = 'city-search-inp'; inp.id = 'citySearch';
-  inp.placeholder = 'Type to search cities…'; inp.autocomplete = 'off';
-
-  const list = document.createElement('div');
-  list.className = 'city-chip-list'; list.id = 'cityChipList';
-
-  wrap.appendChild(inp); wrap.appendChild(list);
   msgs().appendChild(wrap); scrollBottom();
 
-  function availableCities() {
-    try {
-      const sa = JSON.parse(localStorage.getItem('vettochat_service_area') || '{}');
-      if (sa.enabled && Array.isArray(sa.cities) && sa.cities.length) return sa.cities;
-    } catch(_) {}
-    return _CITIES;
+  // ── Step 1: State selector ────────────────────────────────────────────────
+  function showStateStep() {
+    wrap.innerHTML = '';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'loc-step-label'; lbl.textContent = 'Step 1 — Select your state';
+    wrap.appendChild(lbl);
+
+    const inp = document.createElement('input');
+    inp.className = 'city-search-inp'; inp.placeholder = 'Search states…'; inp.autocomplete = 'off';
+    wrap.appendChild(inp);
+
+    const list = document.createElement('div');
+    list.className = 'city-chip-list';
+    wrap.appendChild(list);
+
+    function renderStates(q) {
+      const filtered = _US_STATES.filter(s =>
+        !q || s.name.toLowerCase().includes(q.toLowerCase()) || s.abbr.toLowerCase().startsWith(q.toLowerCase())
+      );
+      list.innerHTML = '';
+      filtered.forEach(state => {
+        const btn = document.createElement('button');
+        btn.className = 'city-chip-btn';
+        btn.textContent = state.name;
+        btn.onclick = () => showCityStep(state);
+        list.appendChild(btn);
+      });
+      scrollBottom();
+    }
+
+    renderStates('');
+    inp.addEventListener('input', () => renderStates(inp.value));
+    setTimeout(() => inp.focus(), 50);
+    scrollBottom();
   }
 
-  function renderCities(filter) {
-    const all = availableCities();
-    const q = (filter || '').toLowerCase().trim();
-    const filtered = q ? all.filter(c => c.toLowerCase().includes(q)) : all.slice(0, 60);
-    list.innerHTML = '';
-    if (!filtered.length) {
+  // ── Step 2: City selector (filtered by state) ─────────────────────────────
+  function showCityStep(state) {
+    wrap.innerHTML = '';
+
+    const backRow = document.createElement('div');
+    backRow.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:8px';
+    const backBtn = document.createElement('button');
+    backBtn.className = 'loc-back-btn';
+    backBtn.innerHTML = '&#8592; ' + state.name;
+    backBtn.onclick = showStateStep;
+    backRow.appendChild(backBtn);
+    wrap.appendChild(backRow);
+
+    // Filter: if service area is configured, only show whitelisted cities for this state
+    let cities;
+    try {
+      const sa = JSON.parse(localStorage.getItem('vettochat_service_area') || '{}');
+      if (sa.enabled && Array.isArray(sa.cities) && sa.cities.length) {
+        cities = sa.cities.filter(c => c.endsWith(', ' + state.abbr));
+      }
+    } catch(_) {}
+    if (!cities) cities = _CITIES.filter(c => c.endsWith(', ' + state.abbr));
+
+    if (!cities.length) {
+      const lbl = document.createElement('div');
+      lbl.className = 'loc-step-label'; lbl.textContent = 'Cities in ' + state.name;
+      wrap.appendChild(lbl);
       const none = document.createElement('div');
       none.className = 'city-no-results';
-      none.textContent = 'No cities found. Try a different search.';
-      list.appendChild(none); return;
+      none.textContent = 'No cities listed for ' + state.name + '. Please contact us directly.';
+      wrap.appendChild(none); scrollBottom(); return;
     }
-    filtered.forEach(city => {
+
+    const lbl = document.createElement('div');
+    lbl.className = 'loc-step-label'; lbl.textContent = 'Step 2 — Select your city in ' + state.name;
+    wrap.appendChild(lbl);
+
+    const list = document.createElement('div');
+    list.className = 'city-chip-list';
+    cities.forEach(city => {
       const btn = document.createElement('button');
       btn.className = 'city-chip-btn';
-      btn.textContent = city;
+      btn.textContent = city.split(',')[0].trim();
       btn.onclick = () => {
         wrap.remove();
         S.data[key] = city;
@@ -596,12 +668,11 @@ function showCityPicker(key){
       };
       list.appendChild(btn);
     });
+    wrap.appendChild(list);
     scrollBottom();
   }
 
-  renderCities('');
-  inp.addEventListener('input', () => renderCities(inp.value));
-  setTimeout(() => inp.focus(), 50);
+  showStateStep();
 }
 
 function updateProgress(){

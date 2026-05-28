@@ -469,16 +469,14 @@ td.muted{font-size:12px;color:var(--muted)}
 .sa-add-input input:focus{border-color:#2563EB}
 .sa-add-btn{padding:7px 13px;background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
 .sa-add-btn:hover{background:#DBEAFE;border-color:#93C5FD}
-/* City typeahead dropdown */
-.sa-city-search-wrap{position:relative;display:inline-block;width:100%}
-.sa-city-search-inp{width:100%;max-width:340px;background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;box-sizing:border-box}
-.sa-city-search-inp:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.sa-city-dropdown{position:absolute;top:calc(100% + 4px);left:0;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);max-height:210px;overflow-y:auto;width:340px;display:none}
-.sa-city-dropdown::-webkit-scrollbar{width:4px}
-.sa-city-dropdown::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.sa-city-opt{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--navy);transition:background .1s}
-.sa-city-opt:hover{background:#EFF6FF;color:#1E40AF}
-.sa-city-no-results{padding:10px 14px;font-size:12px;color:var(--muted)}
+/* Service area state select */
+.sa-state-sel{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;width:100%;max-width:240px;transition:border-color .2s}
+.sa-state-sel:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+/* City toggle buttons */
+.sa-city-avail-btn{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap;margin:3px 4px 3px 0}
+.sa-city-avail-btn:hover{border-color:#2563EB;color:#1E40AF;background:#EFF6FF}
+.sa-city-avail-btn.added{background:#EFF6FF;border-color:#93C5FD;color:#1E40AF;font-weight:600}
+.sa-city-avail-btn.added:hover{background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C}
 .sa-radius-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
 .sa-radius-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .sa-radius-row label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
@@ -900,21 +898,31 @@ Phone: (214) 555-0192
             <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start">
               <span style="font-size:18px;flex-shrink:0">📍</span>
               <div style="font-size:12px;color:#1E40AF;line-height:1.6">
-                <strong>How it works:</strong> Add the cities you serve below. The chatbot shows customers a searchable City &amp; State picker — only customers who select one of your service cities will proceed through the conversation.
+                <strong>How it works:</strong> Select a state, then toggle the cities you serve. The chatbot presents customers with a two-step State → City picker — only customers who select a city you serve will proceed.
               </div>
             </div>
 
-            <!-- Service Cities -->
+            <!-- Service Cities: tagged chips -->
             <div>
-              <div class="sa-section-label">Service Cities</div>
+              <div class="sa-section-label">Your Service Cities</div>
               <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-                Search and select the <strong>cities you serve</strong>. Customers must select one of these cities to qualify as a lead.
+                Cities added below will be the only valid options customers can choose in the chatbot.
               </div>
-              <div class="sa-tags" id="saLocationTags" style="margin-bottom:12px;min-height:12px"></div>
-              <div class="sa-city-search-wrap">
-                <input id="saNewLocation" type="text" class="sa-city-search-inp" placeholder="Search cities… (e.g. Dallas, TX)" autocomplete="off" oninput="filterSACities(this.value)" onkeydown="if(event.key==='Escape'){var d=document.getElementById('saCityDropdown');if(d)d.style.display='none'}" onblur="setTimeout(()=>{var d=document.getElementById('saCityDropdown');if(d)d.style.display='none'},200)">
-                <div id="saCityDropdown" class="sa-city-dropdown"></div>
-              </div>
+              <div class="sa-tags" id="saLocationTags" style="margin-bottom:14px;min-height:20px"></div>
+            </div>
+
+            <!-- Step 1: State picker -->
+            <div>
+              <div class="sa-section-label" style="margin-bottom:7px">Step 1 — Pick a State</div>
+              <select id="saStateSelect" class="sa-state-sel" onchange="loadSAStateCities(this.value)">
+                <option value="">Choose a state…</option>
+              </select>
+            </div>
+
+            <!-- Step 2: City toggles (revealed after state selected) -->
+            <div id="saStateCitiesWrap" style="display:none">
+              <div class="sa-section-label" id="saStateCitiesLabel" style="margin-bottom:8px">Step 2 — Select Cities to Serve</div>
+              <div id="saAvailableCities" style="display:flex;flex-wrap:wrap"></div>
             </div>
 
             <!-- Radius -->
@@ -2943,6 +2951,27 @@ const _CITIES = [
   'Yakima, WA','Yonkers, NY'
 ];
 
+// ─── US STATES ───────────────────────────────────────────────────────────────
+const _US_STATES = [
+  {abbr:'AL',name:'Alabama'},{abbr:'AK',name:'Alaska'},{abbr:'AZ',name:'Arizona'},
+  {abbr:'AR',name:'Arkansas'},{abbr:'CA',name:'California'},{abbr:'CO',name:'Colorado'},
+  {abbr:'CT',name:'Connecticut'},{abbr:'DC',name:'Washington DC'},{abbr:'DE',name:'Delaware'},
+  {abbr:'FL',name:'Florida'},{abbr:'GA',name:'Georgia'},{abbr:'HI',name:'Hawaii'},
+  {abbr:'ID',name:'Idaho'},{abbr:'IL',name:'Illinois'},{abbr:'IN',name:'Indiana'},
+  {abbr:'IA',name:'Iowa'},{abbr:'KS',name:'Kansas'},{abbr:'KY',name:'Kentucky'},
+  {abbr:'LA',name:'Louisiana'},{abbr:'ME',name:'Maine'},{abbr:'MD',name:'Maryland'},
+  {abbr:'MA',name:'Massachusetts'},{abbr:'MI',name:'Michigan'},{abbr:'MN',name:'Minnesota'},
+  {abbr:'MS',name:'Mississippi'},{abbr:'MO',name:'Missouri'},{abbr:'MT',name:'Montana'},
+  {abbr:'NE',name:'Nebraska'},{abbr:'NV',name:'Nevada'},{abbr:'NH',name:'New Hampshire'},
+  {abbr:'NJ',name:'New Jersey'},{abbr:'NM',name:'New Mexico'},{abbr:'NY',name:'New York'},
+  {abbr:'NC',name:'North Carolina'},{abbr:'ND',name:'North Dakota'},{abbr:'OH',name:'Ohio'},
+  {abbr:'OK',name:'Oklahoma'},{abbr:'OR',name:'Oregon'},{abbr:'PA',name:'Pennsylvania'},
+  {abbr:'RI',name:'Rhode Island'},{abbr:'SC',name:'South Carolina'},{abbr:'SD',name:'South Dakota'},
+  {abbr:'TN',name:'Tennessee'},{abbr:'TX',name:'Texas'},{abbr:'UT',name:'Utah'},
+  {abbr:'VT',name:'Vermont'},{abbr:'VA',name:'Virginia'},{abbr:'WA',name:'Washington'},
+  {abbr:'WV',name:'West Virginia'},{abbr:'WI',name:'Wisconsin'},{abbr:'WY',name:'Wyoming'}
+];
+
 const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later!";
 
 const DEFAULT_SA_CONFIG = {
@@ -3004,8 +3033,8 @@ function renderSAUI() {
   if (body) body.style.display = _saConfig.enabled ? '' : 'none';
   if (radTog) radTog.classList.toggle('on', _saConfig.radius.enabled);
   if (radBody) radBody.style.display = _saConfig.radius.enabled ? '' : 'none';
-  // Render unified location tag list
   _renderSALocationTags();
+  initSAStateSelect();
   // Populate inputs
   const dm = document.getElementById('saDeclineMsg');
   if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
@@ -3015,69 +3044,53 @@ function renderSAUI() {
   if (rm) rm.value = _saConfig.radius.miles || 25;
 }
 
-function _renderSATags(type, containerId, items) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = (items || []).map((item, i) =>
-    `<span class="sa-tag">${_esc(item)}<button onclick="removeSAItem('${type}',${i})" title="Remove">×</button></span>`
-  ).join('');
+function initSAStateSelect() {
+  const sel = document.getElementById('saStateSelect');
+  if (!sel || sel.options.length > 1) return;
+  _US_STATES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.abbr; opt.textContent = s.name;
+    sel.appendChild(opt);
+  });
 }
 
-function filterSACities(query) {
-  const dropdown = document.getElementById('saCityDropdown');
-  if (!dropdown) return;
-  const q = (query || '').toLowerCase().trim();
-  if (!q) { dropdown.style.display = 'none'; return; }
-  const filtered = _CITIES.filter(c => c.toLowerCase().includes(q)).slice(0, 20);
-  if (!filtered.length) {
-    dropdown.innerHTML = '<div class="sa-city-no-results">No cities found</div>';
-    dropdown.style.display = '';
+function loadSAStateCities(stateAbbr) {
+  const wrap  = document.getElementById('saStateCitiesWrap');
+  const label = document.getElementById('saStateCitiesLabel');
+  const list  = document.getElementById('saAvailableCities');
+  if (!wrap || !list) return;
+  if (!stateAbbr) { wrap.style.display = 'none'; return; }
+  const state = _US_STATES.find(s => s.abbr === stateAbbr);
+  const cities = _CITIES.filter(c => c.endsWith(', ' + stateAbbr));
+  if (label) label.textContent = `Step 2 — Select Cities to Serve in ${state?.name || stateAbbr}`;
+  wrap.style.display = '';
+  if (!cities.length) {
+    list.innerHTML = '<span style="font-size:12px;color:var(--muted)">No cities in our list for this state.</span>';
     return;
   }
-  dropdown.innerHTML = filtered
-    .map(c => `<div class="sa-city-opt" onmousedown="addSACityChip(${JSON.stringify(c)})">${_esc(c)}</div>`)
-    .join('');
-  dropdown.style.display = '';
+  _renderSAAvailableCities(cities);
 }
 
-function addSACityChip(city) {
-  if (!city || !_CITIES.includes(city)) return;
-  if (!_saConfig.cities.includes(city)) _saConfig.cities.push(city);
-  const inp = document.getElementById('saNewLocation');
-  const dropdown = document.getElementById('saCityDropdown');
-  if (inp) inp.value = '';
-  if (dropdown) dropdown.style.display = 'none';
+function _renderSAAvailableCities(cities) {
+  const list = document.getElementById('saAvailableCities');
+  if (!list) return;
+  list.innerHTML = (cities || []).map(city => {
+    const added = _saConfig.cities.includes(city);
+    const cityName = _esc(city.split(',')[0].trim());
+    return `<button class="sa-city-avail-btn${added ? ' added' : ''}" onclick="toggleSACityFromList(${JSON.stringify(city)})">${added ? '✓ ' : ''}${cityName}</button>`;
+  }).join('');
+}
+
+function toggleSACityFromList(city) {
+  const idx = _saConfig.cities.indexOf(city);
+  if (idx !== -1) _saConfig.cities.splice(idx, 1);
+  else _saConfig.cities.push(city);
   _renderSALocationTags();
-}
-
-function addSALocation() {
-  // Legacy fallback — try to match input against city list
-  const inp = document.getElementById('saNewLocation');
-  if (!inp) return;
-  const val = inp.value.trim();
-  if (!val) return;
-  // Normalize variations: "dallas tx" / "dallas texas" → "Dallas, TX"
-  const normalized = _normalizeCityInput(val);
-  if (normalized) { addSACityChip(normalized); return; }
-  // Partial match fallback
-  const match = _CITIES.find(c => c.toLowerCase().startsWith(val.toLowerCase()));
-  if (match) { addSACityChip(match); return; }
-  // No match found — do nothing (only valid city chips allowed)
-}
-
-function _normalizeCityInput(raw) {
-  const s = raw.trim();
-  // Exact match check (case-insensitive)
-  const exact = _CITIES.find(c => c.toLowerCase() === s.toLowerCase());
-  if (exact) return exact;
-  // Try "City ST" or "City, ST" → "City, ST" format
-  const m = s.match(/^([A-Za-z][A-Za-z\s'.'-]+?)\s*,?\s*([A-Za-z]{2})$/);
-  if (m) {
-    const candidate = m[1].trim() + ', ' + m[2].toUpperCase();
-    const found = _CITIES.find(c => c.toLowerCase() === candidate.toLowerCase());
-    if (found) return found;
+  const sel = document.getElementById('saStateSelect');
+  if (sel && sel.value) {
+    const cities = _CITIES.filter(c => c.endsWith(', ' + sel.value));
+    _renderSAAvailableCities(cities);
   }
-  return null;
 }
 
 function _renderSALocationTags() {
@@ -3085,7 +3098,7 @@ function _renderSALocationTags() {
   if (!el) return;
   const cities = (_saConfig.cities || []);
   if (!cities.length) {
-    el.innerHTML = '<span style="font-size:12px;color:var(--muted);font-style:italic">No cities added yet — search above to add your service cities.</span>';
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted);font-style:italic">No cities added yet — select a state below to get started.</span>';
     return;
   }
   el.innerHTML = cities.map((c, i) =>
@@ -3097,6 +3110,11 @@ function removeSAItem(type, index) {
   const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
   if (arr) arr.splice(index, 1);
   _renderSALocationTags();
+  const sel = document.getElementById('saStateSelect');
+  if (sel && sel.value) {
+    const cities = _CITIES.filter(c => c.endsWith(', ' + sel.value));
+    _renderSAAvailableCities(cities);
+  }
 }
 
 // Haversine distance in miles
