@@ -3126,7 +3126,18 @@ function renderSAUI() {
   initSAStateSelect();
   // Populate inputs
   const dm = document.getElementById('saDeclineMsg');
-  if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
+  if (dm) {
+    // Migrate any stale default messages from previous versions to the current default
+    const _OLD_DECLINES = [
+      "Thank you for reaching out! Unfortunately, we don't currently service your area — but we hope to expand soon!",
+      "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later!",
+      "Unfortunately, we do not currently service your area. If you believe this was a mistake, please give us a call and we'd be happy to help.",
+    ];
+    const stored = _saConfig.declineMessage || '';
+    const isStale = !stored || _OLD_DECLINES.includes(stored);
+    dm.value = isStale ? _SA_DEFAULT_DECLINE : stored;
+    if (isStale) _saConfig.declineMessage = _SA_DEFAULT_DECLINE;
+  }
 }
 
 function initSAStateSelect() {
