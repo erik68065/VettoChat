@@ -3344,6 +3344,9 @@ function loadWidgetStatus() {
 }
 
 function setWidgetStatus(live) {
+  if (!live && _widgetLive) {
+    if (!confirm('Are you sure you want to turn the chatbot off?\n\nVisitors will not be able to see or use it until you go live again.')) return;
+  }
   _widgetLive = !!live;
   localStorage.setItem('vettochat_widget_live', String(_widgetLive));
   applyWidgetStatus();
