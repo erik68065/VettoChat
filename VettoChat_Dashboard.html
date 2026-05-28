@@ -925,31 +925,6 @@ Phone: (214) 555-0192
               <div id="saAvailableCities" style="display:flex;flex-wrap:wrap"></div>
             </div>
 
-            <!-- Radius -->
-            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px">
-                <div>
-                  <div style="font-size:13px;font-weight:700;color:var(--navy)">Radius from My Business</div>
-                  <div style="font-size:11px;color:var(--muted);margin-top:2px">Automatically qualify any lead within a set distance of your business ZIP.</div>
-                </div>
-                <div class="toggle" id="saRadiusToggle" onclick="toggleSARadius()" style="width:34px;height:18px;flex-shrink:0" title="Enable radius qualification">
-                  <div class="toggle-thumb" style="width:14px;height:14px;top:2px;left:2px"></div>
-                </div>
-              </div>
-              <div id="saRadiusBody" style="display:none;margin-top:12px">
-                <div class="sa-radius-grid">
-                  <div>
-                    <label class="field-label">Your Business ZIP Code</label>
-                    <input class="field-input" id="saRadiusZip" type="text" placeholder="e.g. 75025" maxlength="5" style="margin-bottom:0">
-                  </div>
-                  <div>
-                    <label class="field-label">Radius (miles)</label>
-                    <input class="field-input" id="saRadiusMiles" type="number" placeholder="25" min="1" max="500" style="margin-bottom:0">
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Decline message -->
             <div>
               <label class="field-label">Message Shown to Out-of-Area Customers</label>
@@ -2997,8 +2972,6 @@ function loadSAConfig() {
 
 function saveSAConfig() {
   _saConfig.declineMessage = (document.getElementById('saDeclineMsg')?.value || '').trim() || _SA_DEFAULT_DECLINE;
-  _saConfig.radius.centerZip = (document.getElementById('saRadiusZip')?.value || '').trim();
-  _saConfig.radius.miles = parseInt(document.getElementById('saRadiusMiles')?.value || '25') || 25;
   localStorage.setItem('vettochat_service_area', JSON.stringify(_saConfig));
   const t = document.getElementById('tmplToast');
   if (t) {
@@ -3014,34 +2987,21 @@ function toggleSA() {
   saveSAConfig();
 }
 
-function toggleSARadius() {
-  _saConfig.radius.enabled = !_saConfig.radius.enabled;
-  renderSAUI();
-}
-
 function renderSAUI() {
   const tog = document.getElementById('saToggle');
   const lbl = document.getElementById('saToggleLabel');
   const body = document.getElementById('saBody');
-  const radTog = document.getElementById('saRadiusToggle');
-  const radBody = document.getElementById('saRadiusBody');
   if (tog) { tog.classList.toggle('on', _saConfig.enabled); }
   if (lbl) {
     lbl.textContent  = _saConfig.enabled ? 'ON' : 'OFF';
     lbl.className    = 'widget-toggle-label ' + (_saConfig.enabled ? 'live' : 'offline');
   }
   if (body) body.style.display = _saConfig.enabled ? '' : 'none';
-  if (radTog) radTog.classList.toggle('on', _saConfig.radius.enabled);
-  if (radBody) radBody.style.display = _saConfig.radius.enabled ? '' : 'none';
   _renderSALocationTags();
   initSAStateSelect();
   // Populate inputs
   const dm = document.getElementById('saDeclineMsg');
   if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
-  const rz = document.getElementById('saRadiusZip');
-  if (rz) rz.value = _saConfig.radius.centerZip || '';
-  const rm = document.getElementById('saRadiusMiles');
-  if (rm) rm.value = _saConfig.radius.miles || 25;
 }
 
 function initSAStateSelect() {
