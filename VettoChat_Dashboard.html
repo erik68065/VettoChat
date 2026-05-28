@@ -1011,10 +1011,7 @@ Phone: (214) 555-0192
         <!-- ════ GLOBAL SAVE BAR ════ -->
         <div class="bc-save-bar">
           <span style="font-size:12px;color:var(--muted)">All settings save together — one click pushes everything to your chatbot.</span>
-          <div style="display:flex;align-items:center;gap:12px">
-            <span id="bcSaveStatus" style="font-size:12px;font-weight:600;color:#059669;display:none">✓ All changes saved</span>
-            <button class="save-btn" onclick="saveAllBotConfig()">Save All Changes</button>
-          </div>
+          <button class="save-btn" onclick="saveAllBotConfig()">Save All Changes</button>
         </div>
 
         <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
@@ -1274,6 +1271,16 @@ function showPage(name){
 
 // ─── TOAST ──────────────────────────────────────────────────────────────────
 function showToast(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4500);}
+
+function showToastMsg(title, sub, color) {
+  const t = document.getElementById('tmplToast');
+  if (!t) return;
+  t.style.borderLeftColor = color || '#2563EB';
+  t.querySelector('strong').textContent = title;
+  t.querySelector('span').textContent   = sub || '';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
 
 // ─── DEMO ───────────────────────────────────────────────────────────────────
 let demoActive=false,demoTimers=[];
@@ -1887,13 +1894,7 @@ function _doApplyTemplate(id) {
   renderTemplates();
 
   // Show toast
-  const toast = document.getElementById('tmplToast');
-  if (toast) {
-    toast.querySelector('strong').textContent = `${tmpl.icon} ${tmpl.name} template applied`;
-    toast.querySelector('span').textContent = 'Click Save All Changes to apply';
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3500);
-  }
+  showToastMsg(`${tmpl.icon} ${tmpl.name} template applied`, 'Click Save All Changes to push to chatbot.', '#7C3AED');
 }
 
 function openPreview() {
@@ -2437,13 +2438,7 @@ function saveCRMLead() {
   renderCRMTable();
   closeCRMPanel();
 
-  const t = document.getElementById('tmplToast');
-  if (t) {
-    t.querySelector('strong').textContent = '✓ Lead saved';
-    t.querySelector('span').textContent = `${lead.name} has been updated`;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
+  showToastMsg('✓ Lead updated', `${lead.name}'s details have been saved.`, '#059669');
 }
 
 function deleteCRMLead() {
@@ -2562,13 +2557,7 @@ function createNewLead() {
     activity:[{ type:'created', text:'Lead manually added', ts:now }]
   };
   saveCRMLeads(); renderCRMTable(); updateCRMBadge(); closeNewLeadForm();
-  const t = document.getElementById('tmplToast');
-  if (t) {
-    t.querySelector('strong').textContent = '✓ Lead added';
-    t.querySelector('span').textContent = name + ' added to CRM';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
+  showToastMsg('✓ New lead added', `${name} has been added to your pipeline.`, '#059669');
 }
 
 // ─── STATS & OVERVIEW FROM CRM ───────────────────────────────────────────────
@@ -3042,12 +3031,7 @@ function saveSAConfig() {
   _saConfig.declineMessage = (document.getElementById('saDeclineMsg')?.value || '').trim() || _SA_DEFAULT_DECLINE;
   localStorage.setItem('vettochat_service_area', JSON.stringify(_saConfig));
   requalifyAllLeads();
-  const t = document.getElementById('tmplToast');
-  if (t) {
-    t.querySelector('strong').textContent = '✓ Service area saved';
-    t.querySelector('span').textContent = 'Existing leads re-checked against updated service area';
-    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
-  }
+  showToastMsg('✓ Service areas updated', 'Existing leads re-checked against your service cities.', '#0891B2');
 }
 
 // Evaluate one lead's location against the current service city list.
@@ -3439,10 +3423,9 @@ function saveAllBotConfig() {
   saveSpamConfig();
   saveSAConfig();
   _botConfigDirty = false;
-  const status = document.getElementById('bcSaveStatus');
-  const hint   = document.getElementById('identitySyncStatus');
-  if (status) { status.style.display = ''; setTimeout(() => status.style.display = 'none', 3000); }
-  if (hint)   { hint.style.display = 'none'; }
+  const hint = document.getElementById('identitySyncStatus');
+  if (hint) hint.style.display = 'none';
+  showToastMsg('✓ All changes saved', 'Your chatbot settings have been updated.', '#059669');
 }
 
 function setSpamSensitivity(level) {
@@ -3527,13 +3510,7 @@ function saveCFM() {
   updateSbProfile();
   applyCompanyBranding();
   closeCFM();
-  const t = document.getElementById('tmplToast');
-  if (t) {
-    t.querySelector('strong').textContent = '✓ Profile saved';
-    t.querySelector('span').textContent = 'Your account profile has been updated';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
+  showToastMsg('✓ Profile saved', 'Your account profile has been updated.', '#059669');
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
