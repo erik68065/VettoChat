@@ -2074,17 +2074,9 @@ function saveCRMLead() {
   lead.location = document.getElementById('cpLocation').value.trim();
   lead.urgency  = document.getElementById('cpUrgency').value.trim();
   lead.budget   = document.getElementById('cpBudget').value.trim();
-  // Parse value from budget string or explicit value field
+  // Parse value from explicit value field or budget string
   const rawVal = document.getElementById('cpValue').value;
-  if (rawVal) {
-    lead.value = parseFloat(rawVal) || 0;
-  } else if (lead.budget) {
-    const bc = lead.budget.replace(/[$,]/g,'').toLowerCase();
-    const kr = bc.match(/(\d+)k?[\s–-]+(\d+)k/);
-    const ks = bc.match(/(\d+)k\+?/);
-    const pl = bc.match(/(\d{3,})/);
-    lead.value = kr ? (parseInt(kr[1])+parseInt(kr[2]))/2*1000 : ks ? parseInt(ks[1])*1000 : pl ? parseInt(pl[1]) : 0;
-  }
+  lead.value = rawVal ? (parseFloat(rawVal) || 0) : _parseBudgetToValue(lead.budget);
   lead.status   = document.getElementById('crmPanelStatus').value;
   const newNotes = document.getElementById('cpNotes').innerHTML;
   if (newNotes !== lead.notes) {
@@ -2307,6 +2299,42 @@ window.addEventListener('beforeunload', (e) => {
 });
 
 // Hook: save incoming socket.io leads to CRM automatically
+// Parse a casual budget string into a numeric dollar value
+function _parseBudgetToValue(raw) {
+  if (!raw) return 0;
+  const s = raw.replace(/[$,]/g, '').toLowerCase().trim();
+
+  // Range with K suffix: "5k–15k", "5k-15k", "5k to 15k", "$5K–$15K"
+  // Use Unicode-safe dash matching [-–—]
+  const rangeK = s.match(/(\d+(?:\.\d+)?)\s*k\s*(?:[-–—]|to)\s*(\d+(?:\.\d+)?)\s*k/);
+  if (rangeK) return Math.round((parseFloat(rangeK[1]) + parseFloat(rangeK[2])) / 2 * 1000);
+
+  // Range in plain dollars: "5000–15000" or "5000-15000"
+  const rangePlain = s.match(/(\d{3,})\s*(?:[-–—]|to)\s*(\d{3,})/);
+  if (rangePlain) return Math.round((parseInt(rangePlain[1]) + parseInt(rangePlain[2])) / 2);
+
+  // Single K value: "15k+", "$15K", "15k", "15 k"
+  const kNum = s.match(/(\d+(?:\.\d+)?)\s*k\+?/);
+  if (kNum) return Math.round(parseFloat(kNum[1]) * 1000);
+
+  // "X thousand" / "X thousand dollars"
+  const thousandNum = s.match(/(\d+(?:\.\d+)?)\s*thousand/);
+  if (thousandNum) return Math.round(parseFloat(thousandNum[1]) * 1000);
+
+  // Casual: "around 10", "about 5", "maybe 15" — treat as thousands if < 500
+  const approx = s.match(/(?:around|about|maybe|approximately|roughly|~)\s*(\d+(?:\.\d+)?)/);
+  if (approx) {
+    const n = parseFloat(approx[1]);
+    return n < 500 ? Math.round(n * 1000) : Math.round(n);
+  }
+
+  // Plain number ≥ 100 (raw dollar amount)
+  const plainNum = s.match(/(\d{3,})/);
+  if (plainNum) return parseInt(plainNum[1]);
+
+  return 0;
+}
+
 function crmIngestLead(lead) {
   if (!crmInited) loadCRMData();
 
@@ -2315,41 +2343,43 @@ function crmIngestLead(lead) {
   if (phone.length === 10) phone = `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
   else phone = lead.phone || '';
 
-  // Parse budget string into a numeric value for sorting/display
-  const budgetRaw = lead.budget || '';
-  let value = 0;
-  const bClean = budgetRaw.replace(/[$,]/g, '').toLowerCase();
-  const kRange = bClean.match(/(\d+)k?[\s–-]+(\d+)k/);   // e.g. "5k–15k"
-  const kSingle = bClean.match(/(\d+)k\+?/);              // e.g. "15k+" or "$15K"
-  const plain = bClean.match(/(\d{3,})/);                 // plain number ≥ 100
-  if (kRange)  value = (parseInt(kRange[1]) + parseInt(kRange[2])) / 2 * 1000;
-  else if (kSingle) value = parseInt(kSingle[1]) * 1000;
-  else if (plain)   value = parseInt(plain[1]);
+  // Location — try every field name the backend might use
+  const location = (
+    lead.location || lead.city || lead.zip || lead.zipCode || lead.cityZip ||
+    lead.address  || lead.area || ''
+  ).trim();
 
-  // Map chatbot lead status → CRM pipeline status
-  const hotStatus  = crmStatuses.find(s => s.id === 'new')  || crmStatuses[0];
-  const warmStatus = crmStatuses.find(s => s.id === 'called') || crmStatuses[0];
-  const coldStatus = crmStatuses.find(s => s.id === 'follow_up') || crmStatuses[0];
-  let crmStatus = hotStatus?.id || 'new';
+  // Budget — try every field name the backend might use
+  const budgetRaw = (
+    lead.budget || lead.budgetRange || lead.budget_range ||
+    lead.projectBudget || lead.estimate || ''
+  ).trim();
+
+  // Parse budget into numeric value for sorting/stats
+  const value = _parseBudgetToValue(budgetRaw);
+
+  // All chatbot-captured leads always start at 'new' regardless of priority score.
+  // Priority (hot/warm/cold) only affects stat counters, not the CRM pipeline stage.
+  const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
+  const crmStatus = newStatus?.id || 'new';
+
   const ls = (lead.status || '').toLowerCase();
-  if (ls === 'warm' || ls === 'medium') crmStatus = warmStatus?.id || crmStatus;
-  if (ls === 'cold' || ls === 'low')    crmStatus = coldStatus?.id || crmStatus;
+  const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
 
   const id  = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
   const now = Date.now();
-  const priority = (ls === 'hot' || ls === 'high') ? 'hot' : (ls === 'warm' || ls === 'medium') ? 'warm' : 'cold';
 
   crmLeads[id] = {
     id,
-    name:     lead.name || lead.firstName || 'Unknown',
+    name:     lead.name     || lead.firstName || 'Unknown',
     phone,
-    email:    '',
+    email:    lead.email    || '',
     value,
-    service:  lead.intent    || '',
-    location: lead.location  || '',
-    urgency:  lead.urgency   || '',
+    service:  lead.intent   || lead.service   || lead.serviceType || '',
+    location,
+    urgency:  lead.urgency  || lead.timeline  || lead.timeframe   || '',
     budget:   budgetRaw,
-    score:    lead.score     || 0,
+    score:    lead.score    || 0,
     priority,
     notes:    '',
     status:   crmStatus,
