@@ -631,16 +631,31 @@ async function finishConversation() {
     return;
   }
 
+  const locRaw = S.data.location || (S.data.zip ? resolveCity(S.data.zip) : '');
+  const locParsed = _extractLoc(locRaw);
+
   const leadPayload = {
     name:       fullName,
     firstName:  fullName,
     phone:      S.data.phone || 'N/A',
     intent:     S.data.service || S.data.intent || 'General Inquiry',
+    service:    S.data.service || S.data.intent || 'General Inquiry',
     urgency:    S.data.urgency || 'Not specified',
     budget:     S.data.budget || '',
-    location:   S.data.location || (S.data.zip ? resolveCity(S.data.zip) : ''),
+    location:   locRaw,
+    city:       locParsed.city || '',
+    zip:        locParsed.zip  || '',
     source_url: window.location.hostname
   };
+
+  // Write lead to localStorage immediately so the dashboard tab picks it up
+  // with exact field names, independent of how the backend re-broadcasts it.
+  try {
+    localStorage.setItem('vettochat_pending_lead', JSON.stringify({
+      ...leadPayload,
+      _nonce: Date.now().toString(36) + Math.random().toString(36).slice(2)
+    }));
+  } catch (_) {}
 
   try {
     // Auto-detect server URL so the widget works from any device on the network

@@ -2378,6 +2378,19 @@ function renderOverviewFromCRM() {
 
 // Cross-tab real-time sync via storage events
 window.addEventListener('storage', (e) => {
+  // Widget wrote a completed lead directly to localStorage — ingest it immediately
+  // with all field names intact, before the backend's socket event can arrive.
+  if (e.key === 'vettochat_pending_lead' && !demoActive) {
+    try {
+      const lead = JSON.parse(e.newValue || '{}');
+      if (lead.name && !_isDuplicateLead(lead)) {
+        crmIngestLead(lead);
+        syncStatsFromCRM();
+        renderOverviewFromCRM();
+        if (crmInited) renderCRMTable();
+      }
+    } catch (_) {}
+  }
   if (e.key === 'vettochat_leads' && !demoActive) {
     try { crmLeads = e.newValue ? JSON.parse(e.newValue) : {}; } catch {}
     updateCRMBadge();
@@ -2411,6 +2424,19 @@ window.addEventListener('storage', (e) => {
 window.addEventListener('beforeunload', (e) => {
   if (crmActiveLead) { e.preventDefault(); e.returnValue = ''; }
 });
+
+// Deduplicate: returns true if a lead with the same name+phone was ingested within 60s
+function _isDuplicateLead(lead) {
+  const now   = Date.now();
+  const name  = (lead.name  || lead.firstName || '').toLowerCase().trim();
+  const phone = (lead.phone || '').replace(/\D/g, '');
+  if (!name && !phone) return false;
+  return Object.values(crmLeads).some(l => {
+    if (now - l.created > 60000) return false;
+    return (l.name || '').toLowerCase().trim() === name &&
+           (l.phone || '').replace(/\D/g, '') === phone;
+  });
+}
 
 // Hook: save incoming socket.io leads to CRM automatically
 // Parse a casual budget string into a numeric dollar value
@@ -3067,6 +3093,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.on('new_lead', (lead) => {
     console.log('[VettoChat] Received lead:', JSON.stringify(lead));
+
+    // Skip if already ingested via the localStorage path (widget on same device)
+    if (_isDuplicateLead(lead)) {
+      console.log('[VettoChat] Duplicate skipped — already ingested via localStorage');
+      return;
+    }
 
     // Save to CRM first — all data persisted before touching UI
     const ingested = crmIngestLead(lead);
