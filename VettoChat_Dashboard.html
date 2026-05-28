@@ -469,6 +469,7 @@ td.muted{font-size:12px;color:var(--muted)}
 .sa-radius-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .sa-radius-row label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
 .sa-oor-badge{display:inline-flex;align-items:center;gap:4px;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.04em}
+.sa-ok-badge{display:inline-flex;align-items:center;gap:4px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#15803D;letter-spacing:.04em}
 
 /* ── CONTACT FIELD MANAGER ── */
 .cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;opacity:0;pointer-events:none;transition:opacity 0.25s}
@@ -629,7 +630,7 @@ td.muted{font-size:12px;color:var(--muted)}
     <div class="topbar-title" id="topbarTitle">Overview</div>
     <div class="topbar-date" id="topbarDate"></div>
     <div class="live-chip" id="liveChip"><div class="live-dot"></div>Live</div>
-    <div class="widget-offline-badge" id="widgetOfflineBadge" style="display:none">⚠ Widget Offline</div>
+    <div class="widget-offline-badge" id="widgetOfflineBadge" style="display:none">⚠ Chatbot Offline</div>
     <button class="play-btn" id="playBtn" onclick="startDemo()">
       <div class="play-icon"><svg viewBox="0 0 6 8"><polygon points="0,0 6,4 0,8"/></svg></div>
       Play Demo
@@ -637,7 +638,7 @@ td.muted{font-size:12px;color:var(--muted)}
   </div>
 
   <div class="offline-banner" id="offlineBanner" style="display:none">
-    <span>⚠ Your widget is currently offline — new leads will not be captured until you go live.</span>
+    <span>⚠ Your chatbot is currently offline — new leads will not be captured until you go live.</span>
     <button onclick="setWidgetStatus(true)">Go Live</button>
   </div>
 
@@ -676,7 +677,7 @@ td.muted{font-size:12px;color:var(--muted)}
             </div>
             <button class="prev-btn" onclick="openPreview()">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="12" height="9" rx="1.5"/><path d="M5 11v1.5M9 11v1.5M3.5 12.5h7" stroke-linecap="round"/></svg>
-              Preview Widget
+              Preview Chatbot
             </button>
           </div>
           <div class="bc-card-body">
@@ -689,7 +690,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="bc-card-head">
             <div>
               <h3>Question Builder</h3>
-              <p>Drag to reorder, toggle on/off, and edit chips. Click <strong>Save Configuration</strong> in Assistant Identity to push to widget.</p>
+              <p>Drag to reorder, toggle on/off, and edit chips. Click <strong>Save Configuration</strong> in Assistant Identity to push to chatbot.</p>
             </div>
           </div>
           <div class="bc-card-body">
@@ -845,59 +846,66 @@ Phone: (214) 555-0192
 
         <!-- ════ SECTION 5: SERVICE AREA ════ -->
         <div class="card">
+          <!-- Header row with toggle -->
           <div class="sa-toggle-row">
             <div class="sa-toggle-info">
               <h4>Service Area Qualification</h4>
-              <p>Automatically validate leads against your service area. Out-of-area inquiries are politely declined in the chatbot and marked in the CRM.</p>
+              <p>When on, the chatbot checks each customer's city or ZIP code and politely stops the conversation if they're outside your service area.</p>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-              <span style="font-size:12px;font-weight:600;color:var(--muted)" id="saToggleLabel">Disabled</span>
+              <span style="font-size:12px;font-weight:600" id="saToggleLabel" class="widget-toggle-label offline">OFF</span>
               <div class="toggle" id="saToggle" onclick="toggleSA()" title="Toggle service area qualification">
                 <div class="toggle-thumb"></div>
               </div>
             </div>
           </div>
+
+          <!-- Setup body (shown when enabled) -->
           <div class="sa-body" id="saBody" style="display:none">
+
+            <!-- How it works callout -->
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:18px;flex-shrink:0">📍</span>
+              <div style="font-size:12px;color:#1E40AF;line-height:1.6">
+                <strong>How it works:</strong> Add the cities or ZIP codes you serve, or set a radius from your business. The chatbot automatically checks the customer's location and only continues the conversation if they're in your area.
+              </div>
+            </div>
+
             <!-- Cities -->
             <div>
-              <div class="sa-section-label">Service Cities</div>
-              <div class="sa-tags" id="saCityTags"></div>
-              <div class="sa-add-input" style="margin-top:8px">
-                <input id="saNewCity" type="text" placeholder="e.g. Plano" onkeydown="if(event.key==='Enter')addSAItem('city')">
-                <button class="sa-add-btn" onclick="addSAItem('city')">+ Add City</button>
+              <div class="sa-section-label">Cities You Service</div>
+              <div class="sa-tags" id="saCityTags" style="margin-bottom:8px"></div>
+              <div class="sa-add-input">
+                <input id="saNewCity" type="text" placeholder="Type a city and press Enter" onkeydown="if(event.key==='Enter')addSAItem('city')">
+                <button class="sa-add-btn" onclick="addSAItem('city')">+ Add</button>
               </div>
             </div>
-            <!-- ZIPs -->
+
+            <!-- ZIP Codes -->
             <div>
-              <div class="sa-section-label">ZIP Codes</div>
-              <div class="sa-tags" id="saZipTags"></div>
-              <div class="sa-add-input" style="margin-top:8px">
-                <input id="saNewZip" type="text" placeholder="e.g. 75025" maxlength="5" onkeydown="if(event.key==='Enter')addSAItem('zip')">
-                <button class="sa-add-btn" onclick="addSAItem('zip')">+ Add ZIP</button>
+              <div class="sa-section-label">ZIP Codes You Service</div>
+              <div class="sa-tags" id="saZipTags" style="margin-bottom:8px"></div>
+              <div class="sa-add-input">
+                <input id="saNewZip" type="text" placeholder="5-digit ZIP, e.g. 75025" maxlength="5" onkeydown="if(event.key==='Enter')addSAItem('zip')">
+                <button class="sa-add-btn" onclick="addSAItem('zip')">+ Add</button>
               </div>
             </div>
-            <!-- Counties -->
-            <div>
-              <div class="sa-section-label">Counties / Regions</div>
-              <div class="sa-tags" id="saCountyTags"></div>
-              <div class="sa-add-input" style="margin-top:8px">
-                <input id="saNewCounty" type="text" placeholder="e.g. Collin County" onkeydown="if(event.key==='Enter')addSAItem('county')">
-                <button class="sa-add-btn" onclick="addSAItem('county')">+ Add County</button>
-              </div>
-            </div>
+
             <!-- Radius -->
             <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
-              <div class="sa-radius-row">
-                <label style="font-size:13px;font-weight:600;color:var(--navy)">Radius-based coverage</label>
-                <div class="toggle" id="saRadiusToggle" onclick="toggleSARadius()" style="width:34px;height:18px" title="Enable radius validation">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px">
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--navy)">Radius from My Business</div>
+                  <div style="font-size:11px;color:var(--muted);margin-top:2px">Automatically qualify any lead within a set distance of your business ZIP.</div>
+                </div>
+                <div class="toggle" id="saRadiusToggle" onclick="toggleSARadius()" style="width:34px;height:18px;flex-shrink:0" title="Enable radius qualification">
                   <div class="toggle-thumb" style="width:14px;height:14px;top:2px;left:2px"></div>
                 </div>
               </div>
-              <div id="saRadiusBody" style="display:none">
-                <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Leads within the specified radius of a center ZIP will be marked serviceable.</p>
+              <div id="saRadiusBody" style="display:none;margin-top:12px">
                 <div class="sa-radius-grid">
                   <div>
-                    <label class="field-label">Center ZIP Code</label>
+                    <label class="field-label">Your Business ZIP Code</label>
                     <input class="field-input" id="saRadiusZip" type="text" placeholder="e.g. 75025" maxlength="5" style="margin-bottom:0">
                   </div>
                   <div>
@@ -907,11 +915,14 @@ Phone: (214) 555-0192
                 </div>
               </div>
             </div>
+
             <!-- Decline message -->
             <div>
-              <label class="field-label">Out-of-Area Message <span style="font-size:10px;font-weight:500;color:var(--muted)">shown to customers outside your service area</span></label>
-              <textarea class="field-input field-textarea" id="saDeclineMsg" rows="3" style="resize:vertical;margin-bottom:0"></textarea>
+              <label class="field-label">Message Shown to Out-of-Area Customers</label>
+              <textarea class="field-input field-textarea" id="saDeclineMsg" rows="3" style="resize:vertical;margin-bottom:4px"></textarea>
+              <div style="font-size:11px;color:var(--muted)">Keep it friendly — let them know you can't help but wish them well.</div>
             </div>
+
             <div style="display:flex;justify-content:flex-end">
               <button class="save-btn" onclick="saveSAConfig()">Save Service Area</button>
             </div>
@@ -923,18 +934,18 @@ Phone: (214) 555-0192
         <div class="card">
           <div class="bc-card-head">
             <div>
-              <h3>Widget Status</h3>
-              <p>Toggle your chatbot live or offline. When offline, the widget is hidden from visitors and no new leads will be captured.</p>
+              <h3>Chatbot Status</h3>
+              <p>Toggle your chatbot live or offline. When offline, the chatbot is hidden from visitors and no new leads will be captured.</p>
             </div>
           </div>
           <div class="widget-status-card">
             <div class="widget-status-info">
-              <h4 id="widgetStatusHeading">Widget is Live</h4>
+              <h4 id="widgetStatusHeading">Chatbot is Live</h4>
               <p id="widgetStatusDesc">Your chatbot is active and capturing leads from your website.</p>
             </div>
             <div class="widget-toggle-wrap">
               <span class="widget-toggle-label live" id="widgetToggleLabel">LIVE</span>
-              <div class="toggle on" id="widgetToggle" onclick="setWidgetStatus(!_widgetLive)" title="Toggle widget live/offline">
+              <div class="toggle on" id="widgetToggle" onclick="setWidgetStatus(!_widgetLive)" title="Toggle chatbot on/off">
                 <div class="toggle-thumb"></div>
               </div>
             </div>
@@ -1721,7 +1732,7 @@ function applyTemplate(id) {
   const toast = document.getElementById('tmplToast');
   if (toast) {
     toast.querySelector('strong').textContent = `${tmpl.icon} ${tmpl.name} template applied`;
-    toast.querySelector('span').textContent = 'Hit Save Configuration to push to widget';
+    toast.querySelector('span').textContent = 'Hit Save Configuration to push to chatbot';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3500);
   }
@@ -1934,7 +1945,7 @@ function saveIdentity() {
   const btn    = document.getElementById('saveIdentityBtn');
   const status = document.getElementById('identitySyncStatus');
   status.style.display = '';
-  status.textContent   = '✓ Synced to widget';
+  status.textContent   = '✓ Synced to chatbot';
   status.style.color   = '#059669';
   btn.disabled = true;
   setTimeout(() => {
@@ -2080,8 +2091,12 @@ function renderCRMTable() {
     const val   = l.budget  || (l.value ? '$' + Number(l.value).toLocaleString() : '—');
     const notes = (l.notes  || '').replace(/<[^>]*>/g, '').slice(0, 60) || '—';
     const isOOA = l.status === 'out_of_area';
+    const saEnabled = _saConfig.enabled;
+    const saBadge = isOOA
+      ? '<div style="margin-top:2px"><span class="sa-oor-badge">⊗ Out of Area</span></div>'
+      : (saEnabled && l.serviceable === true ? '<div style="margin-top:2px"><span class="sa-ok-badge">✓ Serviceable</span></div>' : '');
     return `<tr onclick="openCRMPanel('${l.id}')" style="${isOOA ? 'opacity:0.7' : ''}">
-      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><div><span class="lead-name">${_esc(l.name || '—')}</span>${isOOA ? '<div style="margin-top:2px"><span class="sa-oor-badge">⊗ Out of Area</span></div>' : ''}</div></div></td>
+      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><div><span class="lead-name">${_esc(l.name || '—')}</span>${saBadge}</div></div></td>
       <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
       <td style="font-size:12px">${_esc(l.service || '—')}</td>
       <td class="crm-val">${val}</td>
@@ -2481,21 +2496,22 @@ function crmIngestLead(lead) {
 
   crmLeads[id] = {
     id,
-    name:     lead.name     || lead.firstName || 'Unknown',
+    name:        lead.name     || lead.firstName || 'Unknown',
     phone,
-    email:    lead.email    || '',
+    email:       lead.email    || '',
     value,
-    service:  lead.intent   || lead.service   || lead.serviceType || '',
+    service:     lead.intent   || lead.service   || lead.serviceType || '',
     location,
-    urgency:  lead.urgency  || lead.timeline  || lead.timeframe   || '',
-    budget:   budgetRaw,
-    score:    lead.score    || 0,
+    urgency:     lead.urgency  || lead.timeline  || lead.timeframe   || '',
+    budget:      budgetRaw,
+    score:       lead.score    || 0,
     priority,
-    notes:    '',
-    status:   crmStatus,
-    created:  now,
-    updated:  now,
-    activity: [{ type:'created', text:'Lead captured via chatbot', ts:now }]
+    notes:       '',
+    status:      crmStatus,
+    serviceable: saResult.serviceable,
+    created:     now,
+    updated:     now,
+    activity:    [{ type:'created', text:'Lead captured via chatbot', ts:now }]
   };
 
   saveCRMLeads(); updateCRMBadge();
@@ -2682,14 +2698,16 @@ function renderSAUI() {
   const radTog = document.getElementById('saRadiusToggle');
   const radBody = document.getElementById('saRadiusBody');
   if (tog) { tog.classList.toggle('on', _saConfig.enabled); }
-  if (lbl) { lbl.textContent = _saConfig.enabled ? 'Enabled' : 'Disabled'; lbl.style.color = _saConfig.enabled ? 'var(--green)' : 'var(--muted)'; }
+  if (lbl) {
+    lbl.textContent  = _saConfig.enabled ? 'ON' : 'OFF';
+    lbl.className    = 'widget-toggle-label ' + (_saConfig.enabled ? 'live' : 'offline');
+  }
   if (body) body.style.display = _saConfig.enabled ? '' : 'none';
   if (radTog) radTog.classList.toggle('on', _saConfig.radius.enabled);
   if (radBody) radBody.style.display = _saConfig.radius.enabled ? '' : 'none';
   // Render tag lists
-  _renderSATags('city',   'saCityTags',   _saConfig.cities);
-  _renderSATags('zip',    'saZipTags',    _saConfig.zips);
-  _renderSATags('county', 'saCountyTags', _saConfig.counties);
+  _renderSATags('city', 'saCityTags', _saConfig.cities);
+  _renderSATags('zip',  'saZipTags',  _saConfig.zips);
   // Populate inputs
   const dm = document.getElementById('saDeclineMsg');
   if (dm) dm.value = _saConfig.declineMessage || _SA_DEFAULT_DECLINE;
@@ -2708,22 +2726,22 @@ function _renderSATags(type, containerId, items) {
 }
 
 function addSAItem(type) {
-  const inputId = { city:'saNewCity', zip:'saNewZip', county:'saNewCounty' }[type];
+  const inputId = { city:'saNewCity', zip:'saNewZip' }[type];
   const inp = document.getElementById(inputId);
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) return;
   if (type === 'zip' && !/^\d{5}$/.test(val)) { inp.style.borderColor='#EF4444'; setTimeout(()=>inp.style.borderColor='',1500); return; }
-  const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
+  const arr = type === 'city' ? _saConfig.cities : _saConfig.zips;
   if (!arr.includes(val)) arr.push(val);
   inp.value = '';
-  _renderSATags(type, { city:'saCityTags', zip:'saZipTags', county:'saCountyTags' }[type], arr);
+  _renderSATags(type, { city:'saCityTags', zip:'saZipTags' }[type], arr);
 }
 
 function removeSAItem(type, index) {
   const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
   arr.splice(index, 1);
-  _renderSATags(type, { city:'saCityTags', zip:'saZipTags', county:'saCountyTags' }[type], arr);
+  _renderSATags(type, { city:'saCityTags', zip:'saZipTags' }[type], arr);
 }
 
 // Haversine distance in miles
@@ -2962,7 +2980,7 @@ function applyWidgetStatus() {
     if (banner)  banner.style.display  = 'none';
     if (toggle)  { toggle.classList.add('on'); toggle.style.background = ''; }
     if (label)   { label.textContent = 'LIVE';    label.className = 'widget-toggle-label live'; }
-    if (heading) heading.textContent = 'Widget is Live';
+    if (heading) heading.textContent = 'Chatbot is Live';
     if (desc)    desc.textContent = 'Your chatbot is active and capturing leads from your website.';
     if (prevBtn) { prevBtn.style.opacity = ''; prevBtn.style.pointerEvents = ''; }
   } else {
@@ -2971,7 +2989,7 @@ function applyWidgetStatus() {
     if (banner)  banner.style.display  = 'flex';
     if (toggle)  { toggle.classList.remove('on'); toggle.style.background = '#EF4444'; }
     if (label)   { label.textContent = 'OFFLINE'; label.className = 'widget-toggle-label offline'; }
-    if (heading) heading.textContent = 'Widget is Offline';
+    if (heading) heading.textContent = 'Chatbot is Offline';
     if (desc)    desc.textContent = 'Your chatbot is hidden from visitors. Go live to start capturing leads.';
     if (prevBtn) { prevBtn.style.opacity = '0.45'; prevBtn.style.pointerEvents = 'none'; }
   }
@@ -3088,7 +3106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div class="toast" id="tmplToast" style="border-left-color:#059669">
   <span class="toast-icon">✓</span>
-  <div><strong>Template applied</strong><span id="tmplToastSub">Hit Save Configuration to push to widget</span></div>
+  <div><strong>Template applied</strong><span id="tmplToastSub">Hit Save Configuration to push to chatbot</span></div>
 </div>
 
 <!-- ── CRM LEAD DETAIL PANEL ── -->
@@ -3240,10 +3258,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="prev-dots">
         <div class="prev-dot r"></div><div class="prev-dot y"></div><div class="prev-dot g"></div>
       </div>
-      <span class="prev-lbl">Widget Preview — Live</span>
+      <span class="prev-lbl">Chatbot Preview — Live</span>
       <button class="prev-x" onclick="closePreview()" title="Close">×</button>
     </div>
-    <iframe id="prevFrame" src="widget.html?preview=true" title="Widget Preview"></iframe>
+    <iframe id="prevFrame" src="widget.html?preview=true" title="Chatbot Preview"></iframe>
   </div>
 </div>
 
