@@ -521,6 +521,18 @@ td.muted{font-size:12px;color:var(--muted)}
 .sb-settings-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--sb-label);padding:5px;border-radius:6px;transition:all 0.15s;display:flex;align-items:center;line-height:0;flex-shrink:0}
 .sb-settings-btn:hover{color:#fff;background:rgba(255,255,255,0.1)}
 
+/* ── EMBED SECTION ── */
+.embed-code-wrap{position:relative;background:#0B1525;border-radius:10px;padding:16px 18px;margin:0}
+.embed-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#A5B4FC;line-height:1.7;white-space:pre-wrap;word-break:break-all;margin:0;user-select:all}
+.embed-copy-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
+.embed-copy-btn:hover{background:rgba(255,255,255,0.2)}
+.embed-copy-btn.copied{background:#059669;border-color:#059669}
+.embed-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.embed-step:last-child{border-bottom:none}
+.embed-step-num{width:24px;height:24px;background:#EFF6FF;color:#1D4ED8;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.embed-step-text{font-size:13px;color:var(--navy);line-height:1.55}
+.embed-step-text strong{font-weight:700}
+.embed-step-text code{background:#EFF6FF;color:#1D4ED8;font-family:'JetBrains Mono',monospace;font-size:11px;padding:1px 6px;border-radius:4px}
 /* ── CRM PAGE ── */
 .crm-wrap{display:flex;flex-direction:column;gap:20px}
 .crm-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -1040,6 +1052,66 @@ Phone: (214) 555-0192
                 <div class="spam-check-sub">Catches nonsense or repetitive text in open-ended answer fields</div>
               </div>
               <div class="toggle on" id="spamKeyboardToggle" onclick="toggleSpamCheck('detectKeyboard')"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════ SECTION 8: EMBED ON YOUR WEBSITE ════ -->
+        <div class="card">
+          <div class="bc-card-head">
+            <div>
+              <h3>Embed on Your Website</h3>
+              <p>Add your chatbot to any website by pasting one line of code. Works with WordPress, Wix, Squarespace, Webflow, and any custom HTML site.</p>
+            </div>
+            <a id="embedPreviewLink" href="widget.html?preview=true" target="_blank" class="prev-btn" style="text-decoration:none">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="12" height="9" rx="1.5"/><path d="M5 11v1.5M9 11v1.5M3.5 12.5h7" stroke-linecap="round"/></svg>
+              Preview Widget
+            </a>
+          </div>
+          <div class="bc-card-body">
+
+            <!-- Steps -->
+            <div style="margin-bottom:22px">
+              <div class="embed-step">
+                <div class="embed-step-num">1</div>
+                <div class="embed-step-text"><strong>Copy the embed code</strong> below using the Copy button.</div>
+              </div>
+              <div class="embed-step">
+                <div class="embed-step-num">2</div>
+                <div class="embed-step-text">Open your website editor and paste the code just before the closing <code>&lt;/body&gt;</code> tag on every page you want the chatbot to appear.</div>
+              </div>
+              <div class="embed-step">
+                <div class="embed-step-num">3</div>
+                <div class="embed-step-text"><strong>Save and publish</strong> your website. The chatbot will appear in the bottom-right corner within seconds.</div>
+              </div>
+            </div>
+
+            <!-- Embed URL input -->
+            <div style="margin-bottom:14px">
+              <label class="field-label">Your Widget URL</label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input id="embedUrlInput" class="field-input" style="margin-bottom:0;font-family:'JetBrains Mono',monospace;font-size:12px;flex:1" placeholder="https://your-domain.com/widget.html" oninput="updateEmbedCode()" value="">
+                <span style="font-size:12px;color:var(--muted);white-space:nowrap">← your hosted widget URL</span>
+              </div>
+            </div>
+
+            <!-- Code block -->
+            <div class="embed-code-wrap">
+              <pre class="embed-code" id="embedCodeBlock">&lt;!-- VettoChat Widget --&gt;
+&lt;iframe
+  src="widget.html"
+  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"
+  allow="clipboard-write"
+  title="VettoChat"&gt;
+&lt;/iframe&gt;</pre>
+              <button class="embed-copy-btn" id="embedCopyBtn" onclick="copyEmbedCode()">Copy Code</button>
+            </div>
+
+            <div style="margin-top:14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:11px 14px;display:flex;gap:10px;align-items:flex-start">
+              <span style="font-size:16px;flex-shrink:0">💡</span>
+              <div style="font-size:12px;color:#166534;line-height:1.6">
+                <strong>Using WordPress or Wix?</strong> Paste the code into a Custom HTML widget or your theme's footer script area. The chatbot automatically inherits your brand colors and settings saved above.
+              </div>
             </div>
           </div>
         </div>
@@ -3652,6 +3724,41 @@ function saveCFM() {
   applyCompanyBranding();
   closeCFM();
   showToastMsg('✓ Profile saved', 'Your account profile has been updated.', '#059669');
+}
+
+// ─── EMBED CODE ──────────────────────────────────────────────────────────────
+function _buildEmbedCode(src) {
+  const url = (src || '').trim() || 'widget.html';
+  return `<!-- VettoChat Widget -->\n<iframe\n  src="${url}"\n  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"\n  allow="clipboard-write"\n  title="VettoChat">\n</iframe>`;
+}
+
+function updateEmbedCode() {
+  const src  = document.getElementById('embedUrlInput')?.value || '';
+  const code = document.getElementById('embedCodeBlock');
+  const link = document.getElementById('embedPreviewLink');
+  if (code) code.textContent = _buildEmbedCode(src);
+  if (link) link.href = (src || 'widget.html') + (src.includes('?') ? '&' : '?') + 'preview=true';
+}
+
+function copyEmbedCode() {
+  const src  = document.getElementById('embedUrlInput')?.value || '';
+  const text = _buildEmbedCode(src);
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('embedCopyBtn');
+    if (!btn) return;
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('copied'); }, 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('embedCopyBtn');
+    if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('copied'); }, 2500); }
+  });
 }
 
 // ─── ONBOARDING ──────────────────────────────────────────────────────────────
