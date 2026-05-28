@@ -3037,7 +3037,8 @@ function _renderSAAvailableCities(cities) {
   list.innerHTML = (cities || []).map(city => {
     const added = _saConfig.cities.includes(city);
     const cityName = _esc(city.split(',')[0].trim());
-    return `<button class="sa-city-avail-btn${added ? ' added' : ''}" onclick="toggleSACityFromList(${JSON.stringify(city)})">${added ? '✓ ' : ''}${cityName}</button>`;
+    const safeCity = JSON.stringify(city).replace(/"/g, '&quot;');
+    return `<button class="sa-city-avail-btn${added ? ' added' : ''}" onclick="toggleSACityFromList(${safeCity})">${added ? '✓ ' : ''}${cityName}</button>`;
   }).join('');
 }
 
