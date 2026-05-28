@@ -238,9 +238,10 @@ td.muted{font-size:12px;color:var(--muted)}
   font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
   padding:3px 9px;border-radius:10px;flex-shrink:0;white-space:nowrap;
 }
-.qb-type.text {background:#F0FDF4;color:#166534}
-.qb-type.chips{background:#EFF6FF;color:#1E40AF}
-.qb-type.phone{background:#F5F3FF;color:#5B21B6}
+.qb-type.text       {background:#F0FDF4;color:#166534}
+.qb-type.chips      {background:#EFF6FF;color:#1E40AF}
+.qb-type.phone      {background:#F5F3FF;color:#5B21B6}
+.qb-type.city-picker{background:#ECFEFF;color:#0E7490}
 
 .qb-toggle{flex-shrink:0}
 .qb-delete{
@@ -468,6 +469,16 @@ td.muted{font-size:12px;color:var(--muted)}
 .sa-add-input input:focus{border-color:#2563EB}
 .sa-add-btn{padding:7px 13px;background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
 .sa-add-btn:hover{background:#DBEAFE;border-color:#93C5FD}
+/* City typeahead dropdown */
+.sa-city-search-wrap{position:relative;display:inline-block;width:100%}
+.sa-city-search-inp{width:100%;max-width:340px;background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;box-sizing:border-box}
+.sa-city-search-inp:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.sa-city-dropdown{position:absolute;top:calc(100% + 4px);left:0;z-index:100;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);max-height:210px;overflow-y:auto;width:340px;display:none}
+.sa-city-dropdown::-webkit-scrollbar{width:4px}
+.sa-city-dropdown::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sa-city-opt{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--navy);transition:background .1s}
+.sa-city-opt:hover{background:#EFF6FF;color:#1E40AF}
+.sa-city-no-results{padding:10px 14px;font-size:12px;color:var(--muted)}
 .sa-radius-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
 .sa-radius-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .sa-radius-row label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
@@ -889,20 +900,20 @@ Phone: (214) 555-0192
             <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start">
               <span style="font-size:18px;flex-shrink:0">📍</span>
               <div style="font-size:12px;color:#1E40AF;line-height:1.6">
-                <strong>How it works:</strong> Add the cities or ZIP codes you serve, or set a radius from your business. The chatbot automatically checks the customer's location and only continues the conversation if they're in your area.
+                <strong>How it works:</strong> Add the cities you serve below. The chatbot shows customers a searchable City &amp; State picker — only customers who select one of your service cities will proceed through the conversation.
               </div>
             </div>
 
-            <!-- Unified Service Locations -->
+            <!-- Service Cities -->
             <div>
-              <div class="sa-section-label">Service Locations</div>
+              <div class="sa-section-label">Service Cities</div>
               <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-                Type a <strong>city &amp; state</strong> (e.g. <em>Dallas TX</em>) or a <strong>ZIP code</strong> (e.g. <em>75025</em>) — we'll detect it automatically.
+                Search and select the <strong>cities you serve</strong>. Customers must select one of these cities to qualify as a lead.
               </div>
-              <div class="sa-tags" id="saLocationTags" style="margin-bottom:10px;min-height:12px"></div>
-              <div class="sa-add-input">
-                <input id="saNewLocation" type="text" placeholder="Dallas TX  or  75025" onkeydown="if(event.key==='Enter')addSALocation()" style="max-width:260px">
-                <button class="sa-add-btn" onclick="addSALocation()">+ Add</button>
+              <div class="sa-tags" id="saLocationTags" style="margin-bottom:12px;min-height:12px"></div>
+              <div class="sa-city-search-wrap">
+                <input id="saNewLocation" type="text" class="sa-city-search-inp" placeholder="Search cities… (e.g. Dallas, TX)" autocomplete="off" oninput="filterSACities(this.value)" onkeydown="if(event.key==='Escape'){var d=document.getElementById('saCityDropdown');if(d)d.style.display='none'}" onblur="setTimeout(()=>{var d=document.getElementById('saCityDropdown');if(d)d.style.display='none'},200)">
+                <div id="saCityDropdown" class="sa-city-dropdown"></div>
               </div>
             </div>
 
@@ -1324,7 +1335,7 @@ const Q1_DEFAULT_TEXT = "Hi! I'm (Bot Name). I can get you a free quote in under
 let questions = [
   {id:1,key:'name',     text:Q1_DEFAULT_TEXT,                                    type:'text',  enabled:true, placeholder:'Enter your full name…',         chips:[]},
   {id:2,key:'service',  text:'What type of roofing service do you need?',        type:'chips', enabled:true, placeholder:'Or type your service…',          chips:['Full Replacement','Leak Repair','Storm Damage','New Install','Gutters','Inspection']},
-  {id:3,key:'location', text:'What is your city or ZIP code?',                   type:'text',  enabled:true, placeholder:'City or zip code…',              chips:[]},
+  {id:3,key:'location', text:'Select your city &amp; state',                      type:'city-picker', enabled:true, placeholder:'Search for your city…',     chips:[]},
   {id:4,key:'urgency',  text:'How soon do you need this done?',                  type:'chips', enabled:true, placeholder:'Or describe urgency…',           chips:['Emergency (Within 24h)','This week','Just browsing / Next month']},
   {id:5,key:'budget',   text:'What is your approximate budget?',                 type:'chips', enabled:true, placeholder:'Or enter an amount…',            chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
   {id:6,key:'phone',    text:'What is the best phone number to reach you?',      type:'phone', enabled:true, placeholder:'10-digit phone number…',         chips:[]},
@@ -1362,7 +1373,7 @@ function renderQB(){
       </div>
       <div class="qb-num">Q${idx+1}</div>
       <input class="qb-input" value="${q.text.replace(/"/g,'&quot;')}" data-id="${q.id}" onchange="updateQText(${q.id}, this.value)">
-      <span class="qb-type ${q.type}">${q.type === 'phone' ? 'Phone' : q.type === 'chips' ? 'Chips' : 'Text'}</span>
+      <span class="qb-type ${q.type === 'city-picker' ? 'city-picker' : q.type}">${q.type === 'phone' ? 'Phone' : q.type === 'chips' ? 'Chips' : q.type === 'city-picker' ? 'City' : 'Text'}</span>
       <div class="toggle qb-toggle ${q.enabled ? 'on' : ''}" onclick="toggleQ(${q.id}, this)">
         <div class="toggle-thumb"></div>
       </div>
@@ -1670,7 +1681,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What roofing service do you need?',             placeholder:'Or describe it…',        enabled:true, chips:['Full Replacement','Leak Repair','Storm Damage','New Install','Gutters','Inspection']},
-      {key:'location', type:'text',  question:'What city or zip code are you in?',             placeholder:'City or zip…',           enabled:true, chips:[]},
+      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How soon do you need this done?',               placeholder:'Or describe urgency…',   enabled:true, chips:['Emergency (Within 24h)','This week','Within a month','Just exploring']},
       {key:'budget',   type:'chips', question:"What's your approximate budget?",              placeholder:'Or enter an amount…',    enabled:true, chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
       {key:'phone',    type:'phone', question:'Last step — what number should we call?',       placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1693,7 +1704,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What plumbing service do you need?',            placeholder:'Or describe it…',        enabled:true, chips:['Emergency Leak','Pipe Replacement','Drain Cleaning','Water Heater','New Installation','Inspection']},
-      {key:'location', type:'text',  question:'What city are you located in?',                 placeholder:'City or zip…',           enabled:true, chips:[]},
+      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How urgent is this?',                           placeholder:'Or describe it…',        enabled:true, chips:['Emergency (Right now)','Today','This week','Just getting prices']},
       {key:'budget',   type:'chips', question:"What's your budget range?",                    placeholder:'Or enter an amount…',    enabled:true, chips:['$5K+','$1K–$5K','$500–$1K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number can we reach you at?',              placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1716,7 +1727,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What electrical service do you need?',          placeholder:'Or describe it…',        enabled:true, chips:['Panel Upgrade','Wiring / Rewire','Outlet Installation','Generator','EV Charger','Safety Inspection']},
-      {key:'location', type:'text',  question:'What city are you in?',                         placeholder:'City or zip…',           enabled:true, chips:[]},
+      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How soon do you need this?',                    placeholder:'Or describe it…',        enabled:true, chips:['Emergency','This week','Within a month','Planning ahead']},
       {key:'budget',   type:'chips', question:"What's your approximate budget?",              placeholder:'Or enter an amount…',    enabled:true, chips:['$10K+','$2K–$10K','$500–$2K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:"What's the best number to reach you?",         placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1739,7 +1750,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What HVAC service do you need?',                placeholder:'Or describe it…',        enabled:true, chips:['AC Replacement','Heater Replacement','AC Repair','Heater Repair','New Installation','Seasonal Tune-Up']},
-      {key:'location', type:'text',  question:'What city are you located in?',                 placeholder:'City or zip…',           enabled:true, chips:[]},
+      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How urgent is this for you?',                   placeholder:'Or describe it…',        enabled:true, chips:['Emergency (No AC/Heat)','Today','This week','Seasonal Planning']},
       {key:'budget',   type:'chips', question:"What's your budget for this project?",         placeholder:'Or enter an amount…',    enabled:true, chips:['$10K+','$3K–$10K','$500–$3K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number can we reach you at?',              placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1762,7 +1773,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What landscaping service do you need?',         placeholder:'Or describe it…',        enabled:true, chips:['Full Landscaping','Lawn Maintenance','Tree Removal','Irrigation','Hardscaping','Seasonal Cleanup']},
-      {key:'location', type:'text',  question:'What city or zip code are you in?',             placeholder:'City or zip…',           enabled:true, chips:[]},
+      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:"What's your timeline?",                        placeholder:'Or describe it…',        enabled:true, chips:['This week','This month','Next season','Ongoing contract']},
       {key:'budget',   type:'chips', question:"What's your budget for this project?",         placeholder:'Or enter an amount…',    enabled:true, chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number should we call you at?',            placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1930,7 +1941,7 @@ function applyPresetColor(hex) {
 // Bump CONFIG_VERSION whenever the default setup changes.
 // Any saved config without this exact version is treated as stale
 // and replaced with the clean Roofing + Vetto defaults.
-const CONFIG_VERSION = 1;
+const CONFIG_VERSION = 2;
 
 const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Get a free roof inspection →' };
 
@@ -2863,6 +2874,75 @@ const _ZIP_LL = {
   '55441':[45.01,-93.42],'55447':[45.02,-93.47],
 };
 
+// ─── CITY LIST (mirrors widget.html) ─────────────────────────────────────────
+const _CITIES = [
+  'Abilene, TX','Akron, OH','Albany, GA','Albany, NY','Albuquerque, NM','Alexandria, LA',
+  'Alexandria, VA','Allen, TX','Allentown, PA','Amarillo, TX','Anaheim, CA','Anchorage, AK',
+  'Ann Arbor, MI','Arlington, TX','Arlington, VA','Arvada, CO','Athens, GA','Atlanta, GA',
+  'Augusta, GA','Aurora, CO','Aurora, IL','Austin, TX',
+  'Bakersfield, CA','Baltimore, MD','Baton Rouge, LA','Baytown, TX','Beaumont, TX',
+  'Bedford, TX','Bellevue, WA','Birmingham, AL','Boise, ID','Boston, MA','Boulder, CO',
+  'Bozeman, MT','Bridgeport, CT','Broken Arrow, OK','Brownsville, TX','Bryan, TX',
+  'Buffalo, NY','Burleson, TX','Burbank, CA','Burlington, VT',
+  'Cape Coral, FL','Carrollton, TX','Cary, NC','Cedar Hill, TX','Cedar Park, TX',
+  'Celina, TX','Centennial, CO','Chandler, AZ','Charlotte, NC','Chattanooga, TN',
+  'Chesapeake, VA','Chicago, IL','Chula Vista, CA','Cincinnati, OH','Clarksville, TN',
+  'Clearwater, FL','Cleveland, OH','Colleyville, TX','Colorado Springs, CO','Columbia, MO',
+  'Columbia, SC','Columbus, GA','Columbus, OH','Concord, CA','Concord, NC','Conroe, TX',
+  'Coppell, TX','Coral Springs, FL','Corona, CA','Corpus Christi, TX',
+  'Dallas, TX','Davenport, IA','Dayton, OH','Denton, TX','Denver, CO','DeSoto, TX',
+  'Detroit, MI','Duncanville, TX','Durham, NC',
+  'Edinburg, TX','El Paso, TX','Elizabeth, NJ','Elk Grove, CA','Erie, PA',
+  'Euless, TX','Eugene, OR','Evansville, IN','Everett, WA',
+  'Fargo, ND','Fayetteville, AR','Fayetteville, NC','Flower Mound, TX','Fontana, CA',
+  'Fort Collins, CO','Fort Lauderdale, FL','Fort Myers, FL','Fort Wayne, IN',
+  'Fort Worth, TX','Franklin, TN','Frederick, MD','Fremont, CA','Fresno, CA',
+  'Frisco, TX','Fullerton, CA',
+  'Gainesville, FL','Garland, TX','Georgetown, TX','Gilbert, AZ','Glendale, AZ',
+  'Glendale, CA','Grand Prairie, TX','Grand Rapids, MI','Grapevine, TX','Greensboro, NC',
+  'Gresham, OR',
+  'Haltom City, TX','Hampton, VA','Harrisburg, PA','Hartford, CT','Henderson, NV',
+  'Hialeah, FL','Highland Village, TX','Hillsboro, OR','Hollywood, FL','Honolulu, HI',
+  'Houston, TX','Humble, TX','Huntington Beach, CA','Huntsville, AL','Hurst, TX',
+  'Independence, MO','Indianapolis, IN','Irvine, CA','Irving, TX',
+  'Jackson, MS','Jacksonville, FL','Jersey City, NJ','Joliet, IL',
+  'Kansas City, KS','Kansas City, MO','Katy, TX','Keller, TX','Kent, WA','Killeen, TX',
+  'Kirkland, WA','Knoxville, TN',
+  'Lakewood, CO','Laredo, TX','Las Vegas, NV','Layton, UT','League City, TX',
+  "Lee's Summit, MO",'Lewisville, TX','Lexington, KY','Lincoln, NE','Little Elm, TX',
+  'Little Rock, AR','Long Beach, CA','Los Angeles, CA','Louisville, KY','Lubbock, TX',
+  'Macon, GA','Madison, WI','Mansfield, TX','McKinney, TX','Memphis, TN','Mesa, AZ',
+  'Mesquite, TX','Miami, FL','Miami Gardens, FL','Midland, TX','Milwaukee, WI',
+  'Minneapolis, MN','Miramar, FL','Mobile, AL','Modesto, CA','Montgomery, AL',
+  'Moreno Valley, CA','Murfreesboro, TN','Murphy, TX',
+  'Naperville, IL','Nashville, TN','New Braunfels, TX','New Orleans, LA','New York, NY',
+  'Newark, NJ','Newport News, VA','Norfolk, VA','North Las Vegas, NV',
+  'North Richland Hills, TX',
+  'Oakland, CA','Oklahoma City, OK','Omaha, NE','Ontario, CA','Orlando, FL',
+  'Overland Park, KS','Oxnard, CA',
+  'Palm Bay, FL','Pasadena, CA','Pasadena, TX','Paterson, NJ','Pearland, TX',
+  'Pembroke Pines, FL','Peoria, AZ','Peoria, IL','Pflugerville, TX','Philadelphia, PA',
+  'Phoenix, AZ','Pittsburgh, PA','Plano, TX','Pomona, CA','Port St. Lucie, FL',
+  'Portland, OR','Providence, RI','Prosper, TX','Provo, UT',
+  'Raleigh, NC','Rancho Cucamonga, CA','Reno, NV','Renton, WA','Richardson, TX',
+  'Richmond, VA','Riverside, CA','Rochester, MN','Rochester, NY','Rockford, IL',
+  'Rockwall, TX','Roseville, CA','Round Rock, TX','Rowlett, TX',
+  'Sacramento, CA','Saginaw, TX','Salem, OR','Salt Lake City, UT','San Antonio, TX',
+  'San Bernardino, CA','San Diego, CA','San Francisco, CA','San Jose, CA',
+  'Santa Ana, CA','Santa Clarita, CA','Santa Rosa, CA','Savannah, GA','Scottsdale, AZ',
+  'Seattle, WA','Shreveport, LA','Sioux Falls, SD','South Bend, IN','Southlake, TX',
+  'Spokane, WA','Spring, TX','Springfield, IL','Springfield, MO','St. Louis, MO',
+  'St. Paul, MN','St. Petersburg, FL','Sterling Heights, MI','Stockton, CA',
+  'Sugar Land, TX','Sunnyvale, CA','Sunrise, FL','Surprise, AZ','Syracuse, NY',
+  'Tacoma, WA','Tallahassee, FL','Tampa, FL','Tempe, AZ','The Colony, TX',
+  'The Woodlands, TX','Toledo, OH','Torrance, CA','Tucson, AZ','Tulsa, OK','Tyler, TX',
+  'Vancouver, WA','Virginia Beach, VA','Visalia, CA',
+  'Waco, TX','Warren, MI','Washington, DC','Waxahachie, TX','Weatherford, TX',
+  'West Jordan, UT','West Palm Beach, FL','West Valley City, UT','Wichita, KS',
+  'Wichita Falls, TX','Winston-Salem, NC','Woodbridge, NJ','Wylie, TX',
+  'Yakima, WA','Yonkers, NY'
+];
+
 const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later!";
 
 const DEFAULT_SA_CONFIG = {
@@ -2943,36 +3023,79 @@ function _renderSATags(type, containerId, items) {
   ).join('');
 }
 
+function filterSACities(query) {
+  const dropdown = document.getElementById('saCityDropdown');
+  if (!dropdown) return;
+  const q = (query || '').toLowerCase().trim();
+  if (!q) { dropdown.style.display = 'none'; return; }
+  const filtered = _CITIES.filter(c => c.toLowerCase().includes(q)).slice(0, 20);
+  if (!filtered.length) {
+    dropdown.innerHTML = '<div class="sa-city-no-results">No cities found</div>';
+    dropdown.style.display = '';
+    return;
+  }
+  dropdown.innerHTML = filtered
+    .map(c => `<div class="sa-city-opt" onmousedown="addSACityChip(${JSON.stringify(c)})">${_esc(c)}</div>`)
+    .join('');
+  dropdown.style.display = '';
+}
+
+function addSACityChip(city) {
+  if (!city || !_CITIES.includes(city)) return;
+  if (!_saConfig.cities.includes(city)) _saConfig.cities.push(city);
+  const inp = document.getElementById('saNewLocation');
+  const dropdown = document.getElementById('saCityDropdown');
+  if (inp) inp.value = '';
+  if (dropdown) dropdown.style.display = 'none';
+  _renderSALocationTags();
+}
+
 function addSALocation() {
+  // Legacy fallback — try to match input against city list
   const inp = document.getElementById('saNewLocation');
   if (!inp) return;
   const val = inp.value.trim();
   if (!val) return;
-  const isZip = /^\d{5}$/.test(val);
-  if (isZip) {
-    if (!_saConfig.zips.includes(val)) _saConfig.zips.push(val);
-  } else {
-    if (!_saConfig.cities.includes(val)) _saConfig.cities.push(val);
+  // Normalize variations: "dallas tx" / "dallas texas" → "Dallas, TX"
+  const normalized = _normalizeCityInput(val);
+  if (normalized) { addSACityChip(normalized); return; }
+  // Partial match fallback
+  const match = _CITIES.find(c => c.toLowerCase().startsWith(val.toLowerCase()));
+  if (match) { addSACityChip(match); return; }
+  // No match found — do nothing (only valid city chips allowed)
+}
+
+function _normalizeCityInput(raw) {
+  const s = raw.trim();
+  // Exact match check (case-insensitive)
+  const exact = _CITIES.find(c => c.toLowerCase() === s.toLowerCase());
+  if (exact) return exact;
+  // Try "City ST" or "City, ST" → "City, ST" format
+  const m = s.match(/^([A-Za-z][A-Za-z\s'.'-]+?)\s*,?\s*([A-Za-z]{2})$/);
+  if (m) {
+    const candidate = m[1].trim() + ', ' + m[2].toUpperCase();
+    const found = _CITIES.find(c => c.toLowerCase() === candidate.toLowerCase());
+    if (found) return found;
   }
-  inp.value = '';
-  _renderSALocationTags();
+  return null;
 }
 
 function _renderSALocationTags() {
   const el = document.getElementById('saLocationTags');
   if (!el) return;
-  const cityTags = (_saConfig.cities || []).map((c, i) =>
-    `<span class="sa-tag">🏙 ${_esc(c)}<button onclick="removeSAItem('city',${i})" title="Remove">×</button></span>`
-  );
-  const zipTags = (_saConfig.zips || []).map((z, i) =>
-    `<span class="sa-tag sa-tag-zip"># ${_esc(z)}<button onclick="removeSAItem('zip',${i})" title="Remove">×</button></span>`
-  );
-  el.innerHTML = [...cityTags, ...zipTags].join('');
+  const cities = (_saConfig.cities || []);
+  if (!cities.length) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--muted);font-style:italic">No cities added yet — search above to add your service cities.</span>';
+    return;
+  }
+  el.innerHTML = cities.map((c, i) =>
+    `<span class="sa-tag">📍 ${_esc(c)}<button onclick="removeSAItem('city',${i})" title="Remove">×</button></span>`
+  ).join('');
 }
 
 function removeSAItem(type, index) {
   const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
-  arr.splice(index, 1);
+  if (arr) arr.splice(index, 1);
   _renderSALocationTags();
 }
 
