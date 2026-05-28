@@ -881,7 +881,7 @@ Phone: (214) 555-0192
           <div class="sa-toggle-row">
             <div class="sa-toggle-info">
               <h4>Service Area Qualification</h4>
-              <p>When on, the chatbot checks each customer's city or ZIP code and politely stops the conversation if they're outside your service area.</p>
+              <p>When on, only customers in your selected cities can proceed. All existing leads are automatically re-evaluated whenever you change your service area — leads outside your cities are flagged ⊗ Out of Area without being deleted.</p>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
               <span style="font-size:12px;font-weight:600" id="saToggleLabel" class="widget-toggle-label offline">OFF</span>
@@ -1036,6 +1036,11 @@ Phone: (214) 555-0192
           </div>
           <select class="crm-select" id="crmFilterStatus" onchange="renderCRMTable()">
             <option value="">All Statuses</option>
+          </select>
+          <select class="crm-select" id="crmFilterSA" onchange="renderCRMTable()">
+            <option value="">All Locations</option>
+            <option value="serviceable">✓ Serviceable</option>
+            <option value="unserviceable">⊗ Out of Area</option>
           </select>
           <select class="crm-select" id="crmSort" onchange="renderCRMTable()">
             <option value="created_desc">Newest First</option>
@@ -2215,20 +2220,26 @@ function seedCRMFromStaticLeads() {
 function getFilteredSortedLeads() {
   const q      = (document.getElementById('crmSearch')?.value || '').toLowerCase();
   const stFilt = document.getElementById('crmFilterStatus')?.value || '';
+  const saFilt = document.getElementById('crmFilterSA')?.value || '';
   const sortVal = document.getElementById('crmSort')?.value || 'created_desc';
 
   let list = Object.values(crmLeads);
 
   // Search
   if (q) list = list.filter(l =>
-    (l.name    || '').toLowerCase().includes(q) ||
-    (l.phone   || '').toLowerCase().includes(q) ||
-    (l.email   || '').toLowerCase().includes(q) ||
-    (l.service || '').toLowerCase().includes(q)
+    (l.name     || '').toLowerCase().includes(q) ||
+    (l.phone    || '').toLowerCase().includes(q) ||
+    (l.email    || '').toLowerCase().includes(q) ||
+    (l.service  || '').toLowerCase().includes(q) ||
+    (l.location || '').toLowerCase().includes(q)
   );
 
   // Status filter
   if (stFilt) list = list.filter(l => l.status === stFilt);
+
+  // Service area filter
+  if (saFilt === 'serviceable')   list = list.filter(l => l.serviceable === true);
+  if (saFilt === 'unserviceable') list = list.filter(l => l.serviceable === false);
 
   // Sort
   const [key, dir] = sortVal.split('_');
@@ -2261,11 +2272,13 @@ function renderCRMTable() {
     const date  = l.created ? new Date(l.created).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : '—';
     const val   = l.budget  || (l.value ? '$' + Number(l.value).toLocaleString() : '—');
     const notes = (l.notes  || '').replace(/<[^>]*>/g, '').slice(0, 60) || '—';
-    const isOOA = l.status === 'out_of_area';
-    const saEnabled = _saConfig.enabled;
-    const saBadge = isOOA
+    const isOOA   = l.status === 'out_of_area';
+    const saActive = _saConfig.enabled && (_saConfig.cities || []).length > 0;
+    const saBadge = l.serviceable === false
       ? '<div style="margin-top:2px"><span class="sa-oor-badge">⊗ Out of Area</span></div>'
-      : (saEnabled && l.serviceable === true ? '<div style="margin-top:2px"><span class="sa-ok-badge">✓ Serviceable</span></div>' : '');
+      : (saActive && l.serviceable === true
+        ? '<div style="margin-top:2px"><span class="sa-ok-badge">✓ Serviceable</span></div>'
+        : '');
     return `<tr onclick="openCRMPanel('${l.id}')" style="${isOOA ? 'opacity:0.7' : ''}">
       <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><div><span class="lead-name">${_esc(l.name || '—')}</span>${saBadge}</div></div></td>
       <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
@@ -2510,8 +2523,12 @@ function createNewLead() {
 function syncStatsFromCRM() {
   if (demoActive) return; // never overwrite demo UI mid-run
   const leads = Object.values(crmLeads);
-  // Exclude out-of-area leads from all stats
-  const qualified = leads.filter(l => l.status !== 'out_of_area');
+  const saActive = _saConfig.enabled && (_saConfig.cities || []).length > 0;
+  const qualified = leads.filter(l => {
+    if (l.status === 'out_of_area') return false;
+    if (saActive && l.serviceable === false) return false;
+    return true;
+  });
   const total    = qualified.length;
   const hot      = qualified.filter(l => l.priority === 'hot').length;
   const deadSet  = new Set(crmStatuses.filter(s => s.color === 'red' || s.id === 'sold' || s.id === 'not_interested' || s.id === 'out_of_area').map(s => s.id));
@@ -2589,6 +2606,7 @@ window.addEventListener('storage', (e) => {
   if (e.key === 'vettochat_service_area') {
     try { const p = JSON.parse(e.newValue || '{}'); _saConfig = { ...DEFAULT_SA_CONFIG, ...p, radius: { ...DEFAULT_SA_CONFIG.radius, ...(p.radius||{}) } }; } catch {}
     renderSAUI();
+    requalifyAllLeads();
   }
   if (e.key === 'vettochat_widget_live') {
     _widgetLive = e.newValue !== 'false';
@@ -2971,11 +2989,41 @@ function loadSAConfig() {
 function saveSAConfig() {
   _saConfig.declineMessage = (document.getElementById('saDeclineMsg')?.value || '').trim() || _SA_DEFAULT_DECLINE;
   localStorage.setItem('vettochat_service_area', JSON.stringify(_saConfig));
+  requalifyAllLeads();
   const t = document.getElementById('tmplToast');
   if (t) {
     t.querySelector('strong').textContent = '✓ Service area saved';
-    t.querySelector('span').textContent = 'Lead qualification rules updated';
-    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+    t.querySelector('span').textContent = 'Existing leads re-evaluated against new service area';
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
+  }
+}
+
+// Evaluate one lead's location against the current service city list.
+// Returns true (in area), false (out of area), or null (no cities configured).
+function _evaluateLeadServiceability(locationStr) {
+  const cities = (_saConfig.cities || []).filter(Boolean);
+  if (!cities.length || !locationStr || !locationStr.trim()) return null;
+  const norm = locationStr.trim().toLowerCase();
+  if (cities.find(c => c.trim().toLowerCase() === norm)) return true;
+  const cityPart = norm.split(',')[0].trim();
+  if (cities.find(c => c.split(',')[0].trim().toLowerCase() === cityPart)) return true;
+  return false;
+}
+
+// Re-check every CRM lead against the current service area config and update
+// their serviceable field. Called whenever SA is toggled or cities change.
+function requalifyAllLeads() {
+  const shouldEval = _saConfig.enabled && (_saConfig.cities || []).filter(Boolean).length > 0;
+  let changed = false;
+  Object.values(crmLeads).forEach(lead => {
+    const prev = lead.serviceable;
+    lead.serviceable = shouldEval ? _evaluateLeadServiceability(lead.location || '') : null;
+    if (lead.serviceable !== prev) changed = true;
+  });
+  if (changed) {
+    saveCRMLeads();
+    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); }
+    syncStatsFromCRM();
   }
 }
 
@@ -2983,6 +3031,7 @@ function toggleSA() {
   _saConfig.enabled = !_saConfig.enabled;
   renderSAUI();
   saveSAConfig();
+  requalifyAllLeads();
 }
 
 function renderSAUI() {
