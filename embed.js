@@ -31,7 +31,7 @@
   // 3. Create the isolated iframe
   const iframe = document.createElement('iframe');
   // Pass the tenantId via URL parameters so the widget knows whose data to load
-  iframe.src = `http://localhost:8080/widget.html?tenantId=${tenantId}`;
+  iframe.src = `https://vettochat-app.vercel.app/widget.html?tenantId=${tenantId}`;
   iframe.style.cssText = `
     width: 100%;
     height: 100%;
