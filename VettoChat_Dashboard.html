@@ -946,9 +946,6 @@ Phone: (214) 555-0192
               <div style="font-size:11px;color:var(--muted)">Keep it friendly — let them know you can't help but wish them well.</div>
             </div>
 
-            <div style="display:flex;justify-content:flex-end">
-              <button class="save-btn" onclick="saveSAConfig()">Save Service Area</button>
-            </div>
           </div>
         </div>
 
@@ -1252,7 +1249,19 @@ function initFunnel(){
 // ─── NAV ────────────────────────────────────────────────────────────────────
 const PAGE_TITLES={overview:'Overview',botconfig:'Bot Config',crm:'Leads'};
 let currentPage='overview';
-function nav(el,name){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');showPage(name);}
+let _botConfigDirty=false; // tracks unsaved changes on bot config page
+
+function _markDirty(){ _botConfigDirty=true; }
+
+function nav(el,name){
+  if(currentPage==='botconfig' && _botConfigDirty && name!=='botconfig'){
+    if(!confirm('You have unsaved changes in Bot Config.\n\nClick "Save All Changes" to keep them, or leave and discard your edits.\n\nLeave without saving?')) return;
+    _botConfigDirty=false;
+  }
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  showPage(name);
+}
 function showPage(name){
   currentPage=name;
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active','visible');});
@@ -1935,6 +1944,7 @@ function setEditorContent(message, name) {
 }
 
 function syncAssistantName(raw) {
+  _markDirty();
   _assistantName = (raw || '').trim();
   const display = _assistantName || '(Assistant Name)';
 
@@ -1965,6 +1975,7 @@ function syncColorPicker(hex) {
   document.getElementById('colorSwatch').style.background = hex;
 }
 function applyPresetColor(hex) {
+  _markDirty();
   document.getElementById('identityColor').value = hex;
   document.getElementById('colorSwatch').style.background = hex;
   document.getElementById('colorPickerNative').value = hex;
@@ -2664,9 +2675,9 @@ window.addEventListener('storage', (e) => {
   }
 });
 
-// Warn before leaving with unsaved CRM edits
+// Warn before closing/refreshing with unsaved edits
 window.addEventListener('beforeunload', (e) => {
-  if (crmActiveLead) { e.preventDefault(); e.returnValue = ''; }
+  if (crmActiveLead || _botConfigDirty) { e.preventDefault(); e.returnValue = ''; }
 });
 
 // Deduplicate: returns true if a lead with the same name+phone was ingested within 60s
@@ -3071,9 +3082,11 @@ function requalifyAllLeads() {
 function toggleSA() {
   _saConfig.enabled = !_saConfig.enabled;
   renderSAUI();
-  saveSAConfig();
+  saveSAConfig(); // toggle saves immediately (it's a binary switch, not a form field)
   requalifyAllLeads();
 }
+// SA city changes mark the page dirty so the user is reminded to Save All Changes
+function _saDirty(){ _markDirty(); }
 
 function renderSAUI() {
   const tog = document.getElementById('saToggle');
@@ -3131,6 +3144,7 @@ function _renderSAAvailableCities(cities) {
 }
 
 function toggleSACityFromList(city) {
+  _markDirty();
   const idx = _saConfig.cities.indexOf(city);
   if (idx !== -1) _saConfig.cities.splice(idx, 1);
   else _saConfig.cities.push(city);
@@ -3156,6 +3170,7 @@ function _renderSALocationTags() {
 }
 
 function removeSAItem(type, index) {
+  _markDirty();
   const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
   if (arr) arr.splice(index, 1);
   _renderSALocationTags();
@@ -3396,6 +3411,7 @@ function saveSpamConfig() {
 }
 
 function toggleSpamMaster() {
+  _markDirty();
   const allOn = _spamConfig.validatePhone && _spamConfig.validateNames && _spamConfig.detectKeyboard;
   const newVal = !allOn;
   _spamConfig.validatePhone   = newVal;
@@ -3407,6 +3423,8 @@ function toggleSpamMaster() {
 function saveAllBotConfig() {
   saveIdentity();
   saveSpamConfig();
+  saveSAConfig();
+  _botConfigDirty = false;
   const status = document.getElementById('bcSaveStatus');
   const hint   = document.getElementById('identitySyncStatus');
   if (status) { status.style.display = ''; setTimeout(() => status.style.display = 'none', 3000); }
@@ -3419,6 +3437,7 @@ function setSpamSensitivity(level) {
 }
 
 function toggleSpamCheck(key) {
+  _markDirty();
   _spamConfig[key] = !_spamConfig[key];
   renderSpamUI();
 }
