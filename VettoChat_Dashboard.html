@@ -407,6 +407,23 @@ td.muted{font-size:12px;color:var(--muted)}
 .chtag-rm:hover{background:#1E40AF;color:#fff}
 .chtag-add{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1.5px dashed #CBD5E1;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
 .chtag-add:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
+/* ── Template Switch Warning ── */
+.tmpl-warn-bg{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
+.tmpl-warn-bg.open{opacity:1;pointer-events:all}
+.tmpl-warn-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:440px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.22);transform:scale(0.95) translateY(8px);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1)}
+.tmpl-warn-bg.open .tmpl-warn-modal{transform:scale(1) translateY(0)}
+.tmpl-warn-icon{font-size:32px;margin-bottom:14px}
+.tmpl-warn-modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:10px}
+.tmpl-warn-modal p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.tmpl-warn-list{padding-left:18px;margin-bottom:20px}
+.tmpl-warn-list li{font-size:12px;color:var(--muted);line-height:1.7;list-style:disc}
+.tmpl-warn-actions{display:flex;gap:10px;justify-content:flex-end}
+.tmpl-warn-cancel{background:var(--bg);border:1px solid var(--border);color:var(--navy);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;border-radius:8px;cursor:pointer;transition:all 0.15s}
+.tmpl-warn-cancel:hover{border-color:#94A3B8}
+.tmpl-warn-continue{background:#DC2626;border:none;color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer;transition:background 0.15s}
+.tmpl-warn-continue:hover{background:#B91C1C}
+/* ── Global Bot Config Save Bar ── */
+.bc-save-bar{position:sticky;bottom:0;z-index:10;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 -4px 16px rgba(0,0,0,0.07);margin-top:4px}
 /* ── Widget Preview Modal ── */
 .prev-bg{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s}
 .prev-bg.open{opacity:1;pointer-events:all}
@@ -721,7 +738,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="bc-card-head">
             <div>
               <h3>Question Builder</h3>
-              <p>Drag to reorder, toggle on/off, and edit chips. Click <strong>Save Configuration</strong> in Assistant Identity to push to chatbot.</p>
+              <p>Drag to reorder, toggle on/off, and edit chips. Hit <strong>Save All Changes</strong> at the bottom to push to your chatbot.</p>
             </div>
           </div>
           <div class="bc-card-body">
@@ -868,10 +885,7 @@ Phone: (214) 555-0192
                 <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:6px">Auto-generated from Q1 — the <span class="an-name-chip" style="font-size:11px;padding:0 4px">highlighted name</span> updates via the Assistant Name field above.</div>
               </div>
             </div>
-            <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
-              <span id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none">Syncing…</span>
-              <button class="save-btn" id="saveIdentityBtn" onclick="saveIdentity()">Save Changes</button>
-            </div>
+            <div id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none;text-align:right;margin-top:4px">Syncing…</div>
           </div>
         </div>
 
@@ -962,61 +976,47 @@ Phone: (214) 555-0192
         </div>
 
         <!-- ════ SECTION 7: ANTI-SPAM ════ -->
-
         <div class="card">
-          <div class="bc-card-head">
+          <div class="bc-card-head" style="align-items:center">
             <div>
               <h3>Lead Quality &amp; Anti-Spam</h3>
-              <p>Control how aggressively the chatbot filters fake submissions. Qualified leads always get through — this protects your pipeline from spam without blocking real customers.</p>
+              <p>Automatically filters bots and fake submissions so only real customers reach your dashboard. All checks run silently in the background.</p>
+            </div>
+            <div class="toggle on" id="spamMasterToggle" onclick="toggleSpamMaster()" title="Enable/disable spam protection" style="flex-shrink:0">
+              <div class="toggle-thumb"></div>
             </div>
           </div>
-
-          <!-- Sensitivity -->
-          <div style="padding:20px 24px;border-bottom:1px solid var(--border)">
-            <div class="sa-section-label" style="margin-bottom:10px">Spam Sensitivity</div>
-            <div class="spam-sensitivity" id="spamSensitivity">
-              <button id="spamBtnLow"    onclick="setSpamSensitivity('low')">Low</button>
-              <button id="spamBtnMedium" onclick="setSpamSensitivity('medium')" class="active">Medium</button>
-              <button id="spamBtnHigh"   onclick="setSpamSensitivity('high')">High</button>
-            </div>
-            <div style="font-size:12px;color:var(--muted);margin-top:10px" id="spamSensDesc">
-              Catches fake phone patterns, keyboard-spam names, and obviously fake info. Recommended for most businesses.
-            </div>
-          </div>
-
-          <!-- Individual checks -->
-          <div style="padding:4px 24px 12px">
+          <div id="spamChecksBody" style="padding:4px 24px 8px">
             <div class="spam-check-row">
               <div>
-                <div class="spam-check-info">Validate Phone Numbers</div>
-                <div class="spam-check-sub">Blocks repeated digits (1111111111), sequential patterns, and invalid area codes</div>
+                <div class="spam-check-info">Block Fake Phone Numbers</div>
+                <div class="spam-check-sub">Rejects repeated digits (1111111111), sequential patterns, and invalid area codes</div>
               </div>
-              <div class="toggle on" id="spamPhoneToggle" onclick="toggleSpamCheck('validatePhone')" title="Toggle phone validation">
-                <div class="toggle-thumb"></div>
-              </div>
+              <div class="toggle on" id="spamPhoneToggle" onclick="toggleSpamCheck('validatePhone')"><div class="toggle-thumb"></div></div>
             </div>
             <div class="spam-check-row">
               <div>
-                <div class="spam-check-info">Validate Name Quality</div>
-                <div class="spam-check-sub">Flags numeric names, known test names, and keyboard spam like "asdfgh"</div>
+                <div class="spam-check-info">Detect Fake Names</div>
+                <div class="spam-check-sub">Flags numeric names, known test names, and keyboard-mashed entries like "asdfgh"</div>
               </div>
-              <div class="toggle on" id="spamNameToggle" onclick="toggleSpamCheck('validateNames')" title="Toggle name validation">
-                <div class="toggle-thumb"></div>
-              </div>
+              <div class="toggle on" id="spamNameToggle" onclick="toggleSpamCheck('validateNames')"><div class="toggle-thumb"></div></div>
             </div>
-            <div class="spam-check-row">
+            <div class="spam-check-row" style="border-bottom:none">
               <div>
-                <div class="spam-check-info">Detect Keyboard Spam</div>
-                <div class="spam-check-sub">Catches repetitive or nonsense text responses in open fields</div>
+                <div class="spam-check-info">Stop Keyboard Spam</div>
+                <div class="spam-check-sub">Catches nonsense or repetitive text in open-ended answer fields</div>
               </div>
-              <div class="toggle on" id="spamKeyboardToggle" onclick="toggleSpamCheck('detectKeyboard')" title="Toggle keyboard spam detection">
-                <div class="toggle-thumb"></div>
-              </div>
+              <div class="toggle on" id="spamKeyboardToggle" onclick="toggleSpamCheck('detectKeyboard')"><div class="toggle-thumb"></div></div>
             </div>
           </div>
+        </div>
 
-          <div style="padding:0 24px 20px;display:flex;justify-content:flex-end">
-            <button class="save-btn" onclick="saveSpamConfig()">Save Settings</button>
+        <!-- ════ GLOBAL SAVE BAR ════ -->
+        <div class="bc-save-bar">
+          <span style="font-size:12px;color:var(--muted)">All settings save together — one click pushes everything to your chatbot.</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span id="bcSaveStatus" style="font-size:12px;font-weight:600;color:#059669;display:none">✓ All changes saved</span>
+            <button class="save-btn" onclick="saveAllBotConfig()">Save All Changes</button>
           </div>
         </div>
 
@@ -1123,6 +1123,25 @@ Phone: (214) 555-0192
 
   </div><!-- /pages -->
 </div><!-- /main -->
+
+<!-- TEMPLATE SWITCH WARNING MODAL -->
+<div class="tmpl-warn-bg" id="tmplWarnBg">
+  <div class="tmpl-warn-modal">
+    <div class="tmpl-warn-icon">⚠️</div>
+    <h3>Switch Industry Template?</h3>
+    <p>Switching to <strong id="tmplWarnName"></strong> will replace your current chatbot flow, questions, and chip options. <strong>Unsaved changes will be lost.</strong></p>
+    <ul class="tmpl-warn-list">
+      <li>All conversation questions will reset to the new template</li>
+      <li>Chip / answer options will be replaced</li>
+      <li>Lead scoring tiers will reset to template defaults</li>
+      <li>Your assistant name and brand color are kept</li>
+    </ul>
+    <div class="tmpl-warn-actions">
+      <button class="tmpl-warn-cancel" onclick="cancelTemplateSwitch()">Cancel</button>
+      <button class="tmpl-warn-continue" onclick="confirmTemplateSwitch()">Yes, Switch Template</button>
+    </div>
+  </div>
+</div>
 
 <!-- DEMO OVERLAY -->
 <div class="demo-overlay" id="demoOverlay">
@@ -1795,7 +1814,32 @@ function renderTemplates() {
   });
 }
 
+let _pendingTemplateId = null;
+
 function applyTemplate(id) {
+  if (id === _activeTemplate) return; // already active, no warning needed
+  _pendingTemplateId = id;
+  const tmpl = INDUSTRY_TEMPLATES[id];
+  if (!tmpl) return;
+  const nameEl = document.getElementById('tmplWarnName');
+  if (nameEl) nameEl.textContent = `${tmpl.icon} ${tmpl.name}`;
+  const bg = document.getElementById('tmplWarnBg');
+  if (bg) bg.classList.add('open');
+}
+
+function cancelTemplateSwitch() {
+  _pendingTemplateId = null;
+  document.getElementById('tmplWarnBg')?.classList.remove('open');
+}
+
+function confirmTemplateSwitch() {
+  document.getElementById('tmplWarnBg')?.classList.remove('open');
+  if (!_pendingTemplateId) return;
+  _doApplyTemplate(_pendingTemplateId);
+  _pendingTemplateId = null;
+}
+
+function _doApplyTemplate(id) {
   const tmpl = INDUSTRY_TEMPLATES[id];
   if (!tmpl) return;
   _activeTemplate = id;
@@ -1837,7 +1881,7 @@ function applyTemplate(id) {
   const toast = document.getElementById('tmplToast');
   if (toast) {
     toast.querySelector('strong').textContent = `${tmpl.icon} ${tmpl.name} template applied`;
-    toast.querySelector('span').textContent = 'Hit Save Configuration to push to chatbot';
+    toast.querySelector('span').textContent = 'Hit Save All Changes to push to your chatbot';
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 3500);
   }
@@ -2047,16 +2091,13 @@ function saveIdentity() {
   // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
 
-  const btn    = document.getElementById('saveIdentityBtn');
   const status = document.getElementById('identitySyncStatus');
-  status.style.display = '';
-  status.textContent   = '✓ Synced to chatbot';
-  status.style.color   = '#059669';
-  btn.disabled = true;
-  setTimeout(() => {
-    status.style.display = 'none';
-    btn.disabled = false;
-  }, 2500);
+  if (status) {
+    status.style.display = '';
+    status.textContent   = '✓ Synced to chatbot';
+    status.style.color   = '#059669';
+    setTimeout(() => { status.style.display = 'none'; }, 2500);
+  }
 }
 
 // ─── CRM DATA LAYER ──────────────────────────────────────────────────────────
@@ -3352,12 +3393,24 @@ function loadSpamConfig() {
 function saveSpamConfig() {
   localStorage.setItem('vettochat_spam_config', JSON.stringify(_spamConfig));
   renderSpamUI();
-  const t = document.getElementById('tmplToast');
-  if (t) {
-    t.querySelector('strong').textContent = '✓ Spam settings saved';
-    t.querySelector('span').textContent = 'Chatbot lead quality settings updated';
-    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
-  }
+}
+
+function toggleSpamMaster() {
+  const allOn = _spamConfig.validatePhone && _spamConfig.validateNames && _spamConfig.detectKeyboard;
+  const newVal = !allOn;
+  _spamConfig.validatePhone   = newVal;
+  _spamConfig.validateNames   = newVal;
+  _spamConfig.detectKeyboard  = newVal;
+  renderSpamUI();
+}
+
+function saveAllBotConfig() {
+  saveIdentity();
+  saveSpamConfig();
+  const status = document.getElementById('bcSaveStatus');
+  const hint   = document.getElementById('identitySyncStatus');
+  if (status) { status.style.display = ''; setTimeout(() => status.style.display = 'none', 3000); }
+  if (hint)   { hint.style.display = 'none'; }
 }
 
 function setSpamSensitivity(level) {
@@ -3371,19 +3424,18 @@ function toggleSpamCheck(key) {
 }
 
 function renderSpamUI() {
-  const btns = { low:'spamBtnLow', medium:'spamBtnMedium', high:'spamBtnHigh' };
-  Object.entries(btns).forEach(([lvl, id]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('active', _spamConfig.sensitivity === lvl);
-  });
-  const desc = document.getElementById('spamSensDesc');
-  if (desc) desc.textContent = _SPAM_SENS_DESC[_spamConfig.sensitivity] || '';
-
   const checks = { validatePhone:'spamPhoneToggle', validateNames:'spamNameToggle', detectKeyboard:'spamKeyboardToggle' };
   Object.entries(checks).forEach(([key, id]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('on', !!_spamConfig[key]);
   });
+  // Master toggle: on if ANY check is enabled
+  const masterEl = document.getElementById('spamMasterToggle');
+  const anyOn = _spamConfig.validatePhone || _spamConfig.validateNames || _spamConfig.detectKeyboard;
+  if (masterEl) masterEl.classList.toggle('on', !!anyOn);
+  // Show/hide individual checks based on master
+  const body = document.getElementById('spamChecksBody');
+  if (body) body.style.display = anyOn ? '' : 'none';
 }
 
 function loadWidgetStatus() {
