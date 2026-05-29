@@ -21,8 +21,8 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.2px}
 .logo-text span{color:#60A5FA}
 
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:48px;width:100%;max-width:560px}
+/* CARD — max-width increased to 680px */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:48px;width:100%;max-width:680px}
 
 /* PROGRESS */
 .progress-wrap{margin-bottom:36px;text-align:center}
@@ -117,14 +117,24 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
     </div>
   </div>
 
-  <!-- STEP 2 — Your bot -->
+  <!-- STEP 2 — Your bot (field order: Industry, Assistant name, Brand color) -->
   <div class="step" id="step-2">
     <div class="step-title">Set up your chatbot</div>
     <p class="step-sub">These settings control how your bot presents itself and what it asks visitors.</p>
+
+    <!-- Industry field — first, populated by buildIndustryField() -->
+    <div class="field" id="service-field">
+      <label>Industry</label>
+      <!-- Populated by JS based on vc_tenant_industry -->
+    </div>
+
+    <!-- Assistant name — second -->
     <div class="field">
       <label>Assistant name</label>
       <input type="text" id="s2-name" placeholder="e.g. Vetto, Max, Alex" maxlength="20">
     </div>
+
+    <!-- Brand color — third -->
     <div class="field">
       <label>Brand color</label>
       <div class="color-row">
@@ -132,10 +142,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
         <span class="color-val" id="color-val">#2563EB</span>
       </div>
     </div>
-    <div class="field" id="service-field">
-      <label>Primary service</label>
-      <!-- Populated by JS based on industry -->
-    </div>
+
     <div class="btn-row">
       <button class="btn-back" onclick="goTo(1)">Back</button>
       <button class="btn-next" onclick="goTo(3)">Next</button>
@@ -150,8 +157,8 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
       <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy</button>
       <pre class="code-block" id="embed-code"></pre>
     </div>
-    <a href="VettoChat_Dashboard.html" class="btn-full">Go to my dashboard</a>
-    <a href="VettoChat_Dashboard.html" class="btn-skip">Skip for now</a>
+    <a href="VettoChat_Dashboard.html" class="btn-full" onclick="finalSave()">Go to my dashboard</a>
+    <a href="VettoChat_Dashboard.html" class="btn-skip" onclick="finalSave()">Skip for now</a>
   </div>
 
 </div>
@@ -165,7 +172,13 @@ const INDUSTRY_SERVICES = {
   electrical: ['Panel Upgrade','Wiring','Outlet Installation','Generator'],
 };
 
+// ── NAVIGATION ──────────────────────────────────────────────────────────────
+
 function goTo(step) {
+  // Save data as user advances forward
+  if (currentStep === 1 && step === 2) saveStep1();
+  if (currentStep === 2 && step === 3) saveStep2();
+
   const cur = document.getElementById('step-' + currentStep);
   cur.style.opacity = '0';
   setTimeout(() => {
@@ -176,7 +189,7 @@ function goTo(step) {
     next.classList.add('active');
     setTimeout(() => { next.style.opacity = '1'; }, 10);
     updateProgress();
-    if (step === 2) buildServiceField();
+    if (step === 2) buildIndustryField();
     if (step === 3) buildEmbedCode();
   }, 200);
 }
@@ -189,41 +202,93 @@ function updateProgress() {
   document.getElementById('progress-label').textContent = `Step ${currentStep} of 3`;
 }
 
-function buildServiceField() {
-  const industry = localStorage.getItem('vc_tenant_industry') || '';
-  const services = INDUSTRY_SERVICES[industry];
+// ── DATA SAVING ──────────────────────────────────────────────────────────────
+
+function saveStep1() {
+  const phone   = document.getElementById('s1-phone').value.trim();
+  const website = document.getElementById('s1-website').value.trim();
+  localStorage.setItem('vc_business_phone', phone);
+  localStorage.setItem('vc_website_url',    website);
+}
+
+function saveStep2() {
+  const industry      = localStorage.getItem('vc_tenant_industry') || '';
+  const assistantName = (document.getElementById('s2-name')?.value || 'Vetto').trim() || 'Vetto';
+  const brandColor    = document.getElementById('s2-color')?.value  || '#2563EB';
+  const industryVal   = document.getElementById('s2-service')?.value || '';
+
+  localStorage.setItem('vc_industry',       industryVal);
+  localStorage.setItem('vc_assistant_name', assistantName);
+  localStorage.setItem('vc_brand_color',    brandColor);
+
+  const businessPhone = localStorage.getItem('vc_business_phone') || '';
+  const websiteUrl    = localStorage.getItem('vc_website_url')    || '';
+
+  // Write complete onboarding object with all five values
+  localStorage.setItem('vc_onboarding', JSON.stringify({
+    assistantName,
+    brandColor,
+    industry,     // the industry key (roofing/plumbing/hvac/electrical) — used by _doApplyTemplate
+    businessPhone,
+    websiteUrl,
+  }));
+
+  // Keep vettochat_config in sync for the widget
+  localStorage.setItem('vettochat_config', JSON.stringify({
+    botName:   assistantName,
+    brandColor,
+    chatLabel: 'Get a free quote',
+  }));
+}
+
+// Called by "Go to my dashboard" and "Skip for now" and copyCode
+// Adds tenantId to vc_onboarding if not already present
+function finalSave() {
+  const tenantId = localStorage.getItem('vc_tenant_id') || '';
+  if (!tenantId) return;
+  const ob = JSON.parse(localStorage.getItem('vc_onboarding') || '{}');
+  ob.tenantId = tenantId;
+  localStorage.setItem('vc_onboarding', JSON.stringify(ob));
+}
+
+// ── STEP 2 FIELD BUILDER ─────────────────────────────────────────────────────
+
+function buildIndustryField() {
+  const industry  = localStorage.getItem('vc_tenant_industry') || '';
+  const services  = INDUSTRY_SERVICES[industry];
   const container = document.getElementById('service-field');
 
   if (services) {
     container.innerHTML = `
-      <label>Primary service</label>
+      <label>Industry</label>
       <select id="s2-service">
         <option value="" disabled selected>Select a service</option>
         ${services.map(s => `<option value="${s}">${s}</option>`).join('')}
       </select>`;
   } else {
     container.innerHTML = `
-      <label>Primary service</label>
+      <label>Industry</label>
       <input type="text" id="s2-service" placeholder="e.g. Leak repair, Panel upgrade">`;
   }
 }
 
+// ── STEP 3 EMBED CODE ────────────────────────────────────────────────────────
+
 function buildEmbedCode() {
-  // Save step 2 to localStorage
-  const assistantName  = (document.getElementById('s2-name')?.value || 'Vetto').trim() || 'Vetto';
-  const brandColor     = document.getElementById('s2-color')?.value || '#2563EB';
-  const primaryService = document.getElementById('s2-service')?.value || '';
-
-  localStorage.setItem('vc_onboarding', JSON.stringify({ assistantName, brandColor, primaryService }));
-  localStorage.setItem('vettochat_config', JSON.stringify({ botName: assistantName, brandColor, chatLabel: 'Get a free quote' }));
-
   const tenantId = localStorage.getItem('vc_tenant_id') || 'YOUR_TENANT_ID';
-  const snippet  = `<!-- VettoChat Widget -->\n<iframe\n  src="https://vettochat-backend.onrender.com/widget.html?companyId=${tenantId}"\n  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"\n  allow="clipboard-write"\n  title="VettoChat">\n</iframe>`;
+
+  // Final save: merge tenantId into vc_onboarding
+  const ob = JSON.parse(localStorage.getItem('vc_onboarding') || '{}');
+  ob.tenantId = tenantId;
+  localStorage.setItem('vc_onboarding', JSON.stringify(ob));
+
+  const snippet = `<!-- VettoChat Widget -->\n<iframe\n  src="https://vettochat-backend.onrender.com/widget.html?companyId=${tenantId}"\n  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"\n  allow="clipboard-write"\n  title="VettoChat">\n</iframe>`;
 
   document.getElementById('embed-code').textContent = snippet;
 }
 
 function copyCode() {
+  finalSave(); // ensure tenantId is included on copy
   const code = document.getElementById('embed-code').textContent;
   navigator.clipboard.writeText(code).then(() => {
     const btn = document.getElementById('copy-btn');
