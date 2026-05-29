@@ -15,14 +15,14 @@
 }
 html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 
-/* LOGO — exact from dashboard sidebar */
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;justify-content:center;margin-bottom:32px}
+/* LOGO */
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;justify-content:center;margin-bottom:36px}
 .logo-mark{width:32px;height:32px;background:#1E40AF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.2px}
 .logo-text span{color:#60A5FA}
 
 /* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:52px 52px 44px;width:100%;max-width:480px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:52px 56px 48px;width:100%;max-width:560px}
 
 /* TABS */
 .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px}
@@ -30,8 +30,23 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .tab:hover{color:var(--body)}
 .tab.active{color:var(--h);border-bottom-color:var(--accent)}
 
+/* GOOGLE BUTTON */
+.btn-google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:12px 16px;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border-2);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--body);
+  cursor:pointer;transition:all 0.15s;margin-bottom:20px;
+}
+.btn-google:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.18);color:var(--h)}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider span{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
+
 /* FORM */
-.form-head{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:24px}
+.form-head{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:24px}
 .field{margin-bottom:20px}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .field input,.field select{
@@ -40,7 +55,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   color:var(--h);border-radius:8px;
   font-family:'Inter',sans-serif;font-size:13px;
   outline:none;transition:border-color 0.15s,box-shadow 0.15s;
-  -webkit-appearance:none;
+  -webkit-appearance:none;appearance:none;
 }
 .field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.35)' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
 .field select option{background:#111D2E;color:#fff}
@@ -50,7 +65,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .forgot:hover{color:var(--body)}
 
 /* SUBMIT */
-.submit{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s;margin-top:10px}
+.submit{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s;margin-top:4px}
 .submit:hover{background:var(--accent-h)}
 .submit:disabled{opacity:0.6;cursor:not-allowed}
 
@@ -75,7 +90,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 <body>
 <div class="card">
 
-  <!-- Logo — exact markup from dashboard sidebar -->
+  <!-- Logo -->
   <a href="vettochat-landing.html" class="logo">
     <div class="logo-mark">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/></svg>
@@ -92,6 +107,15 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   <!-- LOGIN VIEW -->
   <div class="view active" id="view-login">
     <div class="form-head">Welcome back</div>
+
+    <!-- Google -->
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908C16.658 14.1 17.64 11.808 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="divider"><span>or continue with email</span></div>
+
     <div class="field">
       <label>Email address</label>
       <input type="email" id="login-email" placeholder="you@company.com" autocomplete="email">
@@ -109,6 +133,15 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   <!-- SIGNUP VIEW -->
   <div class="view" id="view-signup">
     <div class="form-head">Create your account</div>
+
+    <!-- Google -->
+    <button class="btn-google" onclick="handleGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908C16.658 14.1 17.64 11.808 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Sign up with Google
+    </button>
+
+    <div class="divider"><span>or sign up with email</span></div>
+
     <div class="field">
       <label>Business name</label>
       <input type="text" id="signup-biz" placeholder="Your company name" autocomplete="organization">
@@ -173,14 +206,20 @@ function setLoading(btnId, loading, label) {
   btn.innerHTML = loading ? '<span class="spinner"></span>Please wait' : label;
 }
 
+function handleGoogle() {
+  // Placeholder — wire to your OAuth provider when ready
+  showErr('login-err', 'Google login is not configured yet.');
+  showErr('signup-err', 'Google sign-up is not configured yet.');
+}
+
 async function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
+  const email    = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
   if (!email || !password) { showErr('login-err', 'Please fill in all fields.'); return; }
 
   setLoading('login-btn', true, 'Log in');
   try {
-    const res = await fetch(`${API}/api/auth/login`, {
+    const res  = await fetch(`${API}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -209,7 +248,7 @@ async function handleSignup() {
 
   setLoading('signup-btn', true, 'Create my account');
   try {
-    const res = await fetch(`${API}/api/auth/signup`, {
+    const res  = await fetch(`${API}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, businessName: biz, ownerFullName: name, industry }),
@@ -225,7 +264,6 @@ async function handleSignup() {
   }
 }
 
-// Check URL param to open signup tab directly
 if (new URLSearchParams(window.location.search).get('tab') === 'signup' || window.location.hash === '#signup') {
   showView('signup');
 }
