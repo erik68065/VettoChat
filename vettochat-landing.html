@@ -129,6 +129,9 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
 /* PRICING */
 .pricing-section{padding:80px 48px;background:#fff;border-top:1px solid var(--border)}
 .pricing-inner{max-width:440px;margin:0 auto;text-align:center}
+.pricing-header{margin-bottom:28px}
+.pricing-header h2{font-size:clamp(26px,3.5vw,38px);font-weight:800;color:var(--text);letter-spacing:-0.8px;line-height:1.1;margin-bottom:8px}
+.pricing-header p{font-size:15px;color:var(--text-2);line-height:1.6}
 .pricing-single{border:1px solid var(--border);border-radius:10px;padding:40px 36px;margin-top:0}
 .pricing-amount{display:flex;align-items:baseline;gap:2px;justify-content:center;margin-bottom:28px}
 .price-dollar{font-size:18px;font-weight:700;color:var(--text);align-self:flex-start;margin-top:6px}
@@ -425,6 +428,10 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
 <!-- PRICING -->
 <section id="pricing" class="pricing-section">
   <div class="pricing-inner">
+    <div class="pricing-header">
+      <h2>Try it free for 30 days.</h2>
+      <p>No credit card. No commitment. See if it works before you pay anything. $197/month after your trial.</p>
+    </div>
     <div class="pricing-single">
       <div class="pricing-amount">
         <span class="price-dollar">$</span>
@@ -438,10 +445,8 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
         <li>Lead scoring</li>
         <li>Service area qualification</li>
         <li>Full bot customization</li>
-        <li>30-day free trial included</li>
       </ul>
       <a href="auth.html#signup" class="pricing-cta-btn">Start free trial</a>
-      <p class="pricing-note">No credit card required</p>
     </div>
   </div>
 </section>
