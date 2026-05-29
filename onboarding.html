@@ -212,14 +212,14 @@ function saveStep1() {
 }
 
 function saveStep2() {
-  const industry      = localStorage.getItem('vc_tenant_industry') || '';
+  const industryVal   = document.getElementById('s2-service')?.value || '';
   const assistantName = (document.getElementById('s2-name')?.value || 'Vetto').trim() || 'Vetto';
   const brandColor    = document.getElementById('s2-color')?.value  || '#2563EB';
-  const industryVal   = document.getElementById('s2-service')?.value || '';
 
-  localStorage.setItem('vc_industry',       industryVal);
-  localStorage.setItem('vc_assistant_name', assistantName);
-  localStorage.setItem('vc_brand_color',    brandColor);
+  localStorage.setItem('vc_industry',        industryVal);
+  localStorage.setItem('vc_tenant_industry', industryVal); // keep in sync for dashboard sync block
+  localStorage.setItem('vc_assistant_name',  assistantName);
+  localStorage.setItem('vc_brand_color',     brandColor);
 
   const businessPhone = localStorage.getItem('vc_business_phone') || '';
   const websiteUrl    = localStorage.getItem('vc_website_url')    || '';
@@ -228,7 +228,7 @@ function saveStep2() {
   localStorage.setItem('vc_onboarding', JSON.stringify({
     assistantName,
     brandColor,
-    industry,     // the industry key (roofing/plumbing/hvac/electrical) — used by _doApplyTemplate
+    industry: industryVal, // roofing / plumbing / hvac / electrical — used by _doApplyTemplate
     businessPhone,
     websiteUrl,
   }));
@@ -254,22 +254,18 @@ function finalSave() {
 // ── STEP 2 FIELD BUILDER ─────────────────────────────────────────────────────
 
 function buildIndustryField() {
-  const industry  = localStorage.getItem('vc_tenant_industry') || '';
-  const services  = INDUSTRY_SERVICES[industry];
+  const saved     = localStorage.getItem('vc_tenant_industry') || '';
   const container = document.getElementById('service-field');
 
-  if (services) {
-    container.innerHTML = `
-      <label>Industry</label>
-      <select id="s2-service">
-        <option value="" disabled selected>Select a service</option>
-        ${services.map(s => `<option value="${s}">${s}</option>`).join('')}
-      </select>`;
-  } else {
-    container.innerHTML = `
-      <label>Industry</label>
-      <input type="text" id="s2-service" placeholder="e.g. Leak repair, Panel upgrade">`;
-  }
+  container.innerHTML = `
+    <label>Industry</label>
+    <select id="s2-service">
+      <option value="" disabled ${saved ? '' : 'selected'}>Select your industry</option>
+      <option value="roofing"    ${saved === 'roofing'    ? 'selected' : ''}>Roofing</option>
+      <option value="plumbing"   ${saved === 'plumbing'   ? 'selected' : ''}>Plumbing</option>
+      <option value="hvac"       ${saved === 'hvac'       ? 'selected' : ''}>HVAC</option>
+      <option value="electrical" ${saved === 'electrical' ? 'selected' : ''}>Electrical</option>
+    </select>`;
 }
 
 // ── STEP 3 EMBED CODE ────────────────────────────────────────────────────────

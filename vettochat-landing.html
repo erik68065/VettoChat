@@ -74,29 +74,20 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
 .pain-num{font-size:clamp(40px,5vw,54px);font-weight:800;color:var(--h);letter-spacing:-1.5px;line-height:1;margin-bottom:8px}
 .pain-label{font-size:13px;color:var(--body);line-height:1.5}
 
-/* HOW IT WORKS */
-.how-section{padding:80px 40px;background:var(--light)}
-.how-inner{max-width:940px;margin:0 auto}
+/* SHARED SECTION ATOMS */
 .kicker{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:10px}
 .sec-h{font-size:clamp(24px,3vw,36px);font-weight:800;color:var(--lh);letter-spacing:-0.6px;line-height:1.08;margin-bottom:12px}
 .sec-body{font-size:15px;color:var(--lbody);line-height:1.65;max-width:460px}
-.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:52px}
-.how-step{padding:0 32px;border-right:1px solid var(--lborder)}
-.how-step:first-child{padding-left:0}
-.how-step:last-child{border-right:none}
-.step-n{font-size:48px;font-weight:800;color:#F3F4F6;letter-spacing:-2px;line-height:1;margin-bottom:14px;font-variant-numeric:tabular-nums}
-.how-step h3{font-size:15px;font-weight:700;color:var(--lh);margin-bottom:8px}
-.how-step p{font-size:14px;color:var(--lbody);line-height:1.65}
-.how-step p strong{color:var(--lh);font-weight:600}
 
 /* FEATURES */
-.features-section{padding:80px 40px;background:var(--dark);border-top:1px solid var(--border)}
-.features-inner{max-width:940px;margin:0 auto}
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
-.feat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:28px 24px;transition:border-color 0.15s}
-.feat-card:hover{border-color:var(--border-2)}
-.feat-card h3{font-size:15px;font-weight:700;color:var(--h);margin-bottom:9px}
-.feat-card p{font-size:13.5px;color:var(--body);line-height:1.65}
+.features-section{padding:80px 40px;background:var(--dark)}
+.features-inner{max-width:960px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:36px 30px;transition:border-color 0.2s;display:flex;flex-direction:column;gap:0}
+.feat-card:hover{border-color:rgba(37,99,235,0.35)}
+.feat-step{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;opacity:0.75}
+.feat-card h3{font-size:16px;font-weight:700;color:var(--h);margin-bottom:12px;line-height:1.3}
+.feat-card p{font-size:13.5px;color:var(--body);line-height:1.72}
 
 /* DEMO — JS-dependent class names preserved exactly */
 .demo-section{padding:80px 40px;background:var(--dark);border-top:1px solid var(--border)}
@@ -174,8 +165,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
   .nav{padding:0 20px}.nav-links{display:none}
   .hero{padding:88px 20px 60px;text-align:left}.hero-ctas{justify-content:flex-start}.hero-trust{justify-content:flex-start}
   .pain-bar{padding:44px 20px}.pain-inner{grid-template-columns:1fr;gap:32px}.pain-div{display:none}.pain-block{padding:0}
-  .how-section,.features-section,.demo-section,.pricing-section,.testimonials-section,.cta-section{padding:60px 20px}
-  .how-steps{grid-template-columns:1fr;gap:0}.how-step{border-right:none;border-bottom:1px solid var(--lborder);padding:0 0 28px;margin-bottom:28px}.how-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}.how-step:first-child{padding-left:0}
+  .features-section,.demo-section,.pricing-section,.testimonials-section,.cta-section{padding:60px 20px}
   .features-grid{grid-template-columns:1fr}
   .demo-layout{grid-template-columns:1fr}
   .t-grid{grid-template-columns:1fr}
@@ -196,8 +186,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
     <div class="logo-text">Vetto<span>Chat</span></div>
   </a>
   <ul class="nav-links">
-    <li><a href="#how">How it works</a></li>
-    <li><a href="#features">Features</a></li>
+    <li><a href="#features">How it works</a></li>
     <li><a href="#pricing">Pricing</a></li>
   </ul>
   <div class="nav-right">
@@ -214,7 +203,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
     <p class="hero-sub">VettoChat qualifies every visitor on your website, scores their intent, and sends you a full summary before you ever make contact.</p>
     <div class="hero-ctas">
       <a href="auth.html" class="btn btn-lg">Start Free Trial</a>
-      <a href="#demo" class="btn-ghost btn-lg">See How It Works</a>
+      <a href="#features" class="btn-ghost btn-lg">See How It Works</a>
     </div>
     <div class="hero-trust">
       <span>No credit card required</span>
@@ -246,49 +235,26 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section id="how" class="how-section">
-  <div class="how-inner">
-    <span class="kicker">How it works</span>
-    <div class="sec-h">Three steps.</div>
-    <p class="sec-body">No developer required. Paste a script tag and you're live.</p>
-    <div class="how-steps">
-      <div class="how-step">
-        <div class="step-n">01</div>
-        <h3>Paste one line of code on your website</h3>
-        <p>Drop a script tag anywhere on your site. Works on WordPress, Squarespace, or any custom build. Takes two minutes.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-n">02</div>
-        <h3>VettoChat asks your questions and scores every visitor</h3>
-        <p>Configure the questions, chips, and scoring thresholds to match how you qualify a job. Every visitor gets scored automatically.</p>
-      </div>
-      <div class="how-step">
-        <div class="step-n">03</div>
-        <h3>You get a full summary of who is qualified and what they need</h3>
-        <p>Service type, budget, urgency, and location — all captured and scored. You know everything you need <strong>before you call.</strong></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
+<!-- FEATURES (How it works merged in — How It Works section removed) -->
 <section id="features" class="features-section">
   <div class="features-inner">
-    <span class="kicker" style="color:var(--muted)">Features</span>
-    <div class="sec-h" style="color:var(--h);margin-top:4px">What it does.</div>
+    <span class="kicker" style="color:var(--muted)">How it works</span>
+    <div class="sec-h" style="color:var(--h);margin-top:4px">Three steps. No developer needed.</div>
     <div class="features-grid">
       <div class="feat-card">
-        <h3>Know before you call</h3>
-        <p>Every lead arrives with service type, budget, urgency, and location already captured. No more discovery calls on people who were never serious.</p>
+        <div class="feat-step">Step 01</div>
+        <h3>Paste one line of code on your website</h3>
+        <p>Drop a script tag on any page — WordPress, Squarespace, or custom. Takes two minutes. Every visitor from that point is automatically qualified.</p>
       </div>
       <div class="feat-card">
-        <h3>Your questions, your way</h3>
-        <p>Configure exactly what the bot asks and how it scores answers so it qualifies leads the way you would qualify them yourself.</p>
+        <div class="feat-step">Step 02</div>
+        <h3>VettoChat qualifies every visitor on your behalf</h3>
+        <p>It asks your questions, scores answers by service type, urgency, and budget, and filters out anyone who was never serious. You configure exactly how it scores.</p>
       </div>
       <div class="feat-card">
-        <h3>Built-in CRM and SMS alerts</h3>
-        <p>Every lead flows into a dashboard where you track status and add notes. You get a text the moment a hot lead comes in.</p>
+        <div class="feat-step">Step 03</div>
+        <h3>You get a full summary before you ever pick up the phone</h3>
+        <p>Name, service, budget, urgency, and phone number — texted to you the moment they finish. Every lead also flows into your built-in CRM for status tracking and notes.</p>
       </div>
     </div>
   </div>
