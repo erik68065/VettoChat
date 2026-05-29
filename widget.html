@@ -869,7 +869,7 @@ async function finishConversation() {
     budget:    S.data.budget || '',
   };
 
-  // Write to localStorage so dashboard tab picks it up instantly
+  // Write to localStorage so the dashboard tab picks it up instantly
   try {
     localStorage.setItem('vettochat_pending_lead', JSON.stringify({
       ...leadPayload,
@@ -877,26 +877,19 @@ async function finishConversation() {
     }));
   } catch (_) {}
 
-  try {
-    // Auto-detect server URL so the widget works from any device on the network
-    const SERVER_URL = "https://vettochat-backend.onrender.com"
-    const response = await fetch(`${SERVER_URL}/api/leads/capture`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leadPayload)
-    });
-
-    if(response.ok) {
-      setTimeout(() => {
-        removeTyping();
-        addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
-      }, 900);
-    }
-  } catch (error) {
-    console.error("VettoChat Payload Failed:", error);
+  // Show success immediately — don't make the user wait for the server
+  setTimeout(() => {
     removeTyping();
-    addBotMsg("Thanks! We've received your info and will be in touch.", "success");
-  }
+    addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
+  }, 900);
+
+  // Fire the API call in the background — won't block the UI
+  const SERVER_URL = "https://vettochat-backend.onrender.com";
+  fetch(`${SERVER_URL}/api/leads/capture`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(leadPayload)
+  }).catch(err => console.warn("VettoChat background sync failed:", err));
 }
 
 function disableInput(){
