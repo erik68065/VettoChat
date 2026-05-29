@@ -58,13 +58,6 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
   text-align:center;padding:120px 24px 80px;
   position:relative;overflow:hidden;
 }
-.hero-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);
-  background-size:72px 72px;
-}
 .hero-inner{position:relative;z-index:1;max-width:780px;width:100%}
 
 .hero-label{
@@ -284,13 +277,6 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
   text-align:center;position:relative;overflow:hidden;
   border-top:1px solid var(--border-dark);
 }
-.cta-section::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-  background-size:72px 72px;
-}
 .cta-inner{position:relative;z-index:1}
 .cta-section h2{font-size:clamp(28px,4.5vw,48px);font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.08;margin-bottom:36px}
 
@@ -355,8 +341,6 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-grid"></div>
-
   <div class="hero-inner">
     <span class="hero-label">Lead qualification for home service contractors</span>
     <h1>Most contractors lose the job in the first five minutes.</h1>
