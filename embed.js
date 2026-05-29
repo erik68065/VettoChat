@@ -1,58 +1,57 @@
-// ─── THE DELIVERY NETWORK: VETTOCHAT EMBED SCRIPT ────────────────────────
-// The contractor pastes this in their <head>:
-// <script src="http://localhost:8080/embed.js" data-tenant-id="test-tenant-id" id="vettochat-script"></script>
+// ─── VETTOCHAT EMBED SCRIPT ──────────────────────────────────────────────────
+// Paste this in the <head> of any website page:
+// <script src="https://vettochat-backend.onrender.com/embed.js"
+//         data-company-id="YOUR_COMPANY_ID"
+//         id="vettochat-script"></script>
 
-(function() {
-  // 1. Get the script tag and extract the unique Tenant ID
-  const scriptTag = document.getElementById('vettochat-script');
-  const tenantId = scriptTag ? scriptTag.getAttribute('data-tenant-id') : 'unknown';
+(function () {
+  const scriptTag  = document.getElementById('vettochat-script');
+  const companyId  = scriptTag ? scriptTag.getAttribute('data-company-id') : null;
 
-  if (tenantId === 'unknown') {
-    console.error('VettoChat: Missing data-tenant-id attribute.');
+  if (!companyId) {
+    console.error('VettoChat: Missing data-company-id attribute on the script tag.');
     return;
   }
 
-  // 2. Create the wrapper container
+  // Container — fixed bottom-right, transparent to clicks in empty space
   const container = document.createElement('div');
   container.id = 'vettochat-container';
-  // Position it fixed to the bottom right of their website
-  container.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 400px;
-    height: 700px;
-    max-width: 90vw;
-    max-height: 90vh;
-    z-index: 999999;
-    pointer-events: none; /* Let clicks pass through empty space */
-  `;
+  container.style.cssText = [
+    'position:fixed',
+    'bottom:20px',
+    'right:20px',
+    'width:400px',
+    'height:700px',
+    'max-width:90vw',
+    'max-height:90vh',
+    'z-index:999999',
+    'pointer-events:none',
+  ].join(';');
 
-  // 3. Create the isolated iframe
+  // Iframe — pass companyId so widget knows which client config to load
   const iframe = document.createElement('iframe');
-  // Pass the tenantId via URL parameters so the widget knows whose data to load
-  iframe.src = `https://vettochat-app.vercel.app/widget.html?tenantId=${tenantId}`;
-  iframe.style.cssText = `
-    width: 100%;
-    height: 100%;
-    border: none;
-    pointer-events: all; /* Catch clicks inside the iframe */
-    transition: all 0.3s ease;
-  `;
+  iframe.src = `https://vettochat-backend.onrender.com/widget.html?companyId=${encodeURIComponent(companyId)}`;
+  iframe.style.cssText = [
+    'width:100%',
+    'height:100%',
+    'border:none',
+    'pointer-events:all',
+    'transition:all 0.3s ease',
+  ].join(';');
+  iframe.title = 'VettoChat';
+  iframe.allow = 'clipboard-write';
 
   container.appendChild(iframe);
   document.body.appendChild(container);
 
-  // 4. Listen for messages from the iframe (e.g., to resize when closed)
-  window.addEventListener('message', function(event) {
-    // Security check - in production, verify event.origin
+  // Resize container based on open/close messages from the widget iframe
+  window.addEventListener('message', function (event) {
     if (event.data === 'vettochat-open') {
+      container.style.width  = '400px';
       container.style.height = '700px';
-      container.style.width = '400px';
     } else if (event.data === 'vettochat-close') {
-      // Shrink container to just the bubble size so it doesn't block the website
+      container.style.width  = '100px';
       container.style.height = '100px';
-      container.style.width = '100px';
     }
   });
 })();

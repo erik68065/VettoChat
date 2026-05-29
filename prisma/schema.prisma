@@ -1,7 +1,4 @@
-// ─── THE VAULT: MULTI-TENANT DATABASE SCHEMA ──────────────────────────────
-// This uses Prisma ORM to generate our PostgreSQL database tables.
-// Run `npx prisma db push` to sync this to your database.
-
+// ─── VETTOCHAT DATABASE SCHEMA ──────────────────────────────────────────────
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,47 +6,36 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // Added this line for Supabase migrations
+  directUrl = env("DIRECT_URL")
 }
 
-// 1. ORGANIZATION (The Contractor)
-model Organization {
-  id           String        @id @default(uuid())
-  name         String        
-  ownerName    String
-  ownerPhone   String        
-  industry     String        
-  createdAt    DateTime      @default(now())
+// 1. CLIENTS (The Business / Contractor)
+model Client {
+  id            String   @id @default(uuid())
+  businessName  String
+  ownerFullName String
+  ownerPhone    String
+  industry      String
+  createdAt     DateTime @default(now())
 
-  widgetConfig WidgetConfig? 
-  leads        Lead[]        
+  leads         Lead[]
+
+  @@map("clients")
 }
 
-// 2. WIDGET CONFIGURATION (The Bot's Personality & Rules)
-model WidgetConfig {
-  id                String       @id @default(uuid())
-  orgId             String       @unique
-  organization      Organization @relation(fields: [orgId], references: [id])
-  
-  primaryColor      String       @default("#2563EB")
-  botName           String       @default("Vetto Assistant")
-  
-  scoreThresholdHot  Int         @default(80)
-  scoreThresholdWarm Int         @default(50)
-}
-
-// 3. LEADS (The Money)
+// 2. LEADS (Captured from the Chatbot)
 model Lead {
-  id           String       @id @default(uuid())
-  orgId        String
-  organization Organization @relation(fields: [orgId], references: [id])
-  
-  firstName    String
-  phone        String
-  intent       String       
-  urgency      String       
-  
-  score        Int          @default(0)
-  status       String       @default("Cold") 
-  createdAt    DateTime     @default(now())
+  id        String   @id @default(uuid())
+  fullName  String
+  phone     String
+  intent    String
+  urgency   String
+  score     Int      @default(0)
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+
+  companyId String
+  client    Client   @relation(fields: [companyId], references: [id])
+
+  @@map("leads")
 }

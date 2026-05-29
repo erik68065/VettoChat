@@ -295,6 +295,12 @@ function _vc_apply(cfg) {
 
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
+// Pick up companyId from embed.js URL param and store it in config
+(function(){
+  const cid = new URLSearchParams(window.location.search).get('companyId');
+  if (cid) _vc_config.companyId = cid;
+})();
+
 // ─── WIDGET LIVE / OFFLINE ────────────────────────────────────────────────────
 function _applyWidgetLive() {
   const isLive = localStorage.getItem('vettochat_widget_live') !== 'false';

@@ -5,74 +5,91 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 
-// 1. Initialize Prisma ORM
 const prisma = new PrismaClient();
-
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: '*' })); // Note: Restrict this to your Vercel domains later
+app.use(cors({ origin: '*' }));
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*", methods: ["GET", "POST"] } });
+const io = new Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
 io.on('connection', (socket) => {
-  console.log('Dashboard connected via WebSocket:', socket.id);
+  console.log('Dashboard connected:', socket.id);
 });
 
-// 2. Lead Capture & Scoring Endpoint
+// ── Lead Capture Endpoint ─────────────────────────────────────────────────────
+// Clients table: id, businessName, ownerFullName, ownerPhone, industry, createdAt
+// Leads table:   id, fullName, phone, intent, urgency, score, status, createdAt, companyId
 app.post('/api/leads/capture', async (req, res) => {
-  // Extract tenantId (from embed.js) and map it to orgId
-  const { tenantId, orgId, firstName, phone, intent, urgency } = req.body;
-  
-  // The exact ID coming from your test frontend
-  const activeOrgId = orgId || tenantId || 'test-tenant-id';
+  const {
+    companyId,
+    fullName,
+    phone,
+    intent,
+    urgency,
+    // optional extras stored in dashboard but not in Leads table
+    location,
+    budget,
+  } = req.body;
+
+  const activeCompanyId = companyId || 'default-company';
 
   try {
-    // 🔴 THE FIX: Auto-provision the Organization so the Foreign Key never fails
-    await prisma.organization.upsert({
-      where: { id: activeOrgId },
-      update: {}, // If it exists, do nothing
+    // Auto-provision the Client record so the foreign key never fails
+    await prisma.client.upsert({
+      where: { id: activeCompanyId },
+      update: {},
       create: {
-        id: activeOrgId,
-        name: "Demo Contractor LLC",
-        ownerName: "Demo User",
-        ownerPhone: "Not Provided",
-        industry: "Home Services"
-      }
+        id:            activeCompanyId,
+        businessName:  'VettoChat Demo',
+        ownerFullName: 'Account Owner',
+        ownerPhone:    'Not provided',
+        industry:      'Home Services',
+      },
     });
 
-    // Phase 1 Scoring Math
+    // Score the lead
     let score = 0;
-    if (urgency === "Emergency (Within 24h)") score += 50;
-    if (urgency === "This week") score += 30;
-    if (intent === "Active Leak / Storm Damage") score += 40;
-    
-    const status = score >= 50 ? 'Hot' : (score >= 20 ? 'Warm' : 'Cold');
+    if (urgency === 'Emergency (Within 24h)') score += 50;
+    else if (urgency === 'This week')          score += 30;
+    if (intent === 'Storm Damage')             score += 40;
+    else if (intent === 'Full Replacement')    score += 30;
+    else if (intent === 'Leak Repair')         score += 20;
 
-    // Write strictly mapping to your Prisma schema columns
-    const dbLead = await prisma.lead.create({
+    const status = score >= 70 ? 'hot' : score >= 30 ? 'warm' : 'new';
+
+    // Write to Leads table
+    const lead = await prisma.lead.create({
       data: {
-        orgId: activeOrgId,
-        firstName: firstName,
-        phone: phone || "No phone provided",
-        intent: intent || "Not specified",
-        urgency: urgency || "Not specified",
-        score: score,
-        status: status
-      }
+        companyId,
+        fullName: fullName || 'Unknown',
+        phone:    phone    || 'Not provided',
+        intent:   intent   || 'Not specified',
+        urgency:  urgency  || 'Not specified',
+        score,
+        status,
+      },
     });
 
-    // Fire Real-Time Alert to Dashboard
-    console.log(`✅ Lead [${dbLead.firstName}] secured! Org: ${activeOrgId}`);
-    io.emit('new_lead', dbLead); 
-    
-    return res.status(200).json({ success: true, lead: dbLead });
+    console.log(`✅ Lead captured: ${lead.fullName} | Company: ${activeCompanyId}`);
+
+    // Broadcast to all connected dashboard tabs in real time
+    io.emit('new_lead', {
+      ...lead,
+      location: location || '',
+      budget:   budget   || '',
+    });
+
+    return res.status(200).json({ success: true, lead });
 
   } catch (error) {
-    console.error("Prisma Ingestion Error:", error);
-    return res.status(500).json({ error: "Failed to process lead" });
+    console.error('Lead capture error:', error);
+    return res.status(500).json({ error: 'Failed to capture lead' });
   }
 });
 
+// ── Health check ──────────────────────────────────────────────────────────────
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => console.log(`🚀 VettoChat Engine running on port ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 VettoChat running on port ${PORT}`));
