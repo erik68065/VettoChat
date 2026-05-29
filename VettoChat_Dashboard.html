@@ -36,7 +36,6 @@
       });
 
       if (response.status === 401 || response.status === 403) {
-        // Token is dead or expired. Force re-login.
         handleLogout();
         return;
       }
@@ -45,14 +44,36 @@
       
       if (resData.success && resData.leads) {
         console.log("Live leads fetched:", resData.leads);
-        // TODO: Call your existing function that draws the HTML table rows
-        // e.g., renderLeadsTable(resData.leads);
+        
+        // 1. Wipe out any dummy data and populate the global crmLeads object
+        // This safely bridges your Prisma DB columns to your Frontend UI variables
+        crmLeads = {}; 
+        resData.leads.forEach(dbLead => {
+          crmLeads[dbLead.id] = {
+            id: dbLead.id,
+            name: dbLead.firstName || "Unknown",
+            phone: dbLead.phone || "No phone",
+            location: dbLead.location || "N/A", 
+            reason: dbLead.intent || "Not specified",
+            urgency: dbLead.urgency || "Not specified",
+            priority: dbLead.status ? dbLead.status.toLowerCase() : 'cold', // Translates Hot/Warm/Cold to your UI pills
+            status: 'new', // Forces all pulled leads into the "New" CRM column by default
+            created: new Date(dbLead.createdAt).getTime(), 
+            activity: []
+          };
+        });
+
+        // 2. Fire your existing UI render functions without touching any HTML!
+        if (typeof renderCRMTable === "function") renderCRMTable();
+        if (typeof renderOverviewFromCRM === "function") renderOverviewFromCRM();
+        if (typeof updateCRMBadge === "function") updateCRMBadge();
+        if (typeof syncStatsFromCRM === "function") syncStatsFromCRM();
       }
     } catch (error) {
       console.error("Failed to connect to Render backend:", error);
     }
   }
-
+  
   function handleLogout() {
     localStorage.removeItem('vc_token');
     localStorage.removeItem('vc_tenant_id');
