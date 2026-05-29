@@ -3,12 +3,12 @@
 // <script src="http://localhost:8080/embed.js" data-tenant-id="test-tenant-id" id="vettochat-script"></script>
 
 (function() {
-  // 1. Get the script tag and extract the unique Company ID
+  // 1. Get the script tag and extract the unique Tenant ID
   const scriptTag = document.getElementById('vettochat-script');
-  const companyId = scriptTag ? scriptTag.getAttribute('data-company-id') : 'unknown';
+  const tenantId = scriptTag ? scriptTag.getAttribute('data-tenant-id') : 'unknown';
 
-  if (companyId === 'unknown') {
-    console.error('VettoChat: Missing data-company-id attribute.');
+  if (tenantId === 'unknown') {
+    console.error('VettoChat: Missing data-tenant-id attribute.');
     return;
   }
 
@@ -30,8 +30,8 @@
 
   // 3. Create the isolated iframe
   const iframe = document.createElement('iframe');
-  // Pass the companyId via URL parameters so the widget knows whose data to load
-  iframe.src = `https://vettochat-app.vercel.app/widget.html?companyId=${companyId}`;
+  // Pass the tenantId via URL parameters so the widget knows whose data to load
+  iframe.src = `https://vettochat-app.vercel.app/widget.html?tenantId=${tenantId}`;
   iframe.style.cssText = `
     width: 100%;
     height: 100%;

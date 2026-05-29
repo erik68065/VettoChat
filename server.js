@@ -72,6 +72,5 @@ app.post('/api/leads/capture', async (req, res) => {
     return res.status(500).json({ error: "Failed to save lead" });
   }
 });
-
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`🚀 VettoChat Engine running on port ${PORT}`));

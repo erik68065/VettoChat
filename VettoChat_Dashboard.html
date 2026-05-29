@@ -175,8 +175,8 @@ td.muted{font-size:12px;color:var(--muted)}
 .pip{width:22px;height:3px;border-radius:2px;background:var(--border);transition:all 0.3s}
 .pip.done{background:rgba(37,99,235,0.35)}
 .pip.active{background:#2563EB;width:30px}
-.toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 18px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:12px;width:420px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--surface);border:1px solid var(--border);border-left:3px solid #2563EB;border-radius:10px;padding:13px 16px;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;max-width:360px;opacity:0;transform:translateY(10px);transition:opacity 0.3s,transform 0.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
 .toast-icon{font-size:16px;flex-shrink:0}
 .toast strong{font-size:13px;font-weight:700;color:var(--navy);display:block}
 .toast span{font-size:11px;color:var(--muted)}
@@ -238,10 +238,9 @@ td.muted{font-size:12px;color:var(--muted)}
   font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
   padding:3px 9px;border-radius:10px;flex-shrink:0;white-space:nowrap;
 }
-.qb-type.text       {background:#F0FDF4;color:#166534}
-.qb-type.chips      {background:#EFF6FF;color:#1E40AF}
-.qb-type.phone      {background:#F5F3FF;color:#5B21B6}
-.qb-type.city-picker{background:#ECFEFF;color:#0E7490}
+.qb-type.text {background:#F0FDF4;color:#166534}
+.qb-type.chips{background:#EFF6FF;color:#1E40AF}
+.qb-type.phone{background:#F5F3FF;color:#5B21B6}
 
 .qb-toggle{flex-shrink:0}
 .qb-delete{
@@ -407,23 +406,6 @@ td.muted{font-size:12px;color:var(--muted)}
 .chtag-rm:hover{background:#1E40AF;color:#fff}
 .chtag-add{display:inline-flex;align-items:center;gap:5px;background:transparent;border:1.5px dashed #CBD5E1;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s}
 .chtag-add:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
-/* ── Template Switch Warning ── */
-.tmpl-warn-bg{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
-.tmpl-warn-bg.open{opacity:1;pointer-events:all}
-.tmpl-warn-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;max-width:440px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.22);transform:scale(0.95) translateY(8px);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1)}
-.tmpl-warn-bg.open .tmpl-warn-modal{transform:scale(1) translateY(0)}
-.tmpl-warn-icon{font-size:32px;margin-bottom:14px}
-.tmpl-warn-modal h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:10px}
-.tmpl-warn-modal p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
-.tmpl-warn-list{padding-left:18px;margin-bottom:20px}
-.tmpl-warn-list li{font-size:12px;color:var(--muted);line-height:1.7;list-style:disc}
-.tmpl-warn-actions{display:flex;gap:10px;justify-content:flex-end}
-.tmpl-warn-cancel{background:var(--bg);border:1px solid var(--border);color:var(--navy);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;border-radius:8px;cursor:pointer;transition:all 0.15s}
-.tmpl-warn-cancel:hover{border-color:#94A3B8}
-.tmpl-warn-continue{background:#DC2626;border:none;color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:8px;cursor:pointer;transition:background 0.15s}
-.tmpl-warn-continue:hover{background:#B91C1C}
-/* ── Global Bot Config Save Bar ── */
-.bc-save-bar{position:sticky;bottom:0;z-index:10;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 -4px 16px rgba(0,0,0,0.07);margin-top:4px}
 /* ── Widget Preview Modal ── */
 .prev-bg{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.22s}
 .prev-bg.open{opacity:1;pointer-events:all}
@@ -440,65 +422,6 @@ td.muted{font-size:12px;color:var(--muted)}
 /* Preview button */
 .prev-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;background:transparent;border:1.5px solid #2563EB;color:#2563EB;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap;flex-shrink:0}
 .prev-btn:hover{background:#EFF6FF;border-color:#1E40AF;color:#1E40AF}
-
-/* ── WIDGET OFFLINE BADGE + BANNER ── */
-.widget-offline-badge{display:flex;align-items:center;gap:6px;background:#FEF2F2;border:1px solid #FCA5A5;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;color:#B91C1C;animation:blink 2s infinite}
-.offline-banner{background:#FEF2F2;border-bottom:1px solid #FCA5A5;padding:9px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
-.offline-banner span{font-size:13px;font-weight:500;color:#B91C1C}
-.offline-banner button{padding:6px 14px;background:#DC2626;color:#fff;border:none;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
-.offline-banner button:hover{background:#B91C1C}
-/* Widget status toggle card */
-.widget-status-card{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px}
-.widget-status-info h4{font-size:14px;font-weight:700;color:var(--navy);margin:0 0 4px}
-.widget-status-info p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
-.widget-toggle-wrap{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.widget-toggle-label{font-size:13px;font-weight:700;min-width:50px;text-align:right}
-.widget-toggle-label.live{color:#16A34A}
-.widget-toggle-label.offline{color:#DC2626}
-/* Company logo in sidebar */
-.sb-client-logo{width:26px;height:26px;border-radius:5px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center}
-.sb-client-logo img{width:100%;height:100%;object-fit:cover}
-/* Company section divider in cfm */
-.cfm-divider{height:1px;background:var(--border);margin:18px 0}
-.cfm-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
-/* Company logo upload in cfm */
-.cfm-logo-upload{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.cfm-logo-preview{width:56px;height:56px;border-radius:10px;border:1.5px dashed var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color .15s}
-.cfm-logo-preview:hover{border-color:#2563EB}
-.cfm-logo-preview img{width:100%;height:100%;object-fit:contain}
-.cfm-logo-hint{font-size:11px;color:var(--muted);line-height:1.5}
-
-/* ── SERVICE AREA ── */
-.sa-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;border-bottom:1px solid var(--border)}
-.sa-toggle-info h4{font-size:13px;font-weight:700;color:var(--navy);margin:0 0 3px}
-.sa-toggle-info p{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
-.sa-body{padding:20px 24px;display:flex;flex-direction:column;gap:18px}
-.sa-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
-.sa-tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.sa-tag{display:inline-flex;align-items:center;gap:5px;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;color:#1E40AF}
-.sa-tag button{background:none;border:none;cursor:pointer;color:#93C5FD;font-size:13px;line-height:1;padding:0;transition:color .15s;display:flex;align-items:center}
-.sa-tag button:hover{color:#1E40AF}
-.sa-tag-zip{background:#F0FDF4;border-color:#86EFAC;color:#15803D}
-.sa-tag-zip button{color:#6EE7B7}
-.sa-tag-zip button:hover{color:#15803D}
-.sa-add-input{display:flex;gap:6px;align-items:center}
-.sa-add-input input{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:7px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;outline:none;transition:border-color .2s;flex:1;min-width:120px;max-width:200px}
-.sa-add-input input:focus{border-color:#2563EB}
-.sa-add-btn{padding:7px 13px;background:#EFF6FF;border:1.5px solid #BFDBFE;color:#1E40AF;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-.sa-add-btn:hover{background:#DBEAFE;border-color:#93C5FD}
-/* Service area state select */
-.sa-state-sel{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer;width:100%;max-width:240px;transition:border-color .2s}
-.sa-state-sel:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-/* City toggle buttons */
-.sa-city-avail-btn{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap;margin:3px 4px 3px 0}
-.sa-city-avail-btn:hover{border-color:#2563EB;color:#1E40AF;background:#EFF6FF}
-.sa-city-avail-btn.added{background:#EFF6FF;border-color:#93C5FD;color:#1E40AF;font-weight:600}
-.sa-city-avail-btn.added:hover{background:#FEF2F2;border-color:#FCA5A5;color:#B91C1C}
-.sa-radius-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-.sa-radius-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.sa-radius-row label{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
-.sa-oor-badge{display:inline-flex;align-items:center;gap:4px;background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.04em}
-.sa-ok-badge{display:inline-flex;align-items:center;gap:4px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:#15803D;letter-spacing:.04em}
 
 /* ── CONTACT FIELD MANAGER ── */
 .cfm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;opacity:0;pointer-events:none;transition:opacity 0.25s}
@@ -520,161 +443,6 @@ td.muted{font-size:12px;color:var(--muted)}
 .cfm-save-btn:hover{background:#0F172A}
 .sb-settings-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--sb-label);padding:5px;border-radius:6px;transition:all 0.15s;display:flex;align-items:center;line-height:0;flex-shrink:0}
 .sb-settings-btn:hover{color:#fff;background:rgba(255,255,255,0.1)}
-
-/* ── EMBED SECTION ── */
-.embed-code-wrap{position:relative;background:#0B1525;border-radius:10px;padding:16px 18px;margin:0}
-.embed-code{font-family:'JetBrains Mono',monospace;font-size:12px;color:#A5B4FC;line-height:1.7;white-space:pre-wrap;word-break:break-all;margin:0;user-select:all}
-.embed-copy-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s}
-.embed-copy-btn:hover{background:rgba(255,255,255,0.2)}
-.embed-copy-btn.copied{background:#059669;border-color:#059669}
-.embed-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
-.embed-step:last-child{border-bottom:none}
-.embed-step-num{width:24px;height:24px;background:#EFF6FF;color:#1D4ED8;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.embed-step-text{font-size:13px;color:var(--navy);line-height:1.55}
-.embed-step-text strong{font-weight:700}
-.embed-step-text code{background:#EFF6FF;color:#1D4ED8;font-family:'JetBrains Mono',monospace;font-size:11px;padding:1px 6px;border-radius:4px}
-/* ── CRM PAGE ── */
-.crm-wrap{display:flex;flex-direction:column;gap:20px}
-.crm-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.crm-search{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);color:var(--navy);padding:9px 13px 9px 36px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
-.crm-search:focus{border-color:#2563EB}
-.crm-search-wrap{position:relative;flex:1;min-width:180px}
-.crm-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;line-height:0}
-.crm-select{background:var(--surface);border:1px solid var(--border);color:var(--navy);padding:9px 12px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none;cursor:pointer}
-.crm-new-btn{display:flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
-.crm-new-btn:hover{background:#0F172A}
-.crm-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.crm-table{width:100%;border-collapse:collapse}
-.crm-table th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;background:#FAFBFC;border-bottom:1px solid var(--border);white-space:nowrap;user-select:none;cursor:pointer}
-.crm-table th:hover{color:var(--navy)}
-.crm-table th.sort-asc::after{content:' ↑';opacity:.6}
-.crm-table th.sort-desc::after{content:' ↓';opacity:.6}
-.crm-table td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;color:var(--navy)}
-.crm-table tbody tr:last-child td{border-bottom:none}
-.crm-table tbody tr{cursor:pointer;transition:background .12s}
-.crm-table tbody tr:hover td{background:#F8FAFC}
-.crm-notes-preview{font-size:11px;color:var(--muted);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crm-val{font-weight:600;color:var(--navy)}
-.crm-date{font-size:12px;color:var(--muted)}
-.crm-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:13px}
-/* Status badge */
-.crm-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em}
-/* Lead detail panel */
-.crm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:800;opacity:0;pointer-events:none;transition:opacity .25s}
-.crm-overlay.open{opacity:1;pointer-events:all}
-.crm-panel{position:fixed;top:0;right:0;bottom:0;width:620px;background:var(--surface);border-left:1px solid var(--border);z-index:801;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-16px 0 48px rgba(0,0,0,0.15)}
-.crm-panel.open{transform:translateX(0)}
-.crm-panel-head{padding:20px 24px 18px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:flex-start;gap:12px}
-.crm-panel-head-info{flex:1;min-width:0}
-.crm-panel-name{font-size:17px;font-weight:700;color:var(--navy);margin:0 0 6px}
-.crm-panel-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.crm-action-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--border);background:var(--bg);color:var(--navy)}
-.crm-action-btn:hover{border-color:#94A3B8}
-.crm-action-btn.call{border-color:#16A34A;color:#16A34A;background:#F0FDF4}
-.crm-action-btn.call:hover{background:#DCFCE7}
-.crm-action-btn.delete{border-color:#EF4444;color:#EF4444;background:#FEF2F2}
-.crm-action-btn.delete:hover{background:#FEE2E2}
-.crm-panel-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:5px;border-radius:6px;line-height:0;transition:all .15s;flex-shrink:0}
-.crm-panel-close:hover{background:var(--bg);color:var(--navy)}
-.crm-panel-body{flex:1;overflow-y:auto;padding:20px 24px}
-.crm-panel-body::-webkit-scrollbar{width:4px}
-.crm-panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.crm-section-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.crm-section-lbl:first-child{margin-top:0}
-.crm-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
-.crm-detail-field{display:flex;flex-direction:column;gap:5px}
-.crm-detail-field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-.crm-detail-inp{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;box-sizing:border-box}
-.crm-detail-inp:focus{border-color:#2563EB}
-.crm-detail-sel{background:var(--bg);border:1px solid var(--border);color:var(--navy);padding:8px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:13px;outline:none;width:100%;cursor:pointer}
-/* Notes editor */
-.crm-notes-wrap{margin-bottom:4px}
-.crm-notes-toolbar{display:flex;gap:4px;margin-bottom:6px}
-.crm-notes-tbtn{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:4px 8px;font-size:12px;cursor:pointer;color:var(--navy);font-family:'Inter',sans-serif;transition:all .15s;line-height:1}
-.crm-notes-tbtn:hover{background:#EFF6FF;border-color:#2563EB;color:#2563EB}
-.crm-notes-editor{min-height:110px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Inter',sans-serif;font-size:13px;color:var(--navy);outline:none;line-height:1.6;transition:border-color .2s}
-.crm-notes-editor:focus{border-color:#2563EB}
-/* Activity timeline */
-.crm-activity-list{display:flex;flex-direction:column;gap:0}
-.crm-act-item{display:flex;gap:12px;padding:10px 0;position:relative}
-.crm-act-item:not(:last-child)::before{content:'';position:absolute;left:7px;top:26px;bottom:-10px;width:2px;background:var(--border)}
-.crm-act-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:8px}
-.crm-act-dot.created{background:#DBEAFE;color:#2563EB}
-.crm-act-dot.status{background:#FEF9C3;color:#CA8A04}
-.crm-act-dot.note{background:#DCFCE7;color:#16A34A}
-.crm-act-text{font-size:12px;color:var(--navy);line-height:1.5}
-.crm-act-time{font-size:11px;color:var(--muted);margin-top:2px}
-.crm-panel-footer{padding:14px 24px;border-top:1px solid var(--border);flex-shrink:0;display:flex;justify-content:flex-end;gap:10px}
-.crm-save-lead-btn{background:#2563EB;border:none;color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 22px;border-radius:8px;cursor:pointer;transition:background .15s}
-.crm-save-lead-btn:hover{background:#1D4ED8}
-/* Status manager */
-.crm-status-mgr{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px}
-.spam-sensitivity{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content}
-.spam-sensitivity button{padding:7px 18px;border:none;background:var(--bg);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
-.spam-sensitivity button:not(:last-child){border-right:1px solid var(--border)}
-.spam-sensitivity button.active{background:#1E3A5F;color:#fff}
-.spam-check-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
-.spam-check-row:last-child{border-bottom:none}
-.spam-check-info{font-size:13px;font-weight:600;color:var(--navy)}
-.spam-check-sub{font-size:12px;color:var(--muted);margin-top:2px}
-.crm-filtered-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.crm-filtered-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;user-select:none;transition:background .12s}
-.crm-filtered-header:hover{background:#F8FAFC}
-.crm-filtered-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--navy)}
-.crm-filtered-badge{background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
-.crm-filtered-chevron{font-size:11px;color:var(--muted);transition:transform .2s}
-.crm-filtered-chevron.open{transform:rotate(180deg)}
-.crm-filtered-body{border-top:1px solid var(--border)}
-.crm-filtered-reason{display:inline-flex;align-items:center;background:#FEF2F2;border:1px solid #FCA5A5;color:#B91C1C;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600}
-.crm-filtered-clear{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
-.crm-filtered-clear:hover{border-color:#EF4444;color:#EF4444}
-.crm-status-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.crm-status-row{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px}
-.crm-status-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.crm-status-label-inp{flex:1;border:none;background:transparent;font-size:13px;font-weight:500;color:var(--navy);outline:none;font-family:'Inter',sans-serif}
-.crm-status-color-sel{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;font-family:'Inter',sans-serif;outline:none;background:var(--bg);color:var(--navy);cursor:pointer}
-.crm-status-del{background:none;border:none;cursor:pointer;color:#CBD5E1;padding:4px;border-radius:5px;transition:all .15s;line-height:0}
-.crm-status-del:hover{color:#EF4444;background:#FEF2F2}
-.crm-add-status-btn{display:flex;align-items:center;gap:6px;background:none;border:1.5px dashed var(--border);color:var(--muted);padding:8px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;width:100%;justify-content:center}
-.crm-add-status-btn:hover{border-color:#2563EB;color:#2563EB;background:#EFF6FF}
-/* New lead form */
-.crm-new-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-/* ══════════════════════════════════════════
-   ONBOARDING OVERLAY
-══════════════════════════════════════════ */
-.ob-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0B1525 0%,#0F1F3D 60%,#1a2a45 100%);display:flex;align-items:center;justify-content:center;padding:20px}
-.ob-card{background:#fff;border-radius:18px;padding:40px 44px;width:100%;max-width:520px;box-shadow:0 32px 96px rgba(0,0,0,0.45)}
-.ob-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-.ob-logo-mark{width:38px;height:38px;background:#1E40AF;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ob-logo-text{font-size:20px;font-weight:800;color:#0F1F3D;letter-spacing:-0.3px}
-.ob-logo-text span{color:#2563EB}
-.ob-title{font-size:22px;font-weight:800;color:#0F1F3D;margin-bottom:6px;line-height:1.25}
-.ob-sub{font-size:14px;color:#7A8A9E;margin-bottom:28px;line-height:1.5}
-.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.ob-field{display:flex;flex-direction:column;gap:6px}
-.ob-field.full{grid-column:1/-1}
-.ob-label{font-size:11px;font-weight:700;color:#7A8A9E;text-transform:uppercase;letter-spacing:.07em}
-.ob-input{background:#F5F7FA;border:1.5px solid #E4E8EF;color:#0F1F3D;padding:10px 13px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;box-sizing:border-box}
-.ob-input:focus{border-color:#2563EB;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.ob-input.error{border-color:#EF4444;background:#FEF2F2}
-.ob-select{appearance:none;background:#F5F7FA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A8A9E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 13px center;background-size:12px;padding-right:36px}
-.ob-err{font-size:11px;color:#EF4444;margin-top:-8px;margin-bottom:4px;display:none}
-.ob-submit{width:100%;padding:13px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:.01em}
-.ob-submit:hover{background:linear-gradient(135deg,#1D4ED8,#3B82F6);transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,0.4)}
-.ob-submit:active{transform:translateY(0)}
-.ob-note{font-size:11px;color:#B0BAC0;text-align:center;margin-top:14px}
-/* ══════════════════════════════════════════
-   WELCOME MODAL
-══════════════════════════════════════════ */
-.welcome-bg{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-.welcome-bg.open{opacity:1;pointer-events:all}
-.welcome-card{background:#fff;border-radius:18px;padding:44px 48px;max-width:480px;width:90%;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.25);transform:scale(0.93) translateY(10px);transition:transform .3s cubic-bezier(0.34,1.56,0.64,1)}
-.welcome-bg.open .welcome-card{transform:scale(1) translateY(0)}
-.welcome-emoji{font-size:52px;margin-bottom:18px;display:block}
-.welcome-title{font-size:22px;font-weight:800;color:#0F1F3D;margin-bottom:12px;line-height:1.3}
-.welcome-msg{font-size:14px;color:#7A8A9E;line-height:1.65;margin-bottom:28px}
-.welcome-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:linear-gradient(135deg,#1E40AF,#2563EB);color:#fff;border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
-.welcome-btn:hover{background:linear-gradient(135deg,#1D4ED8,#3B82F6);transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,0.4)}
 </style>
 </head>
 <body>
@@ -688,20 +456,17 @@ td.muted{font-size:12px;color:var(--muted)}
     <div class="sb-logo-text">Vetto<span>Chat</span></div>
   </div>
   <div class="sb-client">
-    <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px">
-      <div class="sb-client-logo" id="sbClientLogo" style="display:none"><img id="sbClientLogoImg" src="" alt=""></div>
-      <div class="sb-client-name" id="sbClientName">ABC Roofing &amp; Exteriors</div>
-    </div>
-    <div class="sb-client-sub">Pro Plan</div>
+    <div class="sb-client-name">ABC Roofing & Exteriors</div>
+    <div class="sb-client-sub">Plano, TX · Pro Plan</div>
   </div>
   <nav class="sb-nav">
     <div class="sb-section">Main</div>
     <div class="nav-item active" onclick="nav(this,'overview')">
       <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg></span> Overview
     </div>
-    <div class="nav-item" onclick="nav(this,'crm')">
+    <div class="nav-item" onclick="nav(this,'leads')">
       <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="5.5" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="4.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M11 10.5c1.5 0 3 .8 3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span> Leads
-      <span class="nav-badge" id="crmBadge" style="display:none">0</span>
+      <span class="nav-badge" id="leadsBadge" style="display:none">0</span>
     </div>
     <div class="sb-section">Settings</div>
     <div class="nav-item" onclick="nav(this,'botconfig')">
@@ -725,17 +490,11 @@ td.muted{font-size:12px;color:var(--muted)}
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">Overview</div>
     <div class="topbar-date" id="topbarDate"></div>
-    <div class="live-chip" id="liveChip"><div class="live-dot"></div>Live</div>
-    <div class="widget-offline-badge" id="widgetOfflineBadge" style="display:none">⚠ Chatbot Offline</div>
+    <div class="live-chip"><div class="live-dot"></div>Live</div>
     <button class="play-btn" id="playBtn" onclick="startDemo()">
       <div class="play-icon"><svg viewBox="0 0 6 8"><polygon points="0,0 6,4 0,8"/></svg></div>
       Play Demo
     </button>
-  </div>
-
-  <div class="offline-banner" id="offlineBanner" style="display:none">
-    <span>⚠ Your chatbot is currently offline — new leads will not be captured until you go live.</span>
-    <button onclick="setWidgetStatus(true)">Go Live</button>
   </div>
 
   <div class="pages">
@@ -760,6 +519,20 @@ td.muted{font-size:12px;color:var(--muted)}
       </div>
       <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
     </div>
+    <div class="page" id="page-leads">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-head">
+          <div class="card-head-left"><h3>All Leads</h3><p>Complete lead register for ABC Roofing & Exteriors</p></div>
+          <div style="display:flex;gap:8px" id="leadsChips"></div>
+        </div>
+        <table class="leads-table">
+          <thead><tr><th>Contact</th><th>Phone Number</th><th>Service Requested</th><th>Location</th><th>Budget</th><th>Priority</th><th>Status</th><th>Received</th><th></th></tr></thead>
+          <tbody id="leadsBody"></tbody>
+        </table>
+      </div>
+      <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
+    </div>
+
     <!-- ── BOT CONFIG ── -->
     <div class="page" id="page-botconfig">
       <div class="bc-stack">
@@ -773,7 +546,7 @@ td.muted{font-size:12px;color:var(--muted)}
             </div>
             <button class="prev-btn" onclick="openPreview()">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="12" height="9" rx="1.5"/><path d="M5 11v1.5M9 11v1.5M3.5 12.5h7" stroke-linecap="round"/></svg>
-              Preview Chatbot
+              Preview Widget
             </button>
           </div>
           <div class="bc-card-body">
@@ -786,7 +559,7 @@ td.muted{font-size:12px;color:var(--muted)}
           <div class="bc-card-head">
             <div>
               <h3>Question Builder</h3>
-              <p>Drag to reorder, toggle on/off, and edit chips. Hit <strong>Save All Changes</strong> at the bottom to push to your chatbot.</p>
+              <p>Drag to reorder, toggle on/off, and edit chips. Click <strong>Save Configuration</strong> in Assistant Identity to push to widget.</p>
             </div>
           </div>
           <div class="bc-card-body">
@@ -933,379 +706,21 @@ Phone: (214) 555-0192
                 <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:6px">Auto-generated from Q1 — the <span class="an-name-chip" style="font-size:11px;padding:0 4px">highlighted name</span> updates via the Assistant Name field above.</div>
               </div>
             </div>
-            <div id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none;text-align:right;margin-top:4px">Syncing…</div>
-          </div>
-        </div>
-
-        <!-- ════ SECTION 5: SERVICE AREA ════ -->
-        <div class="card">
-          <!-- Header row with toggle -->
-          <div class="sa-toggle-row">
-            <div class="sa-toggle-info">
-              <h4>Service Area Qualification</h4>
-              <p>When on, only customers in your selected cities can proceed. All existing leads are automatically re-evaluated whenever you change your service area — leads outside your cities are flagged ⊗ Out of Area without being deleted.</p>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-              <span style="font-size:12px;font-weight:600" id="saToggleLabel" class="widget-toggle-label offline">OFF</span>
-              <div class="toggle" id="saToggle" onclick="toggleSA()" title="Toggle service area qualification">
-                <div class="toggle-thumb"></div>
-              </div>
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:4px">
+              <span id="identitySyncStatus" style="font-size:12px;color:var(--muted);display:none">Syncing…</span>
+              <button class="save-btn" id="saveIdentityBtn" onclick="saveIdentity()">Save Changes</button>
             </div>
           </div>
-
-          <!-- Setup body (shown when enabled) -->
-          <div class="sa-body" id="saBody" style="display:none">
-
-            <!-- How it works callout -->
-            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start">
-              <span style="font-size:18px;flex-shrink:0">📍</span>
-              <div style="font-size:12px;color:#1E40AF;line-height:1.6">
-                <strong>How it works:</strong> Select a state, then toggle the cities you serve. The chatbot presents customers with a two-step State → City picker — only customers who select a city you serve will proceed.
-              </div>
-            </div>
-
-            <!-- Service Cities: tagged chips -->
-            <div>
-              <div class="sa-section-label">Your Service Cities</div>
-              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-                Cities added below will be the only valid options customers can choose in the chatbot.
-              </div>
-              <div class="sa-tags" id="saLocationTags" style="margin-bottom:14px;min-height:20px"></div>
-            </div>
-
-            <!-- Step 1: State picker -->
-            <div>
-              <div class="sa-section-label" style="margin-bottom:7px">Step 1 — Pick a State</div>
-              <select id="saStateSelect" class="sa-state-sel" onchange="loadSAStateCities(this.value)">
-                <option value="">Choose a state…</option>
-              </select>
-            </div>
-
-            <!-- Step 2: City toggles (revealed after state selected) -->
-            <div id="saStateCitiesWrap" style="display:none">
-              <div class="sa-section-label" id="saStateCitiesLabel" style="margin-bottom:8px">Step 2 — Select Cities to Serve</div>
-              <div id="saAvailableCities" style="display:flex;flex-wrap:wrap"></div>
-            </div>
-
-            <!-- Decline message -->
-            <div>
-              <label class="field-label">Message Shown to Out-of-Area Customers</label>
-              <textarea class="field-input field-textarea" id="saDeclineMsg" rows="3" style="resize:vertical;margin-bottom:4px"></textarea>
-              <div style="font-size:11px;color:var(--muted)">Keep it friendly — let them know you can't help but wish them well.</div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- ════ SECTION 6: WIDGET STATUS ════ -->
-
-        <div class="card">
-          <div class="bc-card-head">
-            <div>
-              <h3>Chatbot Status</h3>
-              <p>Toggle your chatbot live or offline. When offline, the chatbot is hidden from visitors and no new leads will be captured.</p>
-            </div>
-          </div>
-          <div class="widget-status-card">
-            <div class="widget-status-info">
-              <h4 id="widgetStatusHeading">Chatbot is Live</h4>
-              <p id="widgetStatusDesc">Your chatbot is active and capturing leads from your website.</p>
-            </div>
-            <div class="widget-toggle-wrap">
-              <span class="widget-toggle-label live" id="widgetToggleLabel">LIVE</span>
-              <div class="toggle on" id="widgetToggle" onclick="setWidgetStatus(!_widgetLive)" title="Toggle chatbot on/off">
-                <div class="toggle-thumb"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ════ SECTION 7: ANTI-SPAM ════ -->
-        <div class="card">
-          <div class="bc-card-head" style="align-items:center">
-            <div>
-              <h3>Lead Quality &amp; Anti-Spam</h3>
-              <p>Automatically filters bots and fake submissions so only real customers reach your dashboard. All checks run silently in the background.</p>
-            </div>
-            <div class="toggle on" id="spamMasterToggle" onclick="toggleSpamMaster()" title="Enable/disable spam protection" style="flex-shrink:0">
-              <div class="toggle-thumb"></div>
-            </div>
-          </div>
-          <div id="spamChecksBody" style="padding:4px 24px 8px">
-            <div class="spam-check-row">
-              <div>
-                <div class="spam-check-info">Block Fake Phone Numbers</div>
-                <div class="spam-check-sub">Rejects repeated digits (1111111111), sequential patterns, and invalid area codes</div>
-              </div>
-              <div class="toggle on" id="spamPhoneToggle" onclick="toggleSpamCheck('validatePhone')"><div class="toggle-thumb"></div></div>
-            </div>
-            <div class="spam-check-row">
-              <div>
-                <div class="spam-check-info">Detect Fake Names</div>
-                <div class="spam-check-sub">Flags numeric names, known test names, and keyboard-mashed entries like "asdfgh"</div>
-              </div>
-              <div class="toggle on" id="spamNameToggle" onclick="toggleSpamCheck('validateNames')"><div class="toggle-thumb"></div></div>
-            </div>
-            <div class="spam-check-row" style="border-bottom:none">
-              <div>
-                <div class="spam-check-info">Stop Keyboard Spam</div>
-                <div class="spam-check-sub">Catches nonsense or repetitive text in open-ended answer fields</div>
-              </div>
-              <div class="toggle on" id="spamKeyboardToggle" onclick="toggleSpamCheck('detectKeyboard')"><div class="toggle-thumb"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ════ SECTION 8: EMBED ON YOUR WEBSITE ════ -->
-        <div class="card">
-          <div class="bc-card-head">
-            <div>
-              <h3>Embed on Your Website</h3>
-              <p>Add your chatbot to any website by pasting one line of code. Works with WordPress, Wix, Squarespace, Webflow, and any custom HTML site.</p>
-            </div>
-            <a id="embedPreviewLink" href="widget.html?preview=true" target="_blank" class="prev-btn" style="text-decoration:none">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="12" height="9" rx="1.5"/><path d="M5 11v1.5M9 11v1.5M3.5 12.5h7" stroke-linecap="round"/></svg>
-              Preview Widget
-            </a>
-          </div>
-          <div class="bc-card-body">
-
-            <!-- Steps -->
-            <div style="margin-bottom:22px">
-              <div class="embed-step">
-                <div class="embed-step-num">1</div>
-                <div class="embed-step-text"><strong>Copy the embed code</strong> below using the Copy button.</div>
-              </div>
-              <div class="embed-step">
-                <div class="embed-step-num">2</div>
-                <div class="embed-step-text">Open your website editor and paste the code just before the closing <code>&lt;/body&gt;</code> tag on every page you want the chatbot to appear.</div>
-              </div>
-              <div class="embed-step">
-                <div class="embed-step-num">3</div>
-                <div class="embed-step-text"><strong>Save and publish</strong> your website. The chatbot will appear in the bottom-right corner within seconds.</div>
-              </div>
-            </div>
-
-            <!-- Embed URL input -->
-            <div style="margin-bottom:14px">
-              <label class="field-label">Your Widget URL</label>
-              <div style="display:flex;gap:8px;align-items:center">
-                <input id="embedUrlInput" class="field-input" style="margin-bottom:0;font-family:'JetBrains Mono',monospace;font-size:12px;flex:1" placeholder="https://your-domain.com/widget.html" oninput="updateEmbedCode()" value="">
-                <span style="font-size:12px;color:var(--muted);white-space:nowrap">← your hosted widget URL</span>
-              </div>
-            </div>
-
-            <!-- Code block -->
-            <div class="embed-code-wrap">
-              <pre class="embed-code" id="embedCodeBlock">&lt;!-- VettoChat Widget --&gt;
-&lt;iframe
-  src="widget.html"
-  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"
-  allow="clipboard-write"
-  title="VettoChat"&gt;
-&lt;/iframe&gt;</pre>
-              <button class="embed-copy-btn" id="embedCopyBtn" onclick="copyEmbedCode()">Copy Code</button>
-            </div>
-
-            <div style="margin-top:14px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:11px 14px;display:flex;gap:10px;align-items:flex-start">
-              <span style="font-size:16px;flex-shrink:0">💡</span>
-              <div style="font-size:12px;color:#166534;line-height:1.6">
-                <strong>Using WordPress or Wix?</strong> Paste the code into a Custom HTML widget or your theme's footer script area. The chatbot automatically inherits your brand colors and settings saved above.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ════ GLOBAL SAVE BAR ════ -->
-        <div class="bc-save-bar">
-          <span style="font-size:12px;color:var(--muted)">All settings save together — one click pushes everything to your chatbot.</span>
-          <button class="save-btn" onclick="saveAllBotConfig()">Save All Changes</button>
         </div>
 
         <div class="pg-footer">Powered by <em>VettoChat</em> · Automated Lead Capture</div>
       </div>
     </div>
 
-    <!-- ── CRM ── -->
-    <div class="page" id="page-crm">
-      <div class="crm-wrap">
-
-        <!-- Toolbar -->
-        <div class="crm-toolbar">
-          <div class="crm-search-wrap">
-            <span class="crm-search-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5" stroke-linecap="round"/></svg></span>
-            <input class="crm-search" id="crmSearch" placeholder="Search leads…" oninput="renderCRMTable()">
-          </div>
-          <select class="crm-select" id="crmFilterStatus" onchange="renderCRMTable()">
-            <option value="">All Statuses</option>
-          </select>
-          <select class="crm-select" id="crmFilterSA" onchange="renderCRMTable()">
-            <option value="">All Locations</option>
-            <option value="serviceable">✓ Serviceable</option>
-            <option value="unserviceable">⊗ Out of Area</option>
-          </select>
-          <select class="crm-select" id="crmSort" onchange="renderCRMTable()">
-            <option value="created_desc">Newest First</option>
-            <option value="created_asc">Oldest First</option>
-            <option value="value_desc">Highest Value</option>
-            <option value="value_asc">Lowest Value</option>
-            <option value="name_asc">Name A–Z</option>
-          </select>
-          <button class="crm-new-btn" onclick="openNewLeadForm()">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="white" stroke-width="1.8"><path d="M6.5 1v11M1 6.5h11" stroke-linecap="round"/></svg>
-            New Lead
-          </button>
-        </div>
-
-        <!-- Table -->
-        <div class="crm-table-wrap">
-          <table class="crm-table">
-            <thead>
-              <tr>
-                <th onclick="setCRMSort('name')">Name</th>
-                <th>Phone</th>
-                <th>Service</th>
-                <th onclick="setCRMSort('value')">Budget</th>
-                <th>Status</th>
-                <th onclick="setCRMSort('created')">Date</th>
-                <th>Notes</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="crmTableBody"></tbody>
-          </table>
-        </div>
-
-        <!-- Status Manager -->
-        <div class="crm-status-mgr">
-          <div class="card-head" style="padding:0 0 14px;border:none;margin-bottom:0">
-            <div class="card-head-left"><h3 style="margin:0;font-size:14px">Lead Statuses</h3><p style="margin:0;font-size:12px;color:var(--muted)">Customize the pipeline stages for your team.</p></div>
-          </div>
-          <div class="crm-status-list" id="crmStatusList"></div>
-          <button class="crm-add-status-btn" onclick="addCRMStatus()">+ Add Status</button>
-        </div>
-
-        <!-- Filtered / Disqualified Leads -->
-        <div class="crm-filtered-wrap">
-          <div class="crm-filtered-header" onclick="toggleFilteredSection()">
-            <div class="crm-filtered-title">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#92400E" stroke-width="1.6"><path d="M1 2h12l-4.5 5.5V12l-3-1.5V7.5L1 2z" stroke-linejoin="round"/></svg>
-              Filtered Leads
-              <span class="crm-filtered-badge" id="filteredBadge">0</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:12px;color:var(--muted)">Out-of-area &amp; disqualified — not in main pipeline</span>
-              <span class="crm-filtered-chevron" id="filteredChevron">▾</span>
-            </div>
-          </div>
-          <div class="crm-filtered-body" id="filteredBody" style="display:none">
-            <table class="crm-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Location</th>
-                  <th>Reason</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="filteredTableBody"></tbody>
-            </table>
-            <div style="padding:12px 20px;display:flex;justify-content:flex-end;border-top:1px solid var(--border)">
-              <button class="crm-filtered-clear" onclick="clearFilteredLeads()">Clear All Filtered</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <div class="pg-footer">Powered by <em>VettoChat</em> · Lead Management</div>
-    </div>
-
     <!-- ── INTEGRATIONS ── -->
 
   </div><!-- /pages -->
 </div><!-- /main -->
-
-<!-- TEMPLATE SWITCH WARNING MODAL -->
-<div class="tmpl-warn-bg" id="tmplWarnBg">
-  <div class="tmpl-warn-modal">
-    <div class="tmpl-warn-icon">⚠️</div>
-    <h3>Switch Industry Template?</h3>
-    <p>Switching to <strong id="tmplWarnName"></strong> will replace your current chatbot flow, questions, and chip options. <strong>Unsaved changes will be lost.</strong></p>
-    <ul class="tmpl-warn-list">
-      <li>All conversation questions will reset to the new template</li>
-      <li>Chip / answer options will be replaced</li>
-      <li>Lead scoring tiers will reset to template defaults</li>
-      <li>Your assistant name and brand color are kept</li>
-    </ul>
-    <div class="tmpl-warn-actions">
-      <button class="tmpl-warn-cancel" onclick="cancelTemplateSwitch()">Cancel</button>
-      <button class="tmpl-warn-continue" onclick="confirmTemplateSwitch()">Yes, Switch Template</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════ ONBOARDING OVERLAY ══════════ -->
-<div class="ob-overlay" id="obOverlay" style="display:none">
-  <div class="ob-card">
-    <div class="ob-logo">
-      <div class="ob-logo-mark">
-        <svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/></svg>
-      </div>
-      <div class="ob-logo-text">Vetto<span>Chat</span></div>
-    </div>
-    <div class="ob-title">Let's set up your account</div>
-    <div class="ob-sub">Fill in your details below to personalize your workspace. This only takes a minute.</div>
-
-    <div class="ob-grid">
-      <div class="ob-field full">
-        <label class="ob-label" for="obBusiness">Business Name <span style="color:#EF4444">*</span></label>
-        <input id="obBusiness" class="ob-input" type="text" placeholder="e.g. Apex Roofing &amp; Exteriors" autocomplete="organization">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label" for="obName">Your Name <span style="color:#EF4444">*</span></label>
-        <input id="obName" class="ob-input" type="text" placeholder="First &amp; Last name" autocomplete="name">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label" for="obEmail">Email Address <span style="color:#EF4444">*</span></label>
-        <input id="obEmail" class="ob-input" type="email" placeholder="you@company.com" autocomplete="email">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label" for="obPhone">Phone Number</label>
-        <input id="obPhone" class="ob-input" type="tel" placeholder="+1 (555) 000-0000" autocomplete="tel">
-      </div>
-      <div class="ob-field">
-        <label class="ob-label" for="obIndustry">Industry</label>
-        <select id="obIndustry" class="ob-input ob-select">
-          <option value="">Select your industry…</option>
-          <option value="roofing">🏠 Roofing</option>
-          <option value="plumbing">🔧 Plumbing</option>
-          <option value="hvac">❄️ HVAC</option>
-          <option value="electrical">⚡ Electrical</option>
-          <option value="landscaping">🌿 Landscaping</option>
-          <option value="">Other</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="ob-err" id="obErr">Please fill in all required fields.</div>
-    <button class="ob-submit" onclick="submitOnboarding()">Create My Account &amp; Get Started →</button>
-    <div class="ob-note">Your information is stored locally and never shared.</div>
-  </div>
-</div>
-
-<!-- ══════════ WELCOME MODAL ══════════ -->
-<div class="welcome-bg" id="welcomeBg">
-  <div class="welcome-card">
-    <span class="welcome-emoji">🎉</span>
-    <div class="welcome-title">Hello and welcome to VettoChat!</div>
-    <div class="welcome-msg">We're excited to have you onboard. Let's get your chatbot set up and start generating leads for your business.</div>
-    <button class="welcome-btn" onclick="closeWelcome()">
-      Let's Set Up My Chatbot
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-</div>
 
 <!-- DEMO OVERLAY -->
 <div class="demo-overlay" id="demoOverlay">
@@ -1414,21 +829,9 @@ function initFunnel(){
 }
 
 // ─── NAV ────────────────────────────────────────────────────────────────────
-const PAGE_TITLES={overview:'Overview',botconfig:'Bot Config',crm:'Leads'};
+const PAGE_TITLES={overview:'Overview',leads:'Leads',botconfig:'Bot Config'};
 let currentPage='overview';
-let _botConfigDirty=false; // tracks unsaved changes on bot config page
-
-function _markDirty(){ _botConfigDirty=true; }
-
-function nav(el,name){
-  if(currentPage==='botconfig' && _botConfigDirty && name!=='botconfig'){
-    if(!confirm('You have unsaved changes in Bot Config.\n\nClick "Save All Changes" to keep them, or leave and discard your edits.\n\nLeave without saving?')) return;
-    _botConfigDirty=false;
-  }
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
-  showPage(name);
-}
+function nav(el,name){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');showPage(name);}
 function showPage(name){
   currentPage=name;
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active','visible');});
@@ -1436,21 +839,11 @@ function showPage(name){
   pg.classList.add('active');
   document.getElementById('topbarTitle').textContent=PAGE_TITLES[name]||name;
   document.getElementById('playBtn').style.display=name==='overview'?'':'none';
-  requestAnimationFrame(()=>{pg.classList.add('visible');if(name==='botconfig')initBotConfig();if(name==='crm')initCRM();});
+  requestAnimationFrame(()=>{pg.classList.add('visible');if(name==='botconfig')initBotConfig();});
 }
 
 // ─── TOAST ──────────────────────────────────────────────────────────────────
 function showToast(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4500);}
-
-function showToastMsg(title, sub, color) {
-  const t = document.getElementById('tmplToast');
-  if (!t) return;
-  t.style.borderLeftColor = color || '#2563EB';
-  t.querySelector('strong').textContent = title;
-  t.querySelector('span').textContent   = sub || '';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
-}
 
 // ─── DEMO ───────────────────────────────────────────────────────────────────
 let demoActive=false,demoTimers=[];
@@ -1470,25 +863,38 @@ function dd(ms){return new Promise(res=>{const t=setTimeout(res,ms);demoTimers.p
 let _demoSnapshot = null;
 
 function _captureSnapshot() {
+  const badge = document.getElementById('leadsBadge');
+  const chips = document.getElementById('leadsChips');
   return {
     overviewHTML: (document.getElementById('overviewBody') || {}).innerHTML || '',
+    leadsHTML:    (document.getElementById('leadsBody')    || {}).innerHTML || '',
+    sv0: document.getElementById('sv0').innerText,
+    sv1: document.getElementById('sv1').innerText,
+    sv2: document.getElementById('sv2').innerText,
+    sv3: document.getElementById('sv3').innerText,
+    badgeText:    badge ? badge.textContent    : '0',
+    badgeDisplay: badge ? badge.style.display  : 'none',
+    chipsHTML:    chips ? chips.innerHTML      : '',
     localConfig:  localStorage.getItem('vettochat_config') || '',
   };
 }
 
 function _restoreSnapshot(snap) {
   if (!snap) return;
-  // Restore overview HTML (removes fake demo lead)
-  const tb = document.getElementById('overviewBody');
-  if (tb) tb.innerHTML = snap.overviewHTML;
-  // Restore bot config if changed during demo
+  const tb = document.getElementById('overviewBody'); if (tb) tb.innerHTML = snap.overviewHTML;
+  const lb = document.getElementById('leadsBody');    if (lb) lb.innerHTML = snap.leadsHTML;
+  document.getElementById('sv0').innerText = snap.sv0;
+  document.getElementById('sv1').innerText = snap.sv1;
+  document.getElementById('sv2').innerText = snap.sv2;
+  document.getElementById('sv3').innerText = snap.sv3;
+  const badge = document.getElementById('leadsBadge');
+  if (badge) { badge.textContent = snap.badgeText; badge.style.display = snap.badgeDisplay; }
+  const chips = document.getElementById('leadsChips');
+  if (chips) chips.innerHTML = snap.chipsHTML;
   if (snap.localConfig !== undefined) {
     if (snap.localConfig) localStorage.setItem('vettochat_config', snap.localConfig);
     else localStorage.removeItem('vettochat_config');
   }
-  // Always derive stats from real CRM data — never restore demo-inflated numbers
-  syncStatsFromCRM();
-  updateCRMBadge();
 }
 
 async function startDemo(){
@@ -1528,7 +934,7 @@ const Q1_DEFAULT_TEXT = "Hi! I'm (Bot Name). I can get you a free quote in under
 let questions = [
   {id:1,key:'name',     text:Q1_DEFAULT_TEXT,                                    type:'text',  enabled:true, placeholder:'Enter your full name…',         chips:[]},
   {id:2,key:'service',  text:'What type of roofing service do you need?',        type:'chips', enabled:true, placeholder:'Or type your service…',          chips:['Full Replacement','Leak Repair','Storm Damage','New Install','Gutters','Inspection']},
-  {id:3,key:'location', text:'Select your city &amp; state',                      type:'city-picker', enabled:true, placeholder:'Search for your city…',     chips:[]},
+  {id:3,key:'location', text:'What is your city or ZIP code?',                   type:'text',  enabled:true, placeholder:'City or zip code…',              chips:[]},
   {id:4,key:'urgency',  text:'How soon do you need this done?',                  type:'chips', enabled:true, placeholder:'Or describe urgency…',           chips:['Emergency (Within 24h)','This week','Just browsing / Next month']},
   {id:5,key:'budget',   text:'What is your approximate budget?',                 type:'chips', enabled:true, placeholder:'Or enter an amount…',            chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
   {id:6,key:'phone',    text:'What is the best phone number to reach you?',      type:'phone', enabled:true, placeholder:'10-digit phone number…',         chips:[]},
@@ -1566,7 +972,7 @@ function renderQB(){
       </div>
       <div class="qb-num">Q${idx+1}</div>
       <input class="qb-input" value="${q.text.replace(/"/g,'&quot;')}" data-id="${q.id}" onchange="updateQText(${q.id}, this.value)">
-      <span class="qb-type ${q.type === 'city-picker' ? 'city-picker' : q.type}">${q.type === 'phone' ? 'Phone' : q.type === 'chips' ? 'Chips' : q.type === 'city-picker' ? 'City' : 'Text'}</span>
+      <span class="qb-type ${q.type}">${q.type === 'phone' ? 'Phone' : q.type === 'chips' ? 'Chips' : 'Text'}</span>
       <div class="toggle qb-toggle ${q.enabled ? 'on' : ''}" onclick="toggleQ(${q.id}, this)">
         <div class="toggle-thumb"></div>
       </div>
@@ -1874,7 +1280,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What roofing service do you need?',             placeholder:'Or describe it…',        enabled:true, chips:['Full Replacement','Leak Repair','Storm Damage','New Install','Gutters','Inspection']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
+      {key:'location', type:'text',  question:'What city or zip code are you in?',             placeholder:'City or zip…',           enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How soon do you need this done?',               placeholder:'Or describe urgency…',   enabled:true, chips:['Emergency (Within 24h)','This week','Within a month','Just exploring']},
       {key:'budget',   type:'chips', question:"What's your approximate budget?",              placeholder:'Or enter an amount…',    enabled:true, chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
       {key:'phone',    type:'phone', question:'Last step — what number should we call?',       placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1897,7 +1303,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What plumbing service do you need?',            placeholder:'Or describe it…',        enabled:true, chips:['Emergency Leak','Pipe Replacement','Drain Cleaning','Water Heater','New Installation','Inspection']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
+      {key:'location', type:'text',  question:'What city are you located in?',                 placeholder:'City or zip…',           enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How urgent is this?',                           placeholder:'Or describe it…',        enabled:true, chips:['Emergency (Right now)','Today','This week','Just getting prices']},
       {key:'budget',   type:'chips', question:"What's your budget range?",                    placeholder:'Or enter an amount…',    enabled:true, chips:['$5K+','$1K–$5K','$500–$1K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number can we reach you at?',              placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1920,7 +1326,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What electrical service do you need?',          placeholder:'Or describe it…',        enabled:true, chips:['Panel Upgrade','Wiring / Rewire','Outlet Installation','Generator','EV Charger','Safety Inspection']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
+      {key:'location', type:'text',  question:'What city are you in?',                         placeholder:'City or zip…',           enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How soon do you need this?',                    placeholder:'Or describe it…',        enabled:true, chips:['Emergency','This week','Within a month','Planning ahead']},
       {key:'budget',   type:'chips', question:"What's your approximate budget?",              placeholder:'Or enter an amount…',    enabled:true, chips:['$10K+','$2K–$10K','$500–$2K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:"What's the best number to reach you?",         placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1943,7 +1349,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What HVAC service do you need?',                placeholder:'Or describe it…',        enabled:true, chips:['AC Replacement','Heater Replacement','AC Repair','Heater Repair','New Installation','Seasonal Tune-Up']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
+      {key:'location', type:'text',  question:'What city are you located in?',                 placeholder:'City or zip…',           enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:'How urgent is this for you?',                   placeholder:'Or describe it…',        enabled:true, chips:['Emergency (No AC/Heat)','Today','This week','Seasonal Planning']},
       {key:'budget',   type:'chips', question:"What's your budget for this project?",         placeholder:'Or enter an amount…',    enabled:true, chips:['$10K+','$3K–$10K','$500–$3K','Under $500','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number can we reach you at?',              placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -1966,7 +1372,7 @@ const INDUSTRY_TEMPLATES = {
     steps:[
       {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
       {key:'service',  type:'chips', question:'What landscaping service do you need?',         placeholder:'Or describe it…',        enabled:true, chips:['Full Landscaping','Lawn Maintenance','Tree Removal','Irrigation','Hardscaping','Seasonal Cleanup']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
+      {key:'location', type:'text',  question:'What city or zip code are you in?',             placeholder:'City or zip…',           enabled:true, chips:[]},
       {key:'urgency',  type:'chips', question:"What's your timeline?",                        placeholder:'Or describe it…',        enabled:true, chips:['This week','This month','Next season','Ongoing contract']},
       {key:'budget',   type:'chips', question:"What's your budget for this project?",         placeholder:'Or enter an amount…',    enabled:true, chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
       {key:'phone',    type:'phone', question:'What number should we call you at?',            placeholder:'10-digit number…',       enabled:true, chips:[]},
@@ -2000,32 +1406,7 @@ function renderTemplates() {
   });
 }
 
-let _pendingTemplateId = null;
-
 function applyTemplate(id) {
-  if (id === _activeTemplate) return; // already active, no warning needed
-  _pendingTemplateId = id;
-  const tmpl = INDUSTRY_TEMPLATES[id];
-  if (!tmpl) return;
-  const nameEl = document.getElementById('tmplWarnName');
-  if (nameEl) nameEl.textContent = `${tmpl.icon} ${tmpl.name}`;
-  const bg = document.getElementById('tmplWarnBg');
-  if (bg) bg.classList.add('open');
-}
-
-function cancelTemplateSwitch() {
-  _pendingTemplateId = null;
-  document.getElementById('tmplWarnBg')?.classList.remove('open');
-}
-
-function confirmTemplateSwitch() {
-  document.getElementById('tmplWarnBg')?.classList.remove('open');
-  if (!_pendingTemplateId) return;
-  _doApplyTemplate(_pendingTemplateId);
-  _pendingTemplateId = null;
-}
-
-function _doApplyTemplate(id) {
   const tmpl = INDUSTRY_TEMPLATES[id];
   if (!tmpl) return;
   _activeTemplate = id;
@@ -2064,7 +1445,13 @@ function _doApplyTemplate(id) {
   renderTemplates();
 
   // Show toast
-  showToastMsg(`${tmpl.icon} ${tmpl.name} template applied`, 'Click Save All Changes to push to chatbot.', '#7C3AED');
+  const toast = document.getElementById('tmplToast');
+  if (toast) {
+    toast.querySelector('strong').textContent = `${tmpl.icon} ${tmpl.name} template applied`;
+    toast.querySelector('span').textContent = 'Hit Save Configuration to push to widget';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
 }
 
 function openPreview() {
@@ -2115,7 +1502,6 @@ function setEditorContent(message, name) {
 }
 
 function syncAssistantName(raw) {
-  _markDirty();
   _assistantName = (raw || '').trim();
   const display = _assistantName || '(Assistant Name)';
 
@@ -2146,7 +1532,6 @@ function syncColorPicker(hex) {
   document.getElementById('colorSwatch').style.background = hex;
 }
 function applyPresetColor(hex) {
-  _markDirty();
   document.getElementById('identityColor').value = hex;
   document.getElementById('colorSwatch').style.background = hex;
   document.getElementById('colorPickerNative').value = hex;
@@ -2155,7 +1540,7 @@ function applyPresetColor(hex) {
 // Bump CONFIG_VERSION whenever the default setup changes.
 // Any saved config without this exact version is treated as stale
 // and replaced with the clean Roofing + Vetto defaults.
-const CONFIG_VERSION = 2;
+const CONFIG_VERSION = 1;
 
 const DEFAULTS = { assistantName: 'Vetto', brandColor: '#1E40AF', chatLabel: 'Get a free roof inspection →' };
 
@@ -2273,1206 +1658,21 @@ function saveIdentity() {
   // Write to localStorage — the widget's 'storage' event listener picks this up instantly
   localStorage.setItem('vettochat_config', JSON.stringify(config));
 
+  const btn    = document.getElementById('saveIdentityBtn');
   const status = document.getElementById('identitySyncStatus');
-  if (status) {
-    status.style.display = '';
-    status.textContent   = '✓ Synced to chatbot';
-    status.style.color   = '#059669';
-    setTimeout(() => { status.style.display = 'none'; }, 2500);
-  }
-}
-
-// ─── CRM DATA LAYER ──────────────────────────────────────────────────────────
-const CRM_STATUS_COLORS = {
-  blue:   { bg:'#DBEAFE', text:'#1D4ED8' },
-  green:  { bg:'#DCFCE7', text:'#15803D' },
-  orange: { bg:'#FED7AA', text:'#C2410C' },
-  red:    { bg:'#FEE2E2', text:'#B91C1C' },
-  purple: { bg:'#EDE9FE', text:'#6D28D9' },
-  gray:   { bg:'#F1F5F9', text:'#475569' },
-};
-
-const DEFAULT_STATUSES = [
-  { id:'new',            label:'New',                  color:'blue'   },
-  { id:'called',         label:'Called',               color:'purple' },
-  { id:'quoted',         label:'Quoted',               color:'orange' },
-  { id:'sold',           label:'Sold',                 color:'green'  },
-  { id:'not_interested', label:'Not Interested',       color:'red'    },
-  { id:'follow_up',      label:'Follow Up',            color:'gray'   },
-  { id:'out_of_area',    label:'Out of Service Area',  color:'red'    },
-];
-
-let crmLeads    = {};  // { [id]: lead }
-let crmStatuses = [];  // [ { id, label, color } ]
-let crmActiveLead = null;  // id of currently open lead
-let crmInited   = false;
-let crmSortKey  = 'created';
-let crmSortDir  = 'desc';
-let filteredLeads = {};  // { [id]: { name, phone, location, reason, created } }
-
-function setCRMSort(key) {
-  if (crmSortKey === key) { crmSortDir = crmSortDir === 'asc' ? 'desc' : 'asc'; }
-  else { crmSortKey = key; crmSortDir = key === 'name' ? 'asc' : 'desc'; }
-  // Sync select to match
-  const sel = document.getElementById('crmSort');
-  if (sel) sel.value = key + '_' + crmSortDir;
-  renderCRMTable();
-}
-
-function loadCRMData() {
-  try {
-    const raw = localStorage.getItem('vettochat_leads');
-    crmLeads = raw ? JSON.parse(raw) : {};
-  } catch(e) { crmLeads = {}; }
-  try {
-    const raw = localStorage.getItem('vettochat_lead_statuses');
-    crmStatuses = raw ? JSON.parse(raw) : DEFAULT_STATUSES.map(s => ({...s}));
-  } catch(e) { crmStatuses = DEFAULT_STATUSES.map(s => ({...s})); }
-}
-
-function saveCRMLeads()    { localStorage.setItem('vettochat_leads',         JSON.stringify(crmLeads)); }
-function saveCRMStatuses() { localStorage.setItem('vettochat_lead_statuses', JSON.stringify(crmStatuses)); updateCRMBadge(); }
-
-function loadFilteredLeads() {
-  try { filteredLeads = JSON.parse(localStorage.getItem('vettochat_filtered_leads') || '{}'); }
-  catch(_) { filteredLeads = {}; }
-}
-function saveFilteredLeads() {
-  localStorage.setItem('vettochat_filtered_leads', JSON.stringify(filteredLeads));
-}
-
-const FILTERED_REASON_LABELS = {
-  out_of_area: 'Out of Service Area',
-  invalid:     'Invalid Info',
-  spam:        'Spam / Bot',
-};
-
-function ingestFilteredLead(lead) {
-  const id  = 'flt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-  const now = Date.now();
-  filteredLeads[id] = {
-    id,
-    name:     lead.name     || lead.firstName || 'Unknown',
-    phone:    (lead.phone   || '').replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'),
-    location: lead.location || lead.city || lead.zip || '',
-    service:  lead.service  || lead.intent || '',
-    reason:   lead.reason   || 'out_of_area',
-    created:  now
-  };
-  saveFilteredLeads();
-  renderFilteredTable();
-}
-
-function renderFilteredTable() {
-  const tbody = document.getElementById('filteredTableBody');
-  const badge = document.getElementById('filteredBadge');
-  const items = Object.values(filteredLeads).sort((a, b) => b.created - a.created);
-  if (badge) badge.textContent = items.length;
-  if (!tbody) return;
-  if (!items.length) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;font-size:13px">No filtered leads</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = items.map(l => {
-    const date = l.created ? new Date(l.created).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : '—';
-    const label = FILTERED_REASON_LABELS[l.reason] || l.reason || 'Disqualified';
-    return `<tr>
-      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px;opacity:.6">${initials(l.name)}</div><span class="lead-name" style="color:var(--muted)">${_esc(l.name || '—')}</span></div></td>
-      <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
-      <td style="font-size:12px;color:var(--muted)">${_esc(l.location || '—')}</td>
-      <td><span class="crm-filtered-reason">${_esc(label)}</span></td>
-      <td style="font-size:12px;color:var(--muted)">${date}</td>
-    </tr>`;
-  }).join('');
-}
-
-function toggleFilteredSection() {
-  const body    = document.getElementById('filteredBody');
-  const chevron = document.getElementById('filteredChevron');
-  if (!body) return;
-  const open = body.style.display !== 'none';
-  body.style.display  = open ? 'none' : '';
-  if (chevron) chevron.classList.toggle('open', !open);
-}
-
-function clearFilteredLeads() {
-  if (!confirm('Clear all filtered leads? This cannot be undone.')) return;
-  filteredLeads = {};
-  saveFilteredLeads();
-  renderFilteredTable();
-}
-
-function updateCRMBadge() {
-  const badge = document.getElementById('crmBadge');
-  if (!badge) return;
-  const count = Object.keys(crmLeads).length;
-  badge.textContent = count;
-  badge.style.display = count > 0 ? 'flex' : 'none';
-}
-
-function initCRM() {
-  if (!crmInited) { loadCRMData(); crmInited = true; }
-  renderCRMStatusFilter();
-  renderCRMTable();
-  renderCRMStatusManager();
-  renderFilteredTable();
-  updateCRMBadge();
-}
-
-// ── SEEDING: import static LEADS sample data into CRM on first load ──────────
-function seedCRMFromStaticLeads() {
-  if (Object.keys(crmLeads).length > 0) return;
-  const roofTypes = { 'Full Roof Replacement':'Asphalt Shingle', 'Storm Damage Repair':'Metal/Shingle', 'Emergency Leak Repair':'Flat Roof', 'Roof Replacement':'Asphalt Shingle', 'Roof Inspection':'Tile', 'Gutter Replacement':'N/A', 'Flat Roof Repair':'TPO/EPDM', 'Storm Damage':'Metal/Shingle', 'Gutter Cleaning':'N/A' };
-  LEADS.forEach(l => {
-    const id = 'lead_' + l.ts + '_' + Math.random().toString(36).slice(2,6);
-    crmLeads[id] = {
-      id, name:l.name, phone:l.service, email:'', service:l.service,
-      location:l.location || '', urgency:'', budget:l.budget || '',
-      value: 0,
-      status: l.quality === 'hot' ? 'new' : l.quality === 'warm' ? 'called' : 'follow_up',
-      notes:'', created:l.ts, updated:l.ts,
-      activity:[{ type:'created', text:'Lead imported from dashboard', ts:l.ts }]
-    };
-    // fix: service not phone
-    crmLeads[id].phone = '';
-  });
-  saveCRMLeads();
-}
-
-// ── TABLE RENDERING ──────────────────────────────────────────────────────────
-function getFilteredSortedLeads() {
-  const q      = (document.getElementById('crmSearch')?.value || '').toLowerCase();
-  const stFilt = document.getElementById('crmFilterStatus')?.value || '';
-  const saFilt = document.getElementById('crmFilterSA')?.value || '';
-  const sortVal = document.getElementById('crmSort')?.value || 'created_desc';
-
-  let list = Object.values(crmLeads);
-
-  // Search
-  if (q) list = list.filter(l =>
-    (l.name     || '').toLowerCase().includes(q) ||
-    (l.phone    || '').toLowerCase().includes(q) ||
-    (l.email    || '').toLowerCase().includes(q) ||
-    (l.service  || '').toLowerCase().includes(q) ||
-    (l.location || '').toLowerCase().includes(q)
-  );
-
-  // Status filter
-  if (stFilt) list = list.filter(l => l.status === stFilt);
-
-  // Service area filter
-  if (saFilt === 'serviceable')   list = list.filter(l => l.serviceable === true);
-  if (saFilt === 'unserviceable') list = list.filter(l => l.serviceable === false);
-
-  // Sort
-  const [key, dir] = sortVal.split('_');
-  list.sort((a, b) => {
-    let va = key === 'name' ? (a.name || '').toLowerCase() : (key === 'value' ? (a.value || 0) : (a.created || 0));
-    let vb = key === 'name' ? (b.name || '').toLowerCase() : (key === 'value' ? (b.value || 0) : (b.created || 0));
-    if (va < vb) return dir === 'asc' ? -1 : 1;
-    if (va > vb) return dir === 'asc' ? 1 : -1;
-    return 0;
-  });
-
-  return list;
-}
-
-function statusBadgeHtml(statusId) {
-  const st = crmStatuses.find(s => s.id === statusId) || { label: statusId, color:'gray' };
-  const c  = CRM_STATUS_COLORS[st.color] || CRM_STATUS_COLORS.gray;
-  return `<span class="crm-badge" style="background:${c.bg};color:${c.text}">${_esc(st.label)}</span>`;
-}
-
-function renderCRMTable() {
-  const tbody = document.getElementById('crmTableBody');
-  if (!tbody) return;
-  const list = getFilteredSortedLeads();
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="crm-empty">No leads yet. Add your first lead with the <strong>New Lead</strong> button above.</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = list.map(l => {
-    const date  = l.created ? new Date(l.created).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : '—';
-    const val   = l.budget  || (l.value ? '$' + Number(l.value).toLocaleString() : '—');
-    const notes = (l.notes  || '').replace(/<[^>]*>/g, '').slice(0, 60) || '—';
-    const isOOA   = l.status === 'out_of_area';
-    const saActive = _saConfig.enabled && (_saConfig.cities || []).length > 0;
-    const saBadge = l.serviceable === false
-      ? '<div style="margin-top:2px"><span class="sa-oor-badge">⊗ Out of Area</span></div>'
-      : (saActive && l.serviceable === true
-        ? '<div style="margin-top:2px"><span class="sa-ok-badge">✓ Serviceable</span></div>'
-        : '');
-    return `<tr onclick="openCRMPanel('${l.id}')" style="${isOOA ? 'opacity:0.7' : ''}">
-      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><div><span class="lead-name">${_esc(l.name || '—')}</span>${saBadge}</div></div></td>
-      <td style="font-size:12px;color:var(--muted)">${_esc(l.phone || '—')}</td>
-      <td style="font-size:12px">${_esc(l.service || '—')}</td>
-      <td class="crm-val">${val}</td>
-      <td>${statusBadgeHtml(l.status)}</td>
-      <td class="crm-date">${date}</td>
-      <td class="crm-notes-preview">${_esc(notes)}</td>
-      <td><button class="call-btn" onclick="event.stopPropagation();window.location='tel:'+('${l.phone||''}').replace(/\D/g,'')">Call</button></td>
-    </tr>`;
-  }).join('');
-}
-
-function avatarColor(name) {
-  const colors = ['#E8590C','#7C3AED','#2563EB','#D97706','#059669','#0891B2','#BE185D','#9333EA','#16A34A'];
-  let h = 0; for (const c of (name||'')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
-  return colors[Math.abs(h) % colors.length];
-}
-function initials(name) {
-  const p = (name||'').trim().split(/\s+/);
-  return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : (name||'?').slice(0,2).toUpperCase();
-}
-
-function renderCRMStatusFilter() {
-  const sel = document.getElementById('crmFilterStatus');
-  if (!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = `<option value="">All Statuses</option>` +
-    crmStatuses.map(s => `<option value="${s.id}"${s.id === cur ? ' selected':''}>` + s.label + `</option>`).join('');
-}
-
-// ── DETAIL PANEL ─────────────────────────────────────────────────────────────
-function openCRMPanel(id) {
-  const lead = crmLeads[id];
-  if (!lead) return;
-  crmActiveLead = id;
-
-  document.getElementById('crmPanelName').textContent  = lead.name || 'Unnamed Lead';
-  document.getElementById('cpName').value     = lead.name     || '';
-  document.getElementById('cpPhone').value    = lead.phone    || '';
-  document.getElementById('cpEmail').value    = lead.email    || '';
-  document.getElementById('cpValue').value    = lead.value    ? String(lead.value) : '';
-  document.getElementById('cpService').value  = lead.service  || '';
-  document.getElementById('cpLocation').value = lead.location || '';
-  document.getElementById('cpUrgency').value  = lead.urgency  || '';
-  document.getElementById('cpBudget').value   = lead.budget   || '';
-  document.getElementById('cpNotes').innerHTML = lead.notes   || '';
-
-  const callBtn = document.getElementById('crmCallBtn');
-  callBtn.href = 'tel:' + (lead.phone || '').replace(/\D/g, '');
-
-  // Populate status dropdown
-  const stSel = document.getElementById('crmPanelStatus');
-  stSel.innerHTML = crmStatuses.map(s =>
-    `<option value="${s.id}"${s.id === lead.status ? ' selected':''}>${s.label}</option>`).join('');
-
-  renderCRMActivity(lead.activity || []);
-
-  document.getElementById('crmOverlay').classList.add('open');
-  document.getElementById('crmPanel').classList.add('open');
-}
-
-function closeCRMPanel() {
-  document.getElementById('crmOverlay').classList.remove('open');
-  document.getElementById('crmPanel').classList.remove('open');
-  crmActiveLead = null;
-}
-
-function crmPanelStatusChanged() {
-  const lead = crmLeads[crmActiveLead];
-  if (!lead) return;
-  const newStatus = document.getElementById('crmPanelStatus').value;
-  const oldStatus = lead.status;
-  if (newStatus === oldStatus) return;
-  const stLabel = (crmStatuses.find(s => s.id === newStatus) || {}).label || newStatus;
-  lead.activity = lead.activity || [];
-  lead.activity.unshift({ type:'status', text:`Status changed to "${stLabel}"`, ts:Date.now() });
-  lead.status = newStatus;
-  renderCRMActivity(lead.activity);
-}
-
-function saveCRMLead() {
-  const lead = crmLeads[crmActiveLead];
-  if (!lead) return;
-  const oldName = lead.name;
-  lead.name     = document.getElementById('cpName').value.trim()    || lead.name;
-  lead.phone    = document.getElementById('cpPhone').value.trim();
-  lead.email    = document.getElementById('cpEmail').value.trim();
-  lead.service  = document.getElementById('cpService').value.trim();
-  lead.location = document.getElementById('cpLocation').value.trim();
-  lead.urgency  = document.getElementById('cpUrgency').value.trim();
-  lead.budget   = document.getElementById('cpBudget').value.trim();
-  const rawVal = document.getElementById('cpValue').value;
-  lead.value = rawVal ? (parseFloat(rawVal) || 0) : (lead.value || 0);
-  lead.status   = document.getElementById('crmPanelStatus').value;
-  const newNotes = document.getElementById('cpNotes').innerHTML;
-  if (newNotes !== lead.notes) {
-    lead.activity = lead.activity || [];
-    lead.activity.unshift({ type:'note', text:'Notes updated', ts:Date.now() });
-  }
-  lead.notes   = newNotes;
-  lead.updated = Date.now();
-  saveCRMLeads();
-  renderCRMTable();
-  closeCRMPanel();
-
-  showToastMsg('✓ Lead updated', `${lead.name}'s details have been saved.`, '#059669');
-}
-
-function deleteCRMLead() {
-  if (!crmActiveLead) return;
-  const lead = crmLeads[crmActiveLead];
-  if (!confirm(`Delete "${lead?.name || 'this lead'}"? This cannot be undone.`)) return;
-  delete crmLeads[crmActiveLead];
-  saveCRMLeads();
-  renderCRMTable();
-  updateCRMBadge();
-  closeCRMPanel();
-}
-
-function renderCRMActivity(activity) {
-  const list = document.getElementById('crmActivityList');
-  if (!list) return;
-  const items = [...(activity || [])].sort((a, b) => b.ts - a.ts);
-  if (!items.length) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">No activity yet.</div>'; return; }
-  list.innerHTML = items.map(a => {
-    const cls   = a.type || 'created';
-    const icons = { created:'●', status:'◆', note:'✎' };
-    const time  = new Date(a.ts).toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
-    return `<div class="crm-act-item">
-      <div class="crm-act-dot ${cls}">${icons[cls] || '●'}</div>
-      <div><div class="crm-act-text">${_esc(a.text)}</div><div class="crm-act-time">${time}</div></div>
-    </div>`;
-  }).join('');
-}
-
-function crmExec(cmd) { document.getElementById('cpNotes').focus(); document.execCommand(cmd, false, null); }
-function crmInsertLink() {
-  const url = prompt('Enter URL:');
-  if (url) { document.getElementById('cpNotes').focus(); document.execCommand('createLink', false, url); }
-}
-
-// ── STATUS MANAGER ───────────────────────────────────────────────────────────
-function renderCRMStatusManager() {
-  const list = document.getElementById('crmStatusList');
-  if (!list) return;
-  list.innerHTML = '';
-  crmStatuses.forEach((st, idx) => {
-    const c = CRM_STATUS_COLORS[st.color] || CRM_STATUS_COLORS.gray;
-    const row = document.createElement('div');
-    row.className = 'crm-status-row';
-    row.innerHTML = `
-      <div class="crm-status-dot" style="background:${c.text}"></div>
-      <input class="crm-status-label-inp" value="${_esc(st.label)}" placeholder="Status name" data-idx="${idx}">
-      <select class="crm-status-color-sel" data-idx="${idx}">
-        ${Object.keys(CRM_STATUS_COLORS).map(k => `<option value="${k}"${k===st.color?' selected':''}>${k.charAt(0).toUpperCase()+k.slice(1)}</option>`).join('')}
-      </select>
-      <button class="crm-status-del" data-idx="${idx}" title="Delete status">
-        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 1l9 9M10 1L1 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </button>`;
-
-    row.querySelector('.crm-status-label-inp').addEventListener('input', function() {
-      crmStatuses[parseInt(this.dataset.idx)].label = this.value;
-      saveCRMStatuses(); renderCRMStatusFilter();
-    });
-    row.querySelector('.crm-status-color-sel').addEventListener('change', function() {
-      const i = parseInt(this.dataset.idx);
-      crmStatuses[i].color = this.value;
-      const nc = CRM_STATUS_COLORS[this.value] || CRM_STATUS_COLORS.gray;
-      row.querySelector('.crm-status-dot').style.background = nc.text;
-      saveCRMStatuses();
-    });
-    row.querySelector('.crm-status-del').addEventListener('click', function() {
-      crmStatuses.splice(parseInt(this.dataset.idx), 1);
-      saveCRMStatuses(); renderCRMStatusManager(); renderCRMStatusFilter(); renderCRMTable();
-    });
-
-    list.appendChild(row);
-  });
-}
-
-function addCRMStatus() {
-  const colors = Object.keys(CRM_STATUS_COLORS);
-  const color  = colors[crmStatuses.length % colors.length];
-  const id     = 'status_' + Date.now();
-  crmStatuses.push({ id, label:'New Status', color });
-  saveCRMStatuses(); renderCRMStatusManager(); renderCRMStatusFilter();
-}
-
-// ── NEW LEAD FORM ────────────────────────────────────────────────────────────
-function openNewLeadForm() {
-  ['nlName','nlPhone','nlEmail','nlValue','nlService','nlLocation'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
-  });
-  const stSel = document.getElementById('nlStatus');
-  if (stSel) stSel.innerHTML = crmStatuses.map(s =>
-    `<option value="${s.id}">${s.label}</option>`).join('');
-  document.getElementById('crmNewOverlay').classList.add('open');
-  document.getElementById('crmNewPanel').classList.add('open');
-  setTimeout(() => document.getElementById('nlName')?.focus(), 200);
-}
-
-function closeNewLeadForm() {
-  document.getElementById('crmNewOverlay').classList.remove('open');
-  document.getElementById('crmNewPanel').classList.remove('open');
-}
-
-function createNewLead() {
-  const name = document.getElementById('nlName').value.trim();
-  if (!name) { document.getElementById('nlName').focus(); return; }
-  const id = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  const now = Date.now();
-  crmLeads[id] = {
-    id, name,
-    phone:    document.getElementById('nlPhone').value.trim(),
-    email:    document.getElementById('nlEmail').value.trim(),
-    value:    parseFloat(document.getElementById('nlValue').value) || 0,
-    service:  document.getElementById('nlService').value.trim(),
-    location: document.getElementById('nlLocation').value.trim(),
-    urgency:'', budget:'', notes:'',
-    status: document.getElementById('nlStatus').value || (crmStatuses[0]?.id || 'new'),
-    created:now, updated:now,
-    activity:[{ type:'created', text:'Lead manually added', ts:now }]
-  };
-  saveCRMLeads(); renderCRMTable(); updateCRMBadge(); closeNewLeadForm();
-  showToastMsg('✓ New lead added', `${name} has been added to your pipeline.`, '#059669');
-}
-
-// ─── STATS & OVERVIEW FROM CRM ───────────────────────────────────────────────
-function syncStatsFromCRM() {
-  if (demoActive) return; // never overwrite demo UI mid-run
-  const leads = Object.values(crmLeads);
-  const saActive = _saConfig.enabled && (_saConfig.cities || []).length > 0;
-  const qualified = leads.filter(l => {
-    if (l.status === 'out_of_area') return false;
-    if (saActive && l.serviceable === false) return false;
-    return true;
-  });
-  const total    = qualified.length;
-  const hot      = qualified.filter(l => l.priority === 'hot').length;
-  const deadSet  = new Set(crmStatuses.filter(s => s.color === 'red' || s.id === 'sold' || s.id === 'not_interested' || s.id === 'out_of_area').map(s => s.id));
-  const followUp = qualified.filter(l => !deadSet.has(l.status)).length;
-  const pipeline = qualified.reduce((sum, l) => sum + (l.value || 0), 0);
-
-  const el = id => document.getElementById(id);
-  if (el('sv0')) el('sv0').innerText = total;
-  if (el('sv1')) el('sv1').innerText = hot;
-  if (el('sv2')) el('sv2').innerText = followUp;
-  if (el('sv3')) el('sv3').innerText = pipeline > 0 ? '$' + pipeline.toLocaleString() : '$0';
-}
-
-function renderOverviewFromCRM() {
-  if (demoActive) return;
-  const tbody = document.getElementById('overviewBody');
-  if (!tbody) return;
-  const leads = Object.values(crmLeads).sort((a, b) => b.created - a.created).slice(0, 8);
-  if (!leads.length) { tbody.innerHTML = ''; return; }
-
-  tbody.innerHTML = leads.map(l => {
-    const badgeClass = l.priority === 'hot' ? 'pill-hot' : l.priority === 'warm' ? 'pill-warm' : 'pill-cold';
-    const badgeLabel = l.priority === 'hot' ? 'High'     : l.priority === 'warm' ? 'Medium'    : 'Low';
-    const stLabel    = (crmStatuses.find(s => s.id === l.status) || {}).label || 'New';
-    const stDotCls   = l.status === 'sold' ? 'dot-called' : l.status === 'called' || l.status === 'quoted' ? 'dot-follow' : 'dot-new';
-    const phone      = l.phone ? `<a href="tel:${l.phone.replace(/\D/g,'')}" style="color:inherit;text-decoration:none">${_esc(l.phone)}</a>` : '—';
-    return `<tr>
-      <td><div class="name-cell"><div class="avatar" style="background:${avatarColor(l.name)};font-size:11px">${initials(l.name)}</div><span class="lead-name">${_esc(l.name||'Unknown')}</span></div></td>
-      <td style="font-size:12px;color:var(--muted)">${phone}</td>
-      <td style="font-size:13px">${_esc(l.service||'—')}</td>
-      <td><span class="pill ${badgeClass}">${badgeLabel}</span></td>
-      <td style="font-size:12px;color:var(--muted)"><span class="status-dot ${stDotCls}"></span>${_esc(stLabel)}</td>
-      <td class="muted"><span data-ts="${l.created}">${timeAgo(l.created)}</span></td>
-      <td><button class="call-btn" onclick="if('${l.phone||''}')window.location='tel:${l.phone?l.phone.replace(/\D/g,''):''}'" >Call</button></td>
-    </tr>`;
-  }).join('');
-}
-
-// Cross-tab real-time sync via storage events
-window.addEventListener('storage', (e) => {
-  // Filtered/disqualified lead written by widget (e.g. out-of-area)
-  if (e.key === 'vettochat_filtered_lead') {
-    try {
-      const lead = JSON.parse(e.newValue || '{}');
-      if (lead.name) ingestFilteredLead(lead);
-    } catch (_) {}
-  }
-  // Widget wrote a completed lead directly to localStorage — ingest it immediately
-  // with all field names intact, before the backend's socket event can arrive.
-  if (e.key === 'vettochat_pending_lead' && !demoActive) {
-    try {
-      const lead = JSON.parse(e.newValue || '{}');
-      if (lead.name && !_isDuplicateLead(lead)) {
-        crmIngestLead(lead);
-        syncStatsFromCRM();
-        renderOverviewFromCRM();
-        if (crmInited) renderCRMTable();
-      }
-    } catch (_) {}
-  }
-  if (e.key === 'vettochat_leads' && !demoActive) {
-    try { crmLeads = e.newValue ? JSON.parse(e.newValue) : {}; } catch {}
-    updateCRMBadge();
-    syncStatsFromCRM();
-    renderOverviewFromCRM();
-    if (crmInited) renderCRMTable();
-  }
-  if (e.key === 'vettochat_lead_statuses') {
-    try { crmStatuses = e.newValue ? JSON.parse(e.newValue) : DEFAULT_STATUSES.map(s => ({...s})); } catch {}
-    if (crmInited) { renderCRMStatusManager(); renderCRMStatusFilter(); renderCRMTable(); }
-  }
-  if (e.key === 'vettochat_config' && !demoActive) {
-    loadIdentityForm();
-    rescoreAllLeads(); // scoring rules may have changed from another tab
-  }
-  if (e.key === 'vettochat_service_area') {
-    try { const p = JSON.parse(e.newValue || '{}'); _saConfig = { ...DEFAULT_SA_CONFIG, ...p, radius: { ...DEFAULT_SA_CONFIG.radius, ...(p.radius||{}) } }; } catch {}
-    renderSAUI();
-    requalifyAllLeads();
-  }
-  if (e.key === 'vettochat_widget_live') {
-    _widgetLive = e.newValue !== 'false';
-    applyWidgetStatus();
-  }
-  if (e.key === 'vettochat_spam_config') {
-    try { _spamConfig = { ...DEFAULT_SPAM_CONFIG, ...JSON.parse(e.newValue || '{}') }; } catch(_) {}
-    renderSpamUI();
-  }
-  if (e.key === 'vettochat_profile') {
-    try { accountProfile = e.newValue ? { ...DEFAULT_PROFILE, ...JSON.parse(e.newValue) } : { ...DEFAULT_PROFILE }; } catch {}
-    updateSbProfile();
-    applyCompanyBranding();
-  }
-});
-
-// Warn before closing/refreshing with unsaved edits
-window.addEventListener('beforeunload', (e) => {
-  if (crmActiveLead || _botConfigDirty) { e.preventDefault(); e.returnValue = ''; }
-});
-
-// Deduplicate: returns true if a lead with the same name+phone was ingested within 60s
-function _isDuplicateLead(lead) {
-  const now   = Date.now();
-  const name  = (lead.name  || lead.firstName || '').toLowerCase().trim();
-  const phone = (lead.phone || '').replace(/\D/g, '');
-  if (!name && !phone) return false;
-  return Object.values(crmLeads).some(l => {
-    if (now - l.created > 60000) return false;
-    return (l.name || '').toLowerCase().trim() === name &&
-           (l.phone || '').replace(/\D/g, '') === phone;
-  });
-}
-
-// Hook: save incoming socket.io leads to CRM automatically
-// Parse a casual budget string into a numeric dollar value
-function _parseBudgetToValue(raw) {
-  if (!raw) return 0;
-  const s = raw.replace(/[$,]/g, '').toLowerCase().trim();
-
-  // Range with K suffix: "5k–15k", "5k-15k", "5k to 15k", "$5K–$15K"
-  // Use Unicode-safe dash matching [-–—]
-  const rangeK = s.match(/(\d+(?:\.\d+)?)\s*k\s*(?:[-–—]|to)\s*(\d+(?:\.\d+)?)\s*k/);
-  if (rangeK) return Math.round((parseFloat(rangeK[1]) + parseFloat(rangeK[2])) / 2 * 1000);
-
-  // Range in plain dollars: "5000–15000" or "5000-15000"
-  const rangePlain = s.match(/(\d{3,})\s*(?:[-–—]|to)\s*(\d{3,})/);
-  if (rangePlain) return Math.round((parseInt(rangePlain[1]) + parseInt(rangePlain[2])) / 2);
-
-  // Single K value: "15k+", "$15K", "15k", "15 k"
-  const kNum = s.match(/(\d+(?:\.\d+)?)\s*k\+?/);
-  if (kNum) return Math.round(parseFloat(kNum[1]) * 1000);
-
-  // "X thousand" / "X thousand dollars"
-  const thousandNum = s.match(/(\d+(?:\.\d+)?)\s*thousand/);
-  if (thousandNum) return Math.round(parseFloat(thousandNum[1]) * 1000);
-
-  // Casual: "around 10", "about 5", "maybe 15" — treat as thousands if < 500
-  const approx = s.match(/(?:around|about|maybe|approximately|roughly|~)\s*(\d+(?:\.\d+)?)/);
-  if (approx) {
-    const n = parseFloat(approx[1]);
-    return n < 500 ? Math.round(n * 1000) : Math.round(n);
-  }
-
-  // Plain number ≥ 100 (raw dollar amount)
-  const plainNum = s.match(/(\d{3,})/);
-  if (plainNum) return parseInt(plainNum[1]);
-
-  return 0;
-}
-
-function crmIngestLead(lead) {
-  if (!crmInited) loadCRMData();
-
-  // Drop clearly invalid/spam leads before any processing
-  const rawName  = (lead.name || lead.firstName || '').trim();
-  const rawPhone = (lead.phone || '').replace(/\D/g, '');
-  if (!rawName || rawName.length < 2)            return { id: null, blocked: true, reason: 'invalid' };
-  if (rawPhone.length > 0 && rawPhone.length !== 10) return { id: null, blocked: true, reason: 'invalid' };
-
-  // Format phone
-  let phone = rawPhone;
-  if (phone.length === 10) phone = `(${phone.slice(0,3)}) ${phone.slice(3,6)}-${phone.slice(6)}`;
-  else phone = lead.phone || '';
-
-  // Location — try every field name the backend might use
-  const location = (
-    lead.location || lead.city || lead.zip || lead.zipCode || lead.cityZip ||
-    lead.address  || lead.area || ''
-  ).trim();
-
-  // Budget — try every field name the backend might use
-  const budgetRaw = (
-    lead.budget || lead.budgetRange || lead.budget_range ||
-    lead.projectBudget || lead.estimate || ''
-  ).trim();
-
-  const value = 0; // starts at $0 until user sets it manually
-
-  // Score the lead against current SCORING_QUESTIONS rules
-  const priority = _scoreLead({
-    service: lead.intent || lead.service || lead.serviceType || '',
-    urgency: lead.urgency || lead.timeline || lead.timeframe || '',
-    budget:  budgetRaw,
-  }) || 'cold';
-
-  // All chatbot-captured leads always start at 'new' unless service area validation overrides.
-  const newStatus = crmStatuses.find(s => s.id === 'new') || crmStatuses[0];
-  let crmStatus = newStatus?.id || 'new';
-
-  // If widget already flagged as out-of-area, or dashboard validates it now — drop entirely
-  const isOOA = lead.out_of_area === true;
-  const saResult = isOOA ? { serviceable: false } : _saValidate(location);
-  if (saResult.serviceable === false) {
-    return { id: null, value: 0, priority: 'cold', blocked: true };
-  }
-
-  const id  = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  const now = Date.now();
-
-  crmLeads[id] = {
-    id,
-    name:        lead.name     || lead.firstName || 'Unknown',
-    phone,
-    email:       lead.email    || '',
-    value,
-    service:     lead.intent   || lead.service   || lead.serviceType || '',
-    location,
-    urgency:     lead.urgency  || lead.timeline  || lead.timeframe   || '',
-    budget:      budgetRaw,
-    score:       lead.score    || 0,
-    priority,
-    notes:       '',
-    status:      crmStatus,
-    serviceable: saResult.serviceable,
-    created:     now,
-    updated:     now,
-    activity:    [{ type:'created', text:'Lead captured via chatbot', ts:now }]
-  };
-
-  saveCRMLeads(); updateCRMBadge();
-  if (crmInited) renderCRMTable();
-  return { id, value, priority };
-}
-
-// ─── LEAD SCORING ─────────────────────────────────────────────────────────────
-// Score a lead object against the current SCORING_QUESTIONS rules.
-// Returns 'hot' | 'warm' | 'cold' | null (if no answers matched).
-function _scoreLead(lead) {
-  const tiers = { hot: 3, warm: 2, cold: 1 };
-  let total = 0, count = 0;
-  SCORING_QUESTIONS.forEach(sq => {
-    const answer = (lead[sq.id] || '').trim().toLowerCase();
-    if (!answer) return;
-    const match = sq.answers.find(a => a.label.trim().toLowerCase() === answer);
-    if (match) { total += tiers[match.tier] || 1; count++; }
-  });
-  if (!count) return null;
-  const avg = total / count;
-  return avg >= 2.5 ? 'hot' : avg >= 1.5 ? 'warm' : 'cold';
-}
-
-// Re-score all existing CRM leads against the current SCORING_QUESTIONS.
-// Called whenever scoring rules are saved so every lead immediately reflects
-// the new Hot / Warm / Cold thresholds.
-function rescoreAllLeads() {
-  if (!Object.keys(crmLeads).length) return;
-  let changed = false;
-  Object.values(crmLeads).forEach(lead => {
-    const newPriority = _scoreLead(lead) || lead.priority || 'cold';
-    if (newPriority !== lead.priority) {
-      lead.priority = newPriority;
-      changed = true;
-    }
-  });
-  if (changed) {
-    saveCRMLeads();
-    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); }
-    syncStatsFromCRM();
-  }
-}
-
-// ─── SERVICE AREA ─────────────────────────────────────────────────────────────
-// Compact ZIP centroid table (lat, lng) for radius validation
-const _ZIP_LL = {
-  // DFW Metro
-  '75001':[32.95,-96.83],'75002':[33.11,-96.68],'75006':[32.98,-96.90],'75007':[32.99,-96.87],
-  '75013':[33.11,-96.65],'75019':[32.98,-97.01],'75022':[33.03,-97.07],'75023':[33.04,-96.73],
-  '75024':[33.07,-96.77],'75025':[33.07,-96.73],'75028':[33.05,-97.08],'75034':[33.12,-96.82],
-  '75035':[33.13,-96.78],'75038':[32.87,-96.99],'75039':[32.87,-96.96],'75040':[32.91,-96.63],
-  '75044':[32.96,-96.63],'75048':[32.94,-96.55],'75050':[32.79,-97.04],'75051':[32.74,-97.01],
-  '75052':[32.72,-97.02],'75060':[32.81,-96.99],'75061':[32.83,-96.97],'75062':[32.85,-96.97],
-  '75063':[32.91,-96.99],'75065':[33.05,-97.05],'75067':[33.05,-97.00],'75068':[33.09,-97.02],
-  '75069':[33.20,-96.61],'75070':[33.19,-96.66],'75071':[33.21,-96.70],'75074':[33.02,-96.69],
-  '75075':[33.03,-96.74],'75078':[33.24,-96.85],'75080':[32.98,-96.73],'75081':[32.95,-96.72],
-  '75082':[32.97,-96.69],'75094':[33.02,-96.65],'75098':[33.01,-96.55],'75115':[32.67,-96.88],
-  '75134':[32.63,-96.84],'75150':[32.82,-96.68],'75154':[32.59,-96.80],'75180':[32.76,-96.59],
-  '75201':[32.79,-96.81],'75204':[32.80,-96.79],'75205':[32.83,-96.79],'75206':[32.82,-96.77],
-  '75209':[32.84,-96.85],'75214':[32.82,-96.75],'75218':[32.84,-96.68],'75220':[32.86,-96.88],
-  '75225':[32.87,-96.80],'75229':[32.90,-96.87],'75230':[32.90,-96.80],'75231':[32.87,-96.75],
-  '75234':[32.92,-96.90],'75240':[32.93,-96.81],'75243':[32.90,-96.75],'75244':[32.92,-96.84],
-  '75248':[32.96,-96.79],'75251':[32.91,-96.77],'75252':[32.97,-96.77],'75254':[32.94,-96.79],
-  // Houston Metro
-  '77002':[29.75,-95.37],'77005':[29.72,-95.42],'77006':[29.74,-95.39],'77007':[29.77,-95.40],
-  '77008':[29.79,-95.41],'77009':[29.78,-95.38],'77018':[29.82,-95.42],'77019':[29.75,-95.42],
-  '77024':[29.77,-95.49],'77027':[29.75,-95.44],'77030':[29.70,-95.40],'77040':[29.86,-95.50],
-  '77042':[29.74,-95.55],'77055':[29.80,-95.48],'77056':[29.75,-95.46],'77057':[29.74,-95.48],
-  '77063':[29.73,-95.53],'77064':[29.89,-95.51],'77070':[29.94,-95.57],'77077':[29.74,-95.59],
-  '77079':[29.77,-95.56],'77080':[29.82,-95.51],'77084':[29.80,-95.63],'77094':[29.77,-95.62],
-  '77095':[29.85,-95.60],'77098':[29.73,-95.40],'77099':[29.70,-95.60],
-  // Austin
-  '78701':[30.27,-97.74],'78703':[30.29,-97.76],'78704':[30.24,-97.75],'78705':[30.29,-97.74],
-  '78723':[30.30,-97.68],'78726':[30.43,-97.80],'78727':[30.42,-97.73],'78729':[30.44,-97.77],
-  '78731':[30.34,-97.77],'78741':[30.23,-97.72],'78745':[30.21,-97.78],'78748':[30.17,-97.81],
-  '78750':[30.44,-97.81],'78752':[30.32,-97.71],'78753':[30.38,-97.67],'78758':[30.38,-97.71],
-  // San Antonio
-  '78201':[29.46,-98.54],'78207':[29.42,-98.54],'78209':[29.47,-98.44],'78212':[29.44,-98.50],
-  '78213':[29.50,-98.53],'78216':[29.52,-98.51],'78217':[29.53,-98.46],'78229':[29.50,-98.56],
-  '78230':[29.53,-98.55],'78232':[29.57,-98.51],'78233':[29.55,-98.41],'78240':[29.51,-98.60],
-  '78248':[29.60,-98.53],'78249':[29.56,-98.62],'78250':[29.48,-98.66],'78258':[29.61,-98.50],
-  // Atlanta
-  '30301':[33.75,-84.39],'30305':[33.83,-84.38],'30306':[33.77,-84.35],'30307':[33.76,-84.32],
-  '30308':[33.76,-84.36],'30309':[33.79,-84.38],'30312':[33.74,-84.36],'30314':[33.77,-84.42],
-  '30315':[33.71,-84.38],'30318':[33.79,-84.43],'30319':[33.86,-84.34],'30324':[33.81,-84.36],
-  '30326':[33.84,-84.36],'30327':[33.86,-84.41],'30328':[33.92,-84.37],'30329':[33.83,-84.32],
-  '30338':[33.94,-84.33],'30340':[33.90,-84.29],'30342':[33.88,-84.37],'30346':[33.91,-84.33],
-  '30350':[33.97,-84.30],'30360':[33.94,-84.27],
-  // Chicago
-  '60601':[41.88,-87.62],'60605':[41.87,-87.62],'60607':[41.88,-87.66],'60608':[41.85,-87.66],
-  '60610':[41.90,-87.63],'60611':[41.89,-87.62],'60612':[41.88,-87.69],'60613':[41.95,-87.65],
-  '60614':[41.92,-87.65],'60615':[41.80,-87.60],'60616':[41.84,-87.62],'60618':[41.95,-87.69],
-  '60620':[41.74,-87.65],'60622':[41.90,-87.68],'60625':[41.97,-87.70],'60626':[42.00,-87.67],
-  '60629':[41.77,-87.71],'60630':[41.98,-87.77],'60632':[41.80,-87.73],'60634':[41.93,-87.81],
-  '60637':[41.78,-87.61],'60640':[41.97,-87.66],'60641':[41.94,-87.76],'60647':[41.92,-87.70],
-  '60657':[41.94,-87.65],'60660':[41.99,-87.67],
-  // Los Angeles
-  '90001':[33.97,-118.25],'90004':[34.08,-118.31],'90006':[34.05,-118.31],'90007':[34.02,-118.27],
-  '90011':[34.00,-118.26],'90012':[34.06,-118.24],'90015':[34.04,-118.27],'90019':[34.05,-118.35],
-  '90024':[34.06,-118.43],'90025':[34.05,-118.44],'90026':[34.08,-118.27],'90027':[34.10,-118.29],
-  '90028':[34.10,-118.33],'90034':[34.02,-118.40],'90036':[34.07,-118.35],'90039':[34.11,-118.27],
-  '90041':[34.13,-118.20],'90046':[34.10,-118.37],'90049':[34.07,-118.47],'90064':[34.03,-118.42],
-  '90066':[34.00,-118.43],'90068':[34.12,-118.35],'90069':[34.09,-118.38],'90077':[34.11,-118.46],
-  // New York
-  '10001':[40.75,-74.00],'10002':[40.72,-73.99],'10003':[40.73,-73.99],'10007':[40.71,-74.01],
-  '10009':[40.73,-73.98],'10010':[40.74,-73.98],'10011':[40.74,-74.00],'10012':[40.73,-74.00],
-  '10014':[40.73,-74.00],'10016':[40.75,-73.98],'10019':[40.77,-73.98],'10021':[40.77,-73.96],
-  '10022':[40.76,-73.97],'10023':[40.78,-73.98],'10024':[40.79,-73.98],'10025':[40.80,-73.96],
-  '10028':[40.78,-73.95],'10036':[40.76,-73.99],'10065':[40.77,-73.96],'10128':[40.78,-73.95],
-  '10301':[40.64,-74.09],'10304':[40.62,-74.09],'10305':[40.60,-74.08],
-  // Miami
-  '33101':[25.77,-80.19],'33125':[25.77,-80.23],'33126':[25.76,-80.30],'33127':[25.80,-80.20],
-  '33129':[25.75,-80.21],'33130':[25.75,-80.19],'33131':[25.76,-80.19],'33132':[25.78,-80.18],
-  '33133':[25.73,-80.23],'33134':[25.75,-80.28],'33137':[25.81,-80.19],'33138':[25.85,-80.18],
-  '33139':[25.78,-80.13],'33140':[25.80,-80.14],'33143':[25.70,-80.27],'33145':[25.75,-80.23],
-  '33146':[25.72,-80.27],'33150':[25.86,-80.21],'33155':[25.74,-80.32],'33156':[25.68,-80.29],
-  '33161':[25.89,-80.18],'33162':[25.92,-80.18],'33166':[25.82,-80.31],'33172':[25.77,-80.39],
-  '33176':[25.66,-80.33],'33180':[25.96,-80.15],
-  // Phoenix
-  '85006':[33.46,-112.05],'85008':[33.47,-111.98],'85012':[33.49,-112.07],'85013':[33.51,-112.08],
-  '85014':[33.51,-112.06],'85015':[33.50,-112.10],'85016':[33.49,-111.99],'85018':[33.47,-111.97],
-  '85020':[33.55,-112.05],'85021':[33.55,-112.08],'85022':[33.60,-112.02],'85028':[33.56,-111.99],
-  '85032':[33.58,-111.97],'85040':[33.36,-112.05],'85044':[33.35,-111.99],'85048':[33.31,-111.98],
-  '85050':[33.66,-111.97],'85083':[33.73,-112.09],'85085':[33.71,-112.11],'85086':[33.79,-112.10],
-  // Seattle
-  '98101':[47.61,-122.33],'98102':[47.63,-122.32],'98103':[47.67,-122.34],'98105':[47.66,-122.30],
-  '98107':[47.67,-122.37],'98109':[47.63,-122.36],'98112':[47.63,-122.30],'98115':[47.69,-122.30],
-  '98117':[47.69,-122.37],'98122':[47.61,-122.31],'98125':[47.72,-122.32],'98126':[47.56,-122.37],
-  '98133':[47.74,-122.34],'98144':[47.59,-122.30],'98177':[47.74,-122.38],'98199':[47.65,-122.40],
-  // Denver
-  '80202':[39.75,-104.99],'80203':[39.73,-104.98],'80204':[39.74,-105.02],'80205':[39.76,-104.97],
-  '80206':[39.73,-104.95],'80209':[39.70,-104.97],'80210':[39.68,-104.97],'80211':[39.77,-105.01],
-  '80218':[39.73,-104.97],'80219':[39.71,-105.03],'80220':[39.73,-104.93],'80221':[39.82,-105.00],
-  '80222':[39.68,-104.94],'80226':[39.71,-105.07],'80227':[39.67,-105.07],'80229':[39.87,-104.99],
-  '80231':[39.68,-104.90],'80233':[39.89,-104.95],'80234':[39.91,-105.01],'80238':[39.77,-104.89],
-  // Boston
-  '02108':[42.36,-71.07],'02109':[42.36,-71.05],'02113':[42.37,-71.05],'02114':[42.37,-71.07],
-  '02115':[42.34,-71.10],'02116':[42.35,-71.08],'02118':[42.34,-71.07],'02119':[42.32,-71.09],
-  '02122':[42.30,-71.06],'02125':[42.32,-71.06],'02127':[42.34,-71.04],'02128':[42.37,-71.03],
-  '02129':[42.38,-71.06],'02130':[42.31,-71.11],'02134':[42.35,-71.13],'02215':[42.35,-71.10],
-  // Nashville
-  '37201':[36.17,-86.78],'37203':[36.15,-86.79],'37204':[36.13,-86.79],'37205':[36.12,-86.85],
-  '37206':[36.17,-86.74],'37207':[36.21,-86.78],'37208':[36.19,-86.82],'37209':[36.16,-86.86],
-  '37210':[36.14,-86.76],'37211':[36.09,-86.74],'37212':[36.13,-86.81],'37214':[36.16,-86.68],
-  '37215':[36.09,-86.81],'37216':[36.21,-86.73],'37217':[36.11,-86.71],'37221':[36.08,-86.93],
-  // Portland OR
-  '97201':[45.51,-122.68],'97202':[45.49,-122.65],'97203':[45.60,-122.73],'97206':[45.48,-122.62],
-  '97209':[45.53,-122.69],'97210':[45.54,-122.70],'97211':[45.57,-122.65],'97212':[45.55,-122.63],
-  '97213':[45.53,-122.60],'97214':[45.51,-122.65],'97217':[45.59,-122.68],'97219':[45.45,-122.70],
-  '97221':[45.51,-122.74],'97222':[45.44,-122.62],'97223':[45.44,-122.77],'97225':[45.51,-122.79],
-  '97229':[45.54,-122.82],'97230':[45.55,-122.51],'97239':[45.49,-122.68],
-  // Las Vegas
-  '89101':[36.17,-115.14],'89102':[36.15,-115.18],'89103':[36.10,-115.19],'89104':[36.16,-115.12],
-  '89106':[36.19,-115.17],'89109':[36.12,-115.17],'89117':[36.16,-115.25],'89118':[36.09,-115.20],
-  '89119':[36.08,-115.15],'89121':[36.10,-115.07],'89123':[36.02,-115.13],'89128':[36.21,-115.23],
-  '89129':[36.24,-115.25],'89134':[36.21,-115.30],'89135':[36.17,-115.33],'89141':[36.00,-115.20],
-  '89144':[36.18,-115.30],'89145':[36.21,-115.27],'89146':[36.16,-115.22],'89147':[36.13,-115.23],
-  '89148':[36.10,-115.26],'89149':[36.27,-115.24],
-  // Minneapolis
-  '55401':[44.98,-93.27],'55403':[44.97,-93.28],'55404':[44.96,-93.27],'55405':[44.97,-93.30],
-  '55406':[44.94,-93.23],'55408':[44.94,-93.28],'55409':[44.93,-93.29],'55410':[44.92,-93.31],
-  '55411':[44.99,-93.30],'55412':[45.00,-93.31],'55413':[44.99,-93.24],'55414':[44.98,-93.23],
-  '55416':[44.95,-93.33],'55417':[44.91,-93.24],'55419':[44.91,-93.28],'55420':[44.87,-93.34],
-  '55421':[45.03,-93.25],'55422':[45.01,-93.34],'55423':[44.90,-93.31],'55426':[44.94,-93.37],
-  '55427':[45.00,-93.38],'55431':[44.86,-93.36],'55435':[44.89,-93.35],'55437':[44.88,-93.40],
-  '55441':[45.01,-93.42],'55447':[45.02,-93.47],
-};
-
-// ─── CITY LIST (mirrors widget.html) ─────────────────────────────────────────
-const _CITIES = [
-  'Abilene, TX','Akron, OH','Albany, GA','Albany, NY','Albuquerque, NM','Alexandria, LA',
-  'Alexandria, VA','Allen, TX','Allentown, PA','Amarillo, TX','Anaheim, CA','Anchorage, AK',
-  'Ann Arbor, MI','Arlington, TX','Arlington, VA','Arvada, CO','Athens, GA','Atlanta, GA',
-  'Augusta, GA','Aurora, CO','Aurora, IL','Austin, TX',
-  'Bakersfield, CA','Baltimore, MD','Baton Rouge, LA','Baytown, TX','Beaumont, TX',
-  'Bedford, TX','Bellevue, WA','Birmingham, AL','Boise, ID','Boston, MA','Boulder, CO',
-  'Bozeman, MT','Bridgeport, CT','Broken Arrow, OK','Brownsville, TX','Bryan, TX',
-  'Buffalo, NY','Burleson, TX','Burbank, CA','Burlington, VT',
-  'Cape Coral, FL','Carrollton, TX','Cary, NC','Cedar Hill, TX','Cedar Park, TX',
-  'Celina, TX','Centennial, CO','Chandler, AZ','Charlotte, NC','Chattanooga, TN',
-  'Chesapeake, VA','Chicago, IL','Chula Vista, CA','Cincinnati, OH','Clarksville, TN',
-  'Clearwater, FL','Cleveland, OH','Colleyville, TX','Colorado Springs, CO','Columbia, MO',
-  'Columbia, SC','Columbus, GA','Columbus, OH','Concord, CA','Concord, NC','Conroe, TX',
-  'Coppell, TX','Coral Springs, FL','Corona, CA','Corpus Christi, TX',
-  'Dallas, TX','Davenport, IA','Dayton, OH','Denton, TX','Denver, CO','DeSoto, TX',
-  'Detroit, MI','Duncanville, TX','Durham, NC',
-  'Edinburg, TX','El Paso, TX','Elizabeth, NJ','Elk Grove, CA','Erie, PA',
-  'Euless, TX','Eugene, OR','Evansville, IN','Everett, WA',
-  'Fargo, ND','Fayetteville, AR','Fayetteville, NC','Flower Mound, TX','Fontana, CA',
-  'Fort Collins, CO','Fort Lauderdale, FL','Fort Myers, FL','Fort Wayne, IN',
-  'Fort Worth, TX','Franklin, TN','Frederick, MD','Fremont, CA','Fresno, CA',
-  'Frisco, TX','Fullerton, CA',
-  'Gainesville, FL','Garland, TX','Georgetown, TX','Gilbert, AZ','Glendale, AZ',
-  'Glendale, CA','Grand Prairie, TX','Grand Rapids, MI','Grapevine, TX','Greensboro, NC',
-  'Gresham, OR',
-  'Haltom City, TX','Hampton, VA','Harrisburg, PA','Hartford, CT','Henderson, NV',
-  'Hialeah, FL','Highland Village, TX','Hillsboro, OR','Hollywood, FL','Honolulu, HI',
-  'Houston, TX','Humble, TX','Huntington Beach, CA','Huntsville, AL','Hurst, TX',
-  'Independence, MO','Indianapolis, IN','Irvine, CA','Irving, TX',
-  'Jackson, MS','Jacksonville, FL','Jersey City, NJ','Joliet, IL',
-  'Kansas City, KS','Kansas City, MO','Katy, TX','Keller, TX','Kent, WA','Killeen, TX',
-  'Kirkland, WA','Knoxville, TN',
-  'Lakewood, CO','Laredo, TX','Las Vegas, NV','Layton, UT','League City, TX',
-  "Lee's Summit, MO",'Lewisville, TX','Lexington, KY','Lincoln, NE','Little Elm, TX',
-  'Little Rock, AR','Long Beach, CA','Los Angeles, CA','Louisville, KY','Lubbock, TX',
-  'Macon, GA','Madison, WI','Mansfield, TX','McKinney, TX','Memphis, TN','Mesa, AZ',
-  'Mesquite, TX','Miami, FL','Miami Gardens, FL','Midland, TX','Milwaukee, WI',
-  'Minneapolis, MN','Miramar, FL','Mobile, AL','Modesto, CA','Montgomery, AL',
-  'Moreno Valley, CA','Murfreesboro, TN','Murphy, TX',
-  'Naperville, IL','Nashville, TN','New Braunfels, TX','New Orleans, LA','New York, NY',
-  'Newark, NJ','Newport News, VA','Norfolk, VA','North Las Vegas, NV',
-  'North Richland Hills, TX',
-  'Oakland, CA','Oklahoma City, OK','Omaha, NE','Ontario, CA','Orlando, FL',
-  'Overland Park, KS','Oxnard, CA',
-  'Palm Bay, FL','Pasadena, CA','Pasadena, TX','Paterson, NJ','Pearland, TX',
-  'Pembroke Pines, FL','Peoria, AZ','Peoria, IL','Pflugerville, TX','Philadelphia, PA',
-  'Phoenix, AZ','Pittsburgh, PA','Plano, TX','Pomona, CA','Port St. Lucie, FL',
-  'Portland, OR','Providence, RI','Prosper, TX','Provo, UT',
-  'Raleigh, NC','Rancho Cucamonga, CA','Reno, NV','Renton, WA','Richardson, TX',
-  'Richmond, VA','Riverside, CA','Rochester, MN','Rochester, NY','Rockford, IL',
-  'Rockwall, TX','Roseville, CA','Round Rock, TX','Rowlett, TX',
-  'Sacramento, CA','Saginaw, TX','Salem, OR','Salt Lake City, UT','San Antonio, TX',
-  'San Bernardino, CA','San Diego, CA','San Francisco, CA','San Jose, CA',
-  'Santa Ana, CA','Santa Clarita, CA','Santa Rosa, CA','Savannah, GA','Scottsdale, AZ',
-  'Seattle, WA','Shreveport, LA','Sioux Falls, SD','South Bend, IN','Southlake, TX',
-  'Spokane, WA','Spring, TX','Springfield, IL','Springfield, MO','St. Louis, MO',
-  'St. Paul, MN','St. Petersburg, FL','Sterling Heights, MI','Stockton, CA',
-  'Sugar Land, TX','Sunnyvale, CA','Sunrise, FL','Surprise, AZ','Syracuse, NY',
-  'Tacoma, WA','Tallahassee, FL','Tampa, FL','Tempe, AZ','The Colony, TX',
-  'The Woodlands, TX','Toledo, OH','Torrance, CA','Tucson, AZ','Tulsa, OK','Tyler, TX',
-  'Vancouver, WA','Virginia Beach, VA','Visalia, CA',
-  'Waco, TX','Warren, MI','Washington, DC','Waxahachie, TX','Weatherford, TX',
-  'West Jordan, UT','West Palm Beach, FL','West Valley City, UT','Wichita, KS',
-  'Wichita Falls, TX','Winston-Salem, NC','Woodbridge, NJ','Wylie, TX',
-  'Yakima, WA','Yonkers, NY'
-];
-
-// ─── US STATES ───────────────────────────────────────────────────────────────
-const _US_STATES = [
-  {abbr:'AL',name:'Alabama'},{abbr:'AK',name:'Alaska'},{abbr:'AZ',name:'Arizona'},
-  {abbr:'AR',name:'Arkansas'},{abbr:'CA',name:'California'},{abbr:'CO',name:'Colorado'},
-  {abbr:'CT',name:'Connecticut'},{abbr:'DC',name:'Washington DC'},{abbr:'DE',name:'Delaware'},
-  {abbr:'FL',name:'Florida'},{abbr:'GA',name:'Georgia'},{abbr:'HI',name:'Hawaii'},
-  {abbr:'ID',name:'Idaho'},{abbr:'IL',name:'Illinois'},{abbr:'IN',name:'Indiana'},
-  {abbr:'IA',name:'Iowa'},{abbr:'KS',name:'Kansas'},{abbr:'KY',name:'Kentucky'},
-  {abbr:'LA',name:'Louisiana'},{abbr:'ME',name:'Maine'},{abbr:'MD',name:'Maryland'},
-  {abbr:'MA',name:'Massachusetts'},{abbr:'MI',name:'Michigan'},{abbr:'MN',name:'Minnesota'},
-  {abbr:'MS',name:'Mississippi'},{abbr:'MO',name:'Missouri'},{abbr:'MT',name:'Montana'},
-  {abbr:'NE',name:'Nebraska'},{abbr:'NV',name:'Nevada'},{abbr:'NH',name:'New Hampshire'},
-  {abbr:'NJ',name:'New Jersey'},{abbr:'NM',name:'New Mexico'},{abbr:'NY',name:'New York'},
-  {abbr:'NC',name:'North Carolina'},{abbr:'ND',name:'North Dakota'},{abbr:'OH',name:'Ohio'},
-  {abbr:'OK',name:'Oklahoma'},{abbr:'OR',name:'Oregon'},{abbr:'PA',name:'Pennsylvania'},
-  {abbr:'RI',name:'Rhode Island'},{abbr:'SC',name:'South Carolina'},{abbr:'SD',name:'South Dakota'},
-  {abbr:'TN',name:'Tennessee'},{abbr:'TX',name:'Texas'},{abbr:'UT',name:'Utah'},
-  {abbr:'VT',name:'Vermont'},{abbr:'VA',name:'Virginia'},{abbr:'WA',name:'Washington'},
-  {abbr:'WV',name:'West Virginia'},{abbr:'WI',name:'Wisconsin'},{abbr:'WY',name:'Wyoming'}
-];
-
-const _SA_DEFAULT_DECLINE = "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later! If you believe this was a mistake, please give us a call and we'd be happy to help.";
-
-const DEFAULT_SA_CONFIG = {
-  enabled: false,
-  cities: [], zips: [], counties: [],
-  radius: { enabled: false, centerZip: '', miles: 25 },
-  declineMessage: _SA_DEFAULT_DECLINE,
-};
-let _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } };
-
-function loadSAConfig() {
-  try {
-    const raw = localStorage.getItem('vettochat_service_area');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      _saConfig = { ...DEFAULT_SA_CONFIG, ...parsed, radius: { ...DEFAULT_SA_CONFIG.radius, ...(parsed.radius || {}) } };
-    } else {
-      _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } };
-    }
-  } catch(e) { _saConfig = { ...DEFAULT_SA_CONFIG, radius: { ...DEFAULT_SA_CONFIG.radius } }; }
-  renderSAUI();
-}
-
-function saveSAConfig() {
-  _saConfig.declineMessage = (document.getElementById('saDeclineMsg')?.value || '').trim() || _SA_DEFAULT_DECLINE;
-  localStorage.setItem('vettochat_service_area', JSON.stringify(_saConfig));
-  requalifyAllLeads();
-  showToastMsg('✓ Service areas updated', 'Existing leads re-checked against your service cities.', '#0891B2');
-}
-
-// Evaluate one lead's location against the current service city list.
-// Returns true (in area), false (out of area), or null (no cities configured).
-function _evaluateLeadServiceability(locationStr) {
-  const cities = (_saConfig.cities || []).filter(Boolean);
-  if (!cities.length || !locationStr || !locationStr.trim()) return null;
-  const norm = locationStr.trim().toLowerCase();
-  if (cities.find(c => c.trim().toLowerCase() === norm)) return true;
-  const cityPart = norm.split(',')[0].trim();
-  if (cities.find(c => c.split(',')[0].trim().toLowerCase() === cityPart)) return true;
-  return false;
-}
-
-// Re-check every CRM lead against the current service area config and update
-// their serviceable field. Called whenever SA is toggled or cities change.
-function requalifyAllLeads() {
-  const shouldEval = _saConfig.enabled && (_saConfig.cities || []).filter(Boolean).length > 0;
-  let changed = false;
-
-  Object.values(crmLeads).forEach(lead => {
-    const prev = lead.serviceable;
-    lead.serviceable = shouldEval ? _evaluateLeadServiceability(lead.location || '') : null;
-    if (lead.serviceable !== prev) changed = true;
-  });
-
-  if (changed) {
-    saveCRMLeads();
-    if (crmInited) { renderCRMTable(); renderOverviewFromCRM(); }
-    syncStatsFromCRM();
-    updateCRMBadge();
-  }
-}
-
-function toggleSA() {
-  _saConfig.enabled = !_saConfig.enabled;
-  renderSAUI();
-  saveSAConfig(); // toggle saves immediately (it's a binary switch, not a form field)
-  requalifyAllLeads();
-}
-// SA city changes mark the page dirty so the user is reminded to Save All Changes
-function _saDirty(){ _markDirty(); }
-
-function renderSAUI() {
-  const tog = document.getElementById('saToggle');
-  const lbl = document.getElementById('saToggleLabel');
-  const body = document.getElementById('saBody');
-  if (tog) { tog.classList.toggle('on', _saConfig.enabled); }
-  if (lbl) {
-    lbl.textContent  = _saConfig.enabled ? 'ON' : 'OFF';
-    lbl.className    = 'widget-toggle-label ' + (_saConfig.enabled ? 'live' : 'offline');
-  }
-  if (body) body.style.display = _saConfig.enabled ? '' : 'none';
-  _renderSALocationTags();
-  initSAStateSelect();
-  // Populate inputs
-  const dm = document.getElementById('saDeclineMsg');
-  if (dm) {
-    // Migrate any stale default messages from previous versions to the current default
-    const _OLD_DECLINES = [
-      "Thank you for reaching out! Unfortunately, we don't currently service your area — but we hope to expand soon!",
-      "Thank you for reaching out! Unfortunately, we don't currently service your area. We hope to expand soon — please check back later!",
-      "Unfortunately, we do not currently service your area. If you believe this was a mistake, please give us a call and we'd be happy to help.",
-    ];
-    const stored = _saConfig.declineMessage || '';
-    const isStale = !stored || _OLD_DECLINES.includes(stored);
-    dm.value = isStale ? _SA_DEFAULT_DECLINE : stored;
-    if (isStale) _saConfig.declineMessage = _SA_DEFAULT_DECLINE;
-  }
-}
-
-function initSAStateSelect() {
-  const sel = document.getElementById('saStateSelect');
-  if (!sel || sel.options.length > 1) return;
-  _US_STATES.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.abbr; opt.textContent = s.name;
-    sel.appendChild(opt);
-  });
-}
-
-function loadSAStateCities(stateAbbr) {
-  const wrap  = document.getElementById('saStateCitiesWrap');
-  const label = document.getElementById('saStateCitiesLabel');
-  const list  = document.getElementById('saAvailableCities');
-  if (!wrap || !list) return;
-  if (!stateAbbr) { wrap.style.display = 'none'; return; }
-  const state = _US_STATES.find(s => s.abbr === stateAbbr);
-  const cities = _CITIES.filter(c => c.endsWith(', ' + stateAbbr));
-  if (label) label.textContent = `Step 2 — Select Cities to Serve in ${state?.name || stateAbbr}`;
-  wrap.style.display = '';
-  if (!cities.length) {
-    list.innerHTML = '<span style="font-size:12px;color:var(--muted)">No cities in our list for this state.</span>';
-    return;
-  }
-  _renderSAAvailableCities(cities);
-}
-
-function _renderSAAvailableCities(cities) {
-  const list = document.getElementById('saAvailableCities');
-  if (!list) return;
-  list.innerHTML = (cities || []).map(city => {
-    const added = _saConfig.cities.includes(city);
-    const cityName = _esc(city.split(',')[0].trim());
-    const safeCity = JSON.stringify(city).replace(/"/g, '&quot;');
-    return `<button class="sa-city-avail-btn${added ? ' added' : ''}" onclick="toggleSACityFromList(${safeCity})">${added ? '✓ ' : ''}${cityName}</button>`;
-  }).join('');
-}
-
-function toggleSACityFromList(city) {
-  _markDirty();
-  const idx = _saConfig.cities.indexOf(city);
-  if (idx !== -1) _saConfig.cities.splice(idx, 1);
-  else _saConfig.cities.push(city);
-  _renderSALocationTags();
-  const sel = document.getElementById('saStateSelect');
-  if (sel && sel.value) {
-    const cities = _CITIES.filter(c => c.endsWith(', ' + sel.value));
-    _renderSAAvailableCities(cities);
-  }
-}
-
-function _renderSALocationTags() {
-  const el = document.getElementById('saLocationTags');
-  if (!el) return;
-  const cities = (_saConfig.cities || []);
-  if (!cities.length) {
-    el.innerHTML = '<span style="font-size:12px;color:var(--muted);font-style:italic">No cities added yet — select a state below to get started.</span>';
-    return;
-  }
-  el.innerHTML = cities.map((c, i) =>
-    `<span class="sa-tag">📍 ${_esc(c)}<button onclick="removeSAItem('city',${i})" title="Remove">×</button></span>`
-  ).join('');
-}
-
-function removeSAItem(type, index) {
-  _markDirty();
-  const arr = type === 'city' ? _saConfig.cities : type === 'zip' ? _saConfig.zips : _saConfig.counties;
-  if (arr) arr.splice(index, 1);
-  _renderSALocationTags();
-  const sel = document.getElementById('saStateSelect');
-  if (sel && sel.value) {
-    const cities = _CITIES.filter(c => c.endsWith(', ' + sel.value));
-    _renderSAAvailableCities(cities);
-  }
-}
-
-// Haversine distance in miles
-function _haversineMiles(lat1, lng1, lat2, lng2) {
-  const R = 3958.8, toRad = x => x * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-// Extract ZIP and city from casual text ("near downtown Dallas", "about 20 min from Plano")
-function _parseLocationText(str) {
-  if (!str) return {};
-  const s = str.trim();
-  const zipM = s.match(/\b(\d{5})\b/);
-  const zip = zipM ? zipM[1] : null;
-  // Strip directional noise, extract city-like word(s)
-  const cleaned = s
-    .replace(/\b(?:near|around|in|by|from|outside|close\s+to|about\s+\d+\s+(?:min(?:utes?)?|miles?)\s+from)\b/gi, '')
-    .replace(/\b(?:downtown|uptown|north|south|east|west|central|greater)\b/gi, '')
-    .trim();
-  const cityM = cleaned.match(/^([A-Za-z][A-Za-z\s'-]{1,25}?)(?:\s*,?\s*(?:[A-Z]{2}|\d{5}))?\s*$/);
-  const city = cityM ? cityM[1].trim() : null;
-  return { zip, city };
-}
-
-// Returns { serviceable: true|false|null, matchType, matched }
-// null = location too ambiguous to decide (ask clarification)
-function _saValidate(locationStr) {
-  if (!_saConfig.enabled) return { serviceable: true };
-  const hasRules = _saConfig.cities.length || _saConfig.zips.length || _saConfig.counties.length ||
-                   (_saConfig.radius.enabled && _saConfig.radius.centerZip);
-  if (!hasRules) return { serviceable: true }; // enabled but no rules yet → allow all
-
-  if (!locationStr || !locationStr.trim()) return { serviceable: null };
-
-  const loc = locationStr.toLowerCase();
-  const { zip, city } = _parseLocationText(locationStr);
-
-  // 1. Exact ZIP match
-  if (zip && _saConfig.zips.includes(zip)) return { serviceable: true, matchType:'zip', matched:zip };
-
-  // 2. City match (partial, case-insensitive)
-  for (const c of _saConfig.cities) {
-    const cl = c.toLowerCase();
-    if (loc.includes(cl) || (city && city.toLowerCase().includes(cl))) {
-      return { serviceable: true, matchType:'city', matched:c };
-    }
-  }
-
-  // 3. County/region match
-  for (const county of _saConfig.counties) {
-    if (loc.includes(county.toLowerCase())) return { serviceable: true, matchType:'county', matched:county };
-  }
-
-  // 4. Radius match (ZIP centroid lookup)
-  if (_saConfig.radius.enabled && _saConfig.radius.centerZip && zip) {
-    const center = _ZIP_LL[_saConfig.radius.centerZip];
-    const target = _ZIP_LL[zip];
-    if (center && target) {
-      const dist = _haversineMiles(center[0], center[1], target[0], target[1]);
-      if (dist <= (_saConfig.radius.miles || 25)) {
-        return { serviceable: true, matchType:'radius', matched:zip, dist: Math.round(dist) };
-      }
-      // ZIP found in table but outside radius → definitely outside
-      return { serviceable: false };
-    }
-  }
-
-  // 5. Nothing matched → outside (if we have explicit rules and nothing fit)
-  if (_saConfig.zips.length || _saConfig.cities.length || _saConfig.counties.length) {
-    return { serviceable: false };
-  }
-
-  // Radius-only mode with no ZIP in table → ambiguous
-  return { serviceable: null };
+  status.style.display = '';
+  status.textContent   = '✓ Synced to widget';
+  status.style.color   = '#059669';
+  btn.disabled = true;
+  setTimeout(() => {
+    status.style.display = 'none';
+    btn.disabled = false;
+  }, 2500);
 }
 
 // ─── ACCOUNT PROFILE ─────────────────────────────────────────────────────────
-const DEFAULT_PROFILE = { name:'Jason Miller', role:'Account Owner', email:'', phone:'', photo:'', companyName:'', companyLogo:'' };
+const DEFAULT_PROFILE = { name:'Jason Miller', role:'Account Owner', email:'', phone:'', photo:'' };
 let accountProfile = { ...DEFAULT_PROFILE };
-
-// ─── WIDGET STATUS ────────────────────────────────────────────────────────────
-let _widgetLive = true;
 
 function loadContactData() {
   try {
@@ -3480,7 +1680,6 @@ function loadContactData() {
     accountProfile = raw ? { ...DEFAULT_PROFILE, ...JSON.parse(raw) } : { ...DEFAULT_PROFILE };
   } catch(e) { accountProfile = { ...DEFAULT_PROFILE }; }
   updateSbProfile();
-  applyCompanyBranding();
 }
 
 function updateSbProfile() {
@@ -3504,19 +1703,10 @@ function updateSbProfile() {
 }
 
 function openCFM() {
-  document.getElementById('cfmName').value        = accountProfile.name        || '';
-  document.getElementById('cfmRole').value        = accountProfile.role        || '';
-  document.getElementById('cfmEmail').value       = accountProfile.email       || '';
-  document.getElementById('cfmPhone').value       = accountProfile.phone       || '';
-  document.getElementById('cfmCompanyName').value = accountProfile.companyName || '';
-  const lp = document.getElementById('cfmLogoPreview');
-  if (lp) {
-    if (accountProfile.companyLogo) {
-      lp.innerHTML = `<img src="${accountProfile.companyLogo}" style="width:100%;height:100%;object-fit:contain;border-radius:8px">`;
-    } else {
-      lp.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>`;
-    }
-  }
+  document.getElementById('cfmName').value  = accountProfile.name  || '';
+  document.getElementById('cfmRole').value  = accountProfile.role  || '';
+  document.getElementById('cfmEmail').value = accountProfile.email || '';
+  document.getElementById('cfmPhone').value = accountProfile.phone || '';
   updateCFMPreview();
   document.getElementById('cfmOverlay').classList.add('open');
   document.getElementById('cfmPanel').classList.add('open');
@@ -3554,268 +1744,21 @@ function handleCFMPhoto(input) {
   reader.readAsDataURL(file);
 }
 
-function handleCFMLogo(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    accountProfile.companyLogo = e.target.result;
-    const lp = document.getElementById('cfmLogoPreview');
-    if (lp) lp.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:contain;border-radius:8px">`;
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeCFMLogo() {
-  accountProfile.companyLogo = '';
-  const lp = document.getElementById('cfmLogoPreview');
-  if (lp) lp.innerHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>`;
-  const li = document.getElementById('cfmLogoInput');
-  if (li) li.value = '';
-}
-
-function applyCompanyBranding() {
-  const name = (accountProfile.companyName || '').trim();
-  const logo = accountProfile.companyLogo || '';
-
-  // Sidebar company name
-  const sbName = document.getElementById('sbClientName');
-  if (sbName) sbName.textContent = name || 'ABC Roofing & Exteriors';
-
-  // Sidebar company logo
-  const sbLogo = document.getElementById('sbClientLogo');
-  const sbLogoImg = document.getElementById('sbClientLogoImg');
-  if (sbLogo) {
-    if (logo) {
-      sbLogoImg.src = logo;
-      sbLogo.style.display = 'flex';
-    } else {
-      sbLogo.style.display = 'none';
-    }
-  }
-
-  // Browser tab title
-  document.title = 'VettoChat';
-}
-
-// ─── WIDGET STATUS ────────────────────────────────────────────────────────────
-// ─── SPAM CONFIG ──────────────────────────────────────────────────────────────
-const DEFAULT_SPAM_CONFIG = { sensitivity:'medium', validateNames:true, validatePhone:true, detectKeyboard:true };
-let _spamConfig = { ...DEFAULT_SPAM_CONFIG };
-
-const _SPAM_SENS_DESC = {
-  low:    'Only catches the most obvious spam — all-same-digit numbers and keyboard-mashed names. Great if you don\'t want to risk blocking anyone.',
-  medium: 'Catches fake phone patterns, keyboard-spam names, and obviously fake info. Recommended for most businesses.',
-  high:   'Strict mode — flags suspicious responses after a single bad answer. Best for high-volume forms with lots of bot traffic.'
-};
-
-function loadSpamConfig() {
-  try { _spamConfig = { ...DEFAULT_SPAM_CONFIG, ...JSON.parse(localStorage.getItem('vettochat_spam_config') || '{}') }; }
-  catch(_) { _spamConfig = { ...DEFAULT_SPAM_CONFIG }; }
-  renderSpamUI();
-}
-
-function saveSpamConfig() {
-  localStorage.setItem('vettochat_spam_config', JSON.stringify(_spamConfig));
-  renderSpamUI();
-}
-
-function toggleSpamMaster() {
-  _markDirty();
-  const allOn = _spamConfig.validatePhone && _spamConfig.validateNames && _spamConfig.detectKeyboard;
-  const newVal = !allOn;
-  _spamConfig.validatePhone   = newVal;
-  _spamConfig.validateNames   = newVal;
-  _spamConfig.detectKeyboard  = newVal;
-  renderSpamUI();
-}
-
-function saveAllBotConfig() {
-  saveIdentity();
-  saveSpamConfig();
-  saveSAConfig();
-  rescoreAllLeads(); // re-evaluate every lead against new scoring rules
-  _botConfigDirty = false;
-  const hint = document.getElementById('identitySyncStatus');
-  if (hint) hint.style.display = 'none';
-  showToastMsg('✓ All changes saved', 'Your chatbot settings have been updated.', '#059669');
-}
-
-function setSpamSensitivity(level) {
-  _spamConfig.sensitivity = level;
-  renderSpamUI();
-}
-
-function toggleSpamCheck(key) {
-  _markDirty();
-  _spamConfig[key] = !_spamConfig[key];
-  renderSpamUI();
-}
-
-function renderSpamUI() {
-  const checks = { validatePhone:'spamPhoneToggle', validateNames:'spamNameToggle', detectKeyboard:'spamKeyboardToggle' };
-  Object.entries(checks).forEach(([key, id]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('on', !!_spamConfig[key]);
-  });
-  // Master toggle: on if ANY check is enabled
-  const masterEl = document.getElementById('spamMasterToggle');
-  const anyOn = _spamConfig.validatePhone || _spamConfig.validateNames || _spamConfig.detectKeyboard;
-  if (masterEl) masterEl.classList.toggle('on', !!anyOn);
-  // Show/hide individual checks based on master
-  const body = document.getElementById('spamChecksBody');
-  if (body) body.style.display = anyOn ? '' : 'none';
-}
-
-function loadWidgetStatus() {
-  const stored = localStorage.getItem('vettochat_widget_live');
-  _widgetLive = stored === null ? true : stored === 'true';
-  applyWidgetStatus();
-}
-
-function setWidgetStatus(live) {
-  if (!live && _widgetLive) {
-    if (!confirm('Are you sure you want to turn the chatbot off?\n\nVisitors will not be able to see or use it until you go live again.')) return;
-  }
-  _widgetLive = !!live;
-  localStorage.setItem('vettochat_widget_live', String(_widgetLive));
-  applyWidgetStatus();
-}
-
-function applyWidgetStatus() {
-  const badge   = document.getElementById('widgetOfflineBadge');
-  const chip    = document.getElementById('liveChip');
-  const banner  = document.getElementById('offlineBanner');
-  const toggle  = document.getElementById('widgetToggle');
-  const label   = document.getElementById('widgetToggleLabel');
-  const heading = document.getElementById('widgetStatusHeading');
-  const desc    = document.getElementById('widgetStatusDesc');
-  const prevBtn = document.querySelector('.prev-btn');
-
-  if (_widgetLive) {
-    if (badge)   badge.style.display   = 'none';
-    if (chip)    chip.style.display    = 'flex';
-    if (banner)  banner.style.display  = 'none';
-    if (toggle)  { toggle.classList.add('on'); toggle.style.background = ''; }
-    if (label)   { label.textContent = 'LIVE';    label.className = 'widget-toggle-label live'; }
-    if (heading) heading.textContent = 'Chatbot is Live';
-    if (desc)    desc.textContent = 'Your chatbot is active and capturing leads from your website.';
-    if (prevBtn) { prevBtn.style.opacity = ''; prevBtn.style.pointerEvents = ''; }
-  } else {
-    if (badge)   badge.style.display   = 'flex';
-    if (chip)    chip.style.display    = 'none';
-    if (banner)  banner.style.display  = 'flex';
-    if (toggle)  { toggle.classList.remove('on'); toggle.style.background = '#EF4444'; }
-    if (label)   { label.textContent = 'OFFLINE'; label.className = 'widget-toggle-label offline'; }
-    if (heading) heading.textContent = 'Chatbot is Offline';
-    if (desc)    desc.textContent = 'Your chatbot is hidden from visitors. Go live to start capturing leads.';
-    if (prevBtn) { prevBtn.style.opacity = '0.45'; prevBtn.style.pointerEvents = 'none'; }
-  }
-}
-
 function saveCFM() {
-  accountProfile.name        = document.getElementById('cfmName').value.trim()        || DEFAULT_PROFILE.name;
-  accountProfile.role        = document.getElementById('cfmRole').value.trim()        || DEFAULT_PROFILE.role;
-  accountProfile.email       = document.getElementById('cfmEmail').value.trim();
-  accountProfile.phone       = document.getElementById('cfmPhone').value.trim();
-  accountProfile.companyName = document.getElementById('cfmCompanyName').value.trim();
+  accountProfile.name  = document.getElementById('cfmName').value.trim()  || DEFAULT_PROFILE.name;
+  accountProfile.role  = document.getElementById('cfmRole').value.trim()  || DEFAULT_PROFILE.role;
+  accountProfile.email = document.getElementById('cfmEmail').value.trim();
+  accountProfile.phone = document.getElementById('cfmPhone').value.trim();
   localStorage.setItem('vettochat_profile', JSON.stringify(accountProfile));
   updateSbProfile();
-  applyCompanyBranding();
   closeCFM();
-  showToastMsg('✓ Profile saved', 'Your account profile has been updated.', '#059669');
-}
-
-// ─── EMBED CODE ──────────────────────────────────────────────────────────────
-function _buildEmbedCode(src) {
-  const url = (src || '').trim() || 'widget.html';
-  return `<!-- VettoChat Widget -->\n<iframe\n  src="${url}"\n  style="position:fixed;bottom:0;right:0;width:420px;height:640px;border:none;z-index:9999;background:transparent"\n  allow="clipboard-write"\n  title="VettoChat">\n</iframe>`;
-}
-
-function updateEmbedCode() {
-  const src  = document.getElementById('embedUrlInput')?.value || '';
-  const code = document.getElementById('embedCodeBlock');
-  const link = document.getElementById('embedPreviewLink');
-  if (code) code.textContent = _buildEmbedCode(src);
-  if (link) link.href = (src || 'widget.html') + (src.includes('?') ? '&' : '?') + 'preview=true';
-}
-
-function copyEmbedCode() {
-  const src  = document.getElementById('embedUrlInput')?.value || '';
-  const text = _buildEmbedCode(src);
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('embedCopyBtn');
-    if (!btn) return;
-    btn.textContent = '✓ Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('copied'); }, 2500);
-  }).catch(() => {
-    // Fallback for older browsers
-    const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    const btn = document.getElementById('embedCopyBtn');
-    if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'Copy Code'; btn.classList.remove('copied'); }, 2500); }
-  });
-}
-
-// ─── ONBOARDING ──────────────────────────────────────────────────────────────
-function checkOnboarding() {
-  // ?new_user=1 resets onboarding for testing — strip the param immediately
-  // so a page refresh doesn't keep triggering the reset
-  if (new URLSearchParams(window.location.search).get('new_user') === '1') {
-    localStorage.removeItem('vettochat_onboarding_done');
-    history.replaceState(null, '', window.location.pathname);
+  const t = document.getElementById('tmplToast');
+  if (t) {
+    t.querySelector('strong').textContent = '✓ Profile saved';
+    t.querySelector('span').textContent = 'Your account profile has been updated';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
   }
-  if (localStorage.getItem('vettochat_onboarding_done')) return;
-  document.getElementById('obOverlay').style.display = 'flex';
-}
-
-function submitOnboarding() {
-  const business = document.getElementById('obBusiness').value.trim();
-  const name     = document.getElementById('obName').value.trim();
-  const email    = document.getElementById('obEmail').value.trim();
-  const phone    = document.getElementById('obPhone').value.trim();
-  const industry = document.getElementById('obIndustry').value;
-  const err      = document.getElementById('obErr');
-
-  ['obBusiness','obName','obEmail'].forEach(id => document.getElementById(id).classList.remove('error'));
-  let invalid = false;
-  if (!business) { document.getElementById('obBusiness').classList.add('error'); invalid = true; }
-  if (!name)     { document.getElementById('obName').classList.add('error');     invalid = true; }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById('obEmail').classList.add('error'); invalid = true;
-  }
-  if (invalid) { err.style.display = 'block'; return; }
-  err.style.display = 'none';
-
-  // Save profile
-  accountProfile.name        = name;
-  accountProfile.email       = email;
-  accountProfile.phone       = phone;
-  accountProfile.companyName = business;
-  localStorage.setItem('vettochat_profile', JSON.stringify(accountProfile));
-
-  // Apply industry template if selected
-  if (industry && INDUSTRY_TEMPLATES[industry]) {
-    _doApplyTemplate(industry);
-    saveIdentity();
-  }
-
-  updateSbProfile();
-  applyCompanyBranding();
-  localStorage.setItem('vettochat_onboarding_done', '1');
-
-  document.getElementById('obOverlay').style.display = 'none';
-  document.getElementById('welcomeBg').classList.add('open');
-}
-
-function closeWelcome() {
-  document.getElementById('welcomeBg').classList.remove('open');
-  const bcNav = document.querySelector('.nav-item[onclick*="botconfig"]');
-  if (bcNav) nav(bcNav, 'botconfig');
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
@@ -3837,15 +1780,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderOverview(null);
   loadIdentityForm();
   loadContactData();
-  loadSAConfig();
-  loadSpamConfig();
-  loadCRMData();
-  rescoreAllLeads(); // apply current scoring rules to any existing leads on load
-  loadFilteredLeads();
-  updateCRMBadge();
-  checkOnboarding();
   setWeekRange();
-  loadWidgetStatus();
   requestAnimationFrame(() => {
     document.getElementById('page-overview').classList.add('visible');
   });
@@ -3853,10 +1788,23 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-  // Restore persistent state from CRM on every load (never reset to zero)
+  // 1. Reset Dashboard to Zero for the Demo
   document.addEventListener('DOMContentLoaded', () => {
-    syncStatsFromCRM();
-    renderOverviewFromCRM();
+    // Clear both tables
+    const tbody = document.getElementById('overviewBody');
+    if(tbody) tbody.innerHTML = '';
+    const leadsBody = document.getElementById('leadsBody');
+    if(leadsBody) leadsBody.innerHTML = '';
+    
+    // Reset the top Stat Boxes to zero
+    document.getElementById('sv0').innerText = '0';   // New Leads
+    document.getElementById('sv1').innerText = '0';   // Hot Leads
+    document.getElementById('sv2').innerText = '0';   // Needs Follow-up
+    document.getElementById('sv3').innerText = '$0';  // Pipeline Value
+
+    // Clear leads page chips until leads arrive
+    const chipsEl = document.getElementById('leadsChips');
+    if (chipsEl) chipsEl.innerHTML = '';
   });
 
   // 2. Connect to Local Engine
@@ -3868,153 +1816,158 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.on('new_lead', (lead) => {
     console.log('[VettoChat] Received lead:', JSON.stringify(lead));
 
-    // Skip if already ingested via the localStorage path (widget on same device)
-    if (_isDuplicateLead(lead)) {
-      console.log('[VettoChat] Duplicate skipped — already ingested via localStorage');
-      return;
-    }
-
-    // Save to CRM first — all data persisted before touching UI
-    const ingested = crmIngestLead(lead);
-
+    // Resolve display name
     const leadName = lead.name || lead.firstName || 'Unknown';
-    const ls       = (lead.status || '').toLowerCase();
-    const badgeClass = (ls === 'hot' || ls === 'high') ? 'pill-hot' : (ls === 'warm' || ls === 'medium') ? 'pill-warm' : 'pill-cold';
-    const badgeLabel = (ls === 'hot' || ls === 'high') ? 'High'     : (ls === 'warm' || ls === 'medium') ? 'Medium'    : 'Low';
 
-    let formattedPhone = (lead.phone || '').replace(/\D/g,'');
-    if (formattedPhone.length === 10)
-      formattedPhone = `(${formattedPhone.slice(0,3)}) ${formattedPhone.slice(3,6)}-${formattedPhone.slice(6)}`;
-    else formattedPhone = lead.phone || '';
-
-    // Inject into overview table (real-time row)
+    // Map status to badge class and friendly label
+    let badgeClass = 'pill-cold';
+    let badgeLabel = lead.status || 'Cold';
+    if (lead.status === 'Hot'  || lead.status === 'High')   { badgeClass = 'pill-hot';  badgeLabel = 'High'; }
+    if (lead.status === 'Warm' || lead.status === 'Medium') { badgeClass = 'pill-warm'; badgeLabel = 'Medium'; }
+    if (lead.status === 'Cold' || lead.status === 'Low')    { badgeClass = 'pill-cold'; badgeLabel = 'Low'; }
+    
+    // Format phone number (e.g. 9725551234 -> (972) 555-1234)
+    let formattedPhone = lead.phone;
+    if (lead.phone && lead.phone.length === 10) {
+      formattedPhone = `(${lead.phone.substring(0,3)}) ${lead.phone.substring(3,6)}-${lead.phone.substring(6,10)}`;
+    }
+    
+    // 3. Inject Row into Table
     const _ts = Date.now();
     const newRow = `
-      <tr class="new-row" style="animation:rowIn 0.4s ease-out forwards;background:#f8fafc">
-        <td><div class="name-cell">
-          <div class="avatar" style="background:${avatarColor(leadName)};font-size:11px">${initials(leadName)}</div>
-          <div><div class="lead-name">${leadName}</div><div class="muted"><span data-ts="${_ts}">Just now</span></div></div>
-        </div></td>
-        <td style="font-size:12px;color:var(--muted)">${formattedPhone || '—'}</td>
-        <td><strong>${_esc(lead.intent||'—')}</strong></td>
-        <td><span class="pill ${badgeClass}">${badgeLabel}</span></td>
+      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="lead-name">${leadName}</div>
+              <div class="muted"><span data-ts="${_ts}">Just now</span></div>
+            </div>
+          </div>
+        </td>
+        <td class="muted">${formattedPhone}</td>
+        <td><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
+        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
+        <td><span class="status-dot dot-new"></span>New</td>
+        <td class="muted"><span data-ts="${_ts}">Just now</span></td>
+        <td><button class="call-btn">1-Click Call</button></td>
+      </tr>
+    `;
+
+    const tbody = document.getElementById('overviewBody');
+    if (tbody) tbody.insertAdjacentHTML('afterbegin', newRow);
+
+    // Also add to Leads page
+    const leadsRow = `
+      <tr class="new-row" style="animation: rowIn 0.4s ease-out forwards; background-color: #f8fafc;">
+        <td>
+          <div class="name-cell">
+            <div class="avatar" style="background-color: var(--navy); color: white;">${leadName.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="lead-name">${leadName}</div>
+            </div>
+          </div>
+        </td>
+        <td class="muted">${formattedPhone}</td>
+        <td style="font-size:12px;color:var(--navy-mid)"><strong>${lead.intent}</strong><br><span class="muted">${lead.urgency || ''}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${lead.location || '—'}</td>
+        <td style="font-size:13px;font-weight:600;color:var(--navy)">${lead.budget || '—'}</td>
+        <td><span class="pill ${badgeClass}">${lead.status}</span></td>
         <td style="font-size:12px;color:var(--muted)"><span class="status-dot dot-new"></span>New</td>
         <td class="muted"><span data-ts="${_ts}">Just now</span></td>
-        <td><button class="call-btn" onclick="window.location='tel:${(lead.phone||'').replace(/\D/g,'')}'" >Call</button></td>
-      </tr>`;
-    const tbody = document.getElementById('overviewBody');
-    if (tbody && !demoActive) tbody.insertAdjacentHTML('afterbegin', newRow);
+        <td><button class="call-btn">1-Click Call</button></td>
+      </tr>
+    `;
+    const leadsBody = document.getElementById('leadsBody');
+    if (leadsBody) leadsBody.insertAdjacentHTML('afterbegin', leadsRow);
 
-    // Recompute all stats from ground truth (CRM) — no hardcoded estimates
-    syncStatsFromCRM();
+    // Update leads badge
+    const badge = document.getElementById('leadsBadge');
+    if (badge) {
+      const count = parseInt(badge.textContent) + 1;
+      badge.textContent = count;
+      badge.style.display = 'flex';
+    }
+
+    // 4. LIVE UPDATE THE STAT BOXES
+    // Update Total Leads
+    const totalLeadsEl = document.getElementById('sv0');
+    totalLeadsEl.innerText = parseInt(totalLeadsEl.innerText) + 1;
+
+    // Update Hot Leads counter
+    if (lead.status === 'High' || lead.status === 'Hot') {
+      const hotEl = document.getElementById('sv1');
+      hotEl.innerText = parseInt(hotEl.innerText) + 1;
+    }
+
+    // Update Leads page header chips
+    const chipsEl = document.getElementById('leadsChips');
+    if (chipsEl) {
+      const totalRows = document.getElementById('leadsBody')?.querySelectorAll('tr').length || 0;
+      const hotRows   = document.getElementById('leadsBody')?.querySelectorAll('.pill-hot').length || 0;
+      chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
+                          `<span class="chip chip-blue">${totalRows} Total</span>`;
+    }
+
+    // Every new lead needs a follow-up call
+    const followUpEl = document.getElementById('sv2');
+    followUpEl.innerText = parseInt(followUpEl.innerText) + 1;
+
+    // Estimate & Add Pipeline Value based on intent
+    let addedValue = 1500; // Default base value
+    if (lead.intent.includes('Replacement') || lead.intent.includes('Storm')) addedValue = 12000;
+    if (lead.intent.includes('Repair')) addedValue = 3500;
+    
+    const pipelineEl = document.getElementById('sv3');
+    let currentPipeline = parseInt(pipelineEl.innerText.replace(/\D/g, '')) || 0; // strip non-digits
+    let newPipeline = currentPipeline + addedValue;
+    pipelineEl.innerText = '$' + newPipeline.toLocaleString(); // format with commas
   });
 
-  // Every 30 seconds: refresh relative timestamps + resync stats from CRM ground truth
+  // Every 30 seconds: tick timestamps + resync counts from actual DOM state
   setInterval(() => {
+    // 1. Update all relative timestamps
     document.querySelectorAll('[data-ts]').forEach(el => {
       el.textContent = timeAgo(parseInt(el.dataset.ts));
     });
-    if (!demoActive) syncStatsFromCRM();
+
+    // 2. Resync leads page chips from what's actually in the table
+    const leadsBody = document.getElementById('leadsBody');
+    const chipsEl   = document.getElementById('leadsChips');
+    if (leadsBody && chipsEl) {
+      const totalRows = leadsBody.querySelectorAll('tr').length;
+      const hotRows   = leadsBody.querySelectorAll('.pill-hot').length;
+      if (totalRows > 0) {
+        chipsEl.innerHTML = (hotRows > 0 ? `<span class="chip chip-orange">${hotRows} Hot</span>` : '') +
+                            `<span class="chip chip-blue">${totalRows} Total</span>`;
+      }
+    }
+
+    // 3. Resync stat cards from actual DOM counts
+    const overviewBody = document.getElementById('overviewBody');
+    const leadsBody2   = document.getElementById('leadsBody');
+    if (overviewBody && leadsBody2) {
+      const totalLeads = leadsBody2.querySelectorAll('tr').length;
+      const hotLeads   = leadsBody2.querySelectorAll('.pill-hot').length;
+      if (totalLeads > 0) {
+        document.getElementById('sv0').innerText = totalLeads;
+        document.getElementById('sv1').innerText = hotLeads;
+      }
+    }
   }, 30000);
 </script>
 
 <div class="toast" id="tmplToast" style="border-left-color:#059669">
   <span class="toast-icon">✓</span>
-  <div><strong id="tmplToastTitle">Template applied</strong><span id="tmplToastSub">Click Save All Changes to apply</span></div>
-</div>
-
-<!-- ── CRM LEAD DETAIL PANEL ── -->
-<div class="crm-overlay" id="crmOverlay" onclick="if(event.target===this)closeCRMPanel()"></div>
-<div class="crm-panel" id="crmPanel">
-  <div class="crm-panel-head">
-    <div class="crm-panel-head-info">
-      <div class="crm-panel-name" id="crmPanelName">Lead Name</div>
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:12px;color:var(--muted)">Status:</span>
-        <select class="crm-detail-sel" id="crmPanelStatus" style="width:auto;padding:4px 8px;font-size:12px" onchange="crmPanelStatusChanged()"></select>
-      </div>
-    </div>
-    <div class="crm-panel-actions">
-      <a id="crmCallBtn" href="#" class="crm-action-btn call">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11.5 9.5l-2-1.5-1.5 1c-.8-.4-2.5-2-3-3l1-1.5L4.5 3l-2 2c.5 3.5 5 8 8.5 8.5l2-2z" stroke-linejoin="round"/></svg>
-        Call
-      </a>
-      <button class="crm-action-btn delete" onclick="deleteCRMLead()">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h10M4 3V2h4v1M5 5.5v3M7 5.5v3M2 3l.7 7.3A1 1 0 003.7 11h4.6a1 1 0 001-.7L10 3"/></svg>
-        Delete
-      </button>
-      <button class="crm-panel-close" onclick="closeCRMPanel()" title="Close">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2l11 11M13 2L2 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-  </div>
-  <div class="crm-panel-body">
-    <div class="crm-section-lbl">Contact Information</div>
-    <div class="crm-detail-grid">
-      <div class="crm-detail-field"><label>Full Name</label><input class="crm-detail-inp" id="cpName" type="text" placeholder="Full name"></div>
-      <div class="crm-detail-field"><label>Phone</label><input class="crm-detail-inp" id="cpPhone" type="tel" placeholder="Phone number"></div>
-      <div class="crm-detail-field"><label>Email</label><input class="crm-detail-inp" id="cpEmail" type="email" placeholder="Email address"></div>
-      <div class="crm-detail-field"><label>Lead Value ($)</label><input class="crm-detail-inp" id="cpValue" type="number" placeholder="0"></div>
-    </div>
-    <div class="crm-section-lbl">Project Details</div>
-    <div class="crm-detail-grid">
-      <div class="crm-detail-field"><label>Service Type</label><input class="crm-detail-inp" id="cpService" type="text" placeholder="e.g. Storm Damage"></div>
-      <div class="crm-detail-field"><label>Location</label><input class="crm-detail-inp" id="cpLocation" type="text" placeholder="City or zip"></div>
-      <div class="crm-detail-field"><label>Urgency</label><input class="crm-detail-inp" id="cpUrgency" type="text" placeholder="e.g. Emergency"></div>
-      <div class="crm-detail-field"><label>Budget</label><input class="crm-detail-inp" id="cpBudget" type="text" placeholder="e.g. $5K–$15K"></div>
-    </div>
-    <div class="crm-section-lbl">Notes</div>
-    <div class="crm-notes-wrap">
-      <div class="crm-notes-toolbar">
-        <button class="crm-notes-tbtn" onclick="crmExec('bold')" title="Bold"><b>B</b></button>
-        <button class="crm-notes-tbtn" onclick="crmExec('italic')" title="Italic"><i>I</i></button>
-        <button class="crm-notes-tbtn" onclick="crmExec('underline')" title="Underline"><u>U</u></button>
-        <button class="crm-notes-tbtn" onclick="crmInsertLink()" title="Insert link">🔗</button>
-      </div>
-      <div class="crm-notes-editor" id="cpNotes" contenteditable="true" spellcheck="true"></div>
-    </div>
-    <div class="crm-section-lbl">Activity</div>
-    <div class="crm-activity-list" id="crmActivityList"></div>
-  </div>
-  <div class="crm-panel-footer">
-    <button class="crm-action-btn" onclick="closeCRMPanel()">Cancel</button>
-    <button class="crm-save-lead-btn" onclick="saveCRMLead()">Save Changes</button>
-  </div>
-</div>
-
-<!-- ── CRM NEW LEAD MODAL ── -->
-<div class="cfm-overlay" id="crmNewOverlay" onclick="if(event.target===this)closeNewLeadForm()"></div>
-<div class="cfm-panel" id="crmNewPanel" style="width:480px">
-  <div class="cfm-head">
-    <h2>Add New Lead</h2>
-    <p>Manually add a lead to the CRM pipeline.</p>
-    <button class="cfm-close" onclick="closeNewLeadForm()">
-      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2l11 11M13 2L2 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-    </button>
-  </div>
-  <div class="cfm-body">
-    <div class="crm-new-form">
-      <div><label class="field-label">Full Name *</label><input class="field-input" id="nlName" placeholder="Full name" style="margin-bottom:0"></div>
-      <div><label class="field-label">Phone *</label><input class="field-input" id="nlPhone" type="tel" placeholder="(000) 000-0000" style="margin-bottom:0"></div>
-      <div><label class="field-label">Email</label><input class="field-input" id="nlEmail" type="email" placeholder="email@example.com" style="margin-bottom:0"></div>
-      <div><label class="field-label">Lead Value ($)</label><input class="field-input" id="nlValue" type="number" placeholder="0" style="margin-bottom:0"></div>
-      <div><label class="field-label">Service Type</label><input class="field-input" id="nlService" placeholder="e.g. Storm Damage" style="margin-bottom:0"></div>
-      <div><label class="field-label">Location</label><input class="field-input" id="nlLocation" placeholder="City or zip" style="margin-bottom:0"></div>
-    </div>
-    <div style="margin-top:12px"><label class="field-label">Status</label><select class="field-input" id="nlStatus" style="margin-bottom:0;cursor:pointer"></select></div>
-  </div>
-  <div class="cfm-footer">
-    <button class="cfm-cancel-btn" onclick="closeNewLeadForm()">Cancel</button>
-    <button class="cfm-save-btn" onclick="createNewLead()">Add Lead</button>
-  </div>
+  <div><strong>Template applied</strong><span id="tmplToastSub">Hit Save Configuration to push to widget</span></div>
 </div>
 
 <!-- ── CONTACT FIELD MANAGER ── -->
 <div class="cfm-overlay" id="cfmOverlay" onclick="if(event.target===this)closeCFM()"></div>
 <div class="cfm-panel" id="cfmPanel">
   <div class="cfm-head">
-    <h2>Account &amp; Company</h2>
-    <p>Update your profile and company details.</p>
+    <h2>Account Profile</h2>
+    <p>Update your name, role, and profile photo.</p>
     <button class="cfm-close" onclick="closeCFM()" title="Close">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2l11 11M13 2L2 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
     </button>
@@ -4042,22 +1995,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <label class="field-label">Email Address</label>
     <input class="field-input" id="cfmEmail" type="email" placeholder="you@company.com">
     <label class="field-label">Phone Number</label>
-    <input class="field-input" id="cfmPhone" type="tel" placeholder="+1 (000) 000-0000">
-    <div class="cfm-divider"></div>
-    <div class="cfm-section-title">Company</div>
-    <label class="field-label">Company Name</label>
-    <input class="field-input" id="cfmCompanyName" type="text" placeholder="e.g. ABC Roofing & Exteriors" oninput="updateCFMPreview()">
-    <label class="field-label">Company Logo</label>
-    <div class="cfm-logo-upload">
-      <label for="cfmLogoInput" class="cfm-logo-preview" id="cfmLogoPreview" title="Upload logo">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#CBD5E1" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="2"/><path d="M2 13l4-4 3 3 3-3 4 4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="8" r="1.5"/></svg>
-      </label>
-      <input type="file" id="cfmLogoInput" accept="image/*" style="display:none" onchange="handleCFMLogo(this)">
-      <div>
-        <div class="cfm-logo-hint">Square image recommended.<br>Shown in the sidebar and dashboard header.</div>
-        <button type="button" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;padding:4px 10px;border-radius:5px;cursor:pointer" onclick="removeCFMLogo()">Remove</button>
-      </div>
-    </div>
+    <input class="field-input" id="cfmPhone" type="tel" placeholder="+1 (000) 000-0000" style="margin-bottom:0">
   </div>
   <div class="cfm-footer">
     <button class="cfm-cancel-btn" onclick="closeCFM()">Cancel</button>
@@ -4072,10 +2010,10 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="prev-dots">
         <div class="prev-dot r"></div><div class="prev-dot y"></div><div class="prev-dot g"></div>
       </div>
-      <span class="prev-lbl">Chatbot Preview — Live</span>
+      <span class="prev-lbl">Widget Preview — Live</span>
       <button class="prev-x" onclick="closePreview()" title="Close">×</button>
     </div>
-    <iframe id="prevFrame" src="widget.html?preview=true" title="Chatbot Preview"></iframe>
+    <iframe id="prevFrame" src="widget.html?preview=true" title="Widget Preview"></iframe>
   </div>
 </div>
 
