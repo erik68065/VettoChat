@@ -61,13 +61,15 @@ app.post('/api/leads/capture', async (req, res) => {
     // Write to Leads table
     const lead = await prisma.lead.create({
       data: {
-        companyId,
-        fullName: fullName || 'Unknown',
-        phone:    phone    || 'Not provided',
-        intent:   intent   || 'Not specified',
-        urgency:  urgency  || 'Not specified',
-        score,
-        status,
+        client: { 
+          connect: { id: activeCompanyId } 
+        },
+        fullName: fullName || "Unknown Visitor",
+        phone: phone || "No phone provided",
+        intent: intent || "Not specified",
+        urgency: urgency || "Not specified",
+        score: score,
+        status: status
       },
     });
 
