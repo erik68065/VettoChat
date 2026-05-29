@@ -66,6 +66,39 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
   background-size:72px 72px;
 }
 .hero-inner{position:relative;z-index:1;max-width:780px;width:100%}
+
+/* ── HERO FLOATING CARDS ── */
+.hero-card{
+  position:absolute;z-index:0;pointer-events:none;
+  background:#111D2E;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.55),0 2px 8px rgba(0,0,0,0.35);
+}
+.hc-label{font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px}
+.hc-name{font-size:13px;font-weight:600;color:rgba(255,255,255,0.82);margin-bottom:3px}
+.hc-sub{font-size:12px;color:rgba(255,255,255,0.38);margin-bottom:10px}
+.hc-badge{display:inline-flex;align-items:center;gap:5px;border-radius:4px;padding:4px 9px;font-size:11px;font-weight:700}
+.hc-badge.hot{background:rgba(239,68,68,0.12);color:#F87171;border:1px solid rgba(239,68,68,0.18)}
+.hc-score{font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px}
+.hc-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.hc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hc-row-label{font-size:12px;color:rgba(255,255,255,0.55);flex:1}
+.hc-row-val{font-size:12px;font-weight:600;color:rgba(255,255,255,0.75)}
+.hc-divider{height:1px;background:rgba(255,255,255,0.05);margin:10px 0}
+.hc-sms-from{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:6px}
+.hc-sms-body{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.55}
+.hc-sms-time{font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px}
+/* Positions */
+.hero-card-1{left:3%;top:50%;transform:translateY(-55%);width:196px;padding:16px 18px}
+.hero-card-2{right:3%;top:50%;transform:translateY(-45%);width:218px;padding:16px 18px}
+.hero-card-3{bottom:12%;left:50%;transform:translateX(-50%);width:360px;padding:14px 18px;display:flex;align-items:center;gap:16px}
+.hc-stat-group{flex:1;text-align:center;padding:0 8px}
+.hc-stat-group:not(:last-child){border-right:1px solid rgba(255,255,255,0.05)}
+.hc-stat-num{font-size:20px;font-weight:800;color:rgba(255,255,255,0.85);letter-spacing:-0.5px;line-height:1}
+.hc-stat-lbl{font-size:10px;color:rgba(255,255,255,0.28);margin-top:4px;font-weight:500}
+@media(max-width:1100px){.hero-card-1,.hero-card-2{display:none}}
+@media(max-width:768px){.hero-card{display:none}}
 .hero-label{
   display:inline-block;
   font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
@@ -355,6 +388,45 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
 <!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
+
+  <!-- Card 1 — Lead score -->
+  <div class="hero-card hero-card-1">
+    <div class="hc-label">Lead scored</div>
+    <div class="hc-name">Marcus Reynolds</div>
+    <div class="hc-sub">Storm Damage · Plano, TX</div>
+    <div class="hc-badge hot">Hot lead</div>
+    <div class="hc-score">Score 94 / 100 · Just now</div>
+  </div>
+
+  <!-- Card 2 — SMS alert -->
+  <div class="hero-card hero-card-2">
+    <div class="hc-label">SMS alert sent</div>
+    <div class="hc-sms-from">VettoChat → Your phone</div>
+    <div class="hc-divider"></div>
+    <div class="hc-sms-body">Hot lead: James Carter · Storm Damage · $2K–$8K · (214) 555-0192</div>
+    <div class="hc-sms-time">Delivered 14 seconds ago</div>
+  </div>
+
+  <!-- Card 3 — Pipeline summary -->
+  <div class="hero-card hero-card-3">
+    <div class="hc-stat-group">
+      <div class="hc-stat-num">3</div>
+      <div class="hc-stat-lbl">New today</div>
+    </div>
+    <div class="hc-stat-group">
+      <div class="hc-stat-num" style="color:#F87171">2</div>
+      <div class="hc-stat-lbl">Hot leads</div>
+    </div>
+    <div class="hc-stat-group">
+      <div class="hc-stat-num" style="color:#FCD34D">4</div>
+      <div class="hc-stat-lbl">In pipeline</div>
+    </div>
+    <div class="hc-stat-group">
+      <div class="hc-stat-num" style="color:#6EE7B7">1</div>
+      <div class="hc-stat-lbl">Quoted</div>
+    </div>
+  </div>
+
   <div class="hero-inner">
     <span class="hero-label">Lead qualification for home service contractors</span>
     <h1>Most contractors lose the job in the first five minutes.</h1>
@@ -554,7 +626,7 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="2" stroke="#60A5FA" stroke-width="1.2"/><path d="M6 6H12M6 9H10M6 12H8" stroke="#60A5FA" stroke-width="1.2" stroke-linecap="round"/></svg>
         </div>
         <h3>SMS Alerts</h3>
-        <p>When a qualified lead finishes the chat, you get a text. Name, what they need, their budget, and their phone number. No app to open, no dashboard to check.</p>
+        <p>When a qualified lead finishes the chat, you get a text. Name, what they need, their budget, and their phone number. Every lead is also logged in your built-in CRM, where you can track status, add notes, and manage your pipeline.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">
@@ -570,10 +642,7 @@ html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overf
 <!-- PRICING -->
 <section id="pricing" class="pricing-section">
   <div class="pricing-inner">
-    <span class="section-kicker">Pricing</span>
-    <div class="section-heading">Straightforward pricing.</div>
-    <p class="section-body">30 days free. No credit card. Cancel any time.</p>
-    <div class="pricing-grid">
+    <div class="pricing-grid" style="margin-top:0">
       <!-- STARTER -->
       <div class="pricing-card">
         <div class="pricing-tier">Starter</div>
