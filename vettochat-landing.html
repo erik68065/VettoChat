@@ -3,139 +3,470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VettoChat — AI Lead Qualification for Service Companies</title>
+<title>VettoChat — AI Lead Qualification for Home Service Contractors</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+/* ── RESET & TOKENS ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#0F1F3D;
-  --navy-light:#1E40AF;
-  --navy-accent:#2563EB;
-  --text-primary:#0F1F3D;
-  --text-secondary:#6B7280;
-  --text-muted:#9CA3AF;
-  --border:#E5E7EB;
+  --dark:#0B1525;--dark-2:#0F1F3D;--dark-3:#111E33;
+  --accent:#2563EB;--accent-2:#3B82F6;--accent-3:#60A5FA;
+  --text:#0F1F3D;--text-2:#6B7280;--text-3:#9CA3AF;
+  --border:#E5E7EB;--surface:#fff;
 }
+html,body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);overflow-x:hidden;scroll-behavior:smooth}
 
-html,body{height:100%;font-family:'Inter',sans-serif;background:#fff;color:var(--text-primary)}
-body{overflow-x:hidden}
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:64px;
+  background:rgba(11,21,37,0.55);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  transition:background 0.3s,box-shadow 0.3s;
+}
+.nav.scrolled{background:rgba(11,21,37,0.97);box-shadow:0 1px 0 rgba(255,255,255,0.06)}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.nav-logo-text{font-size:17px;font-weight:800;letter-spacing:-0.4px;color:#fff}
+.nav-logo-text em{color:var(--accent-3);font-style:normal}
+.nav-links{display:flex;gap:32px;list-style:none;margin:0 auto}
+.nav-links a{text-decoration:none;color:rgba(255,255,255,0.55);font-size:13px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:#fff}
+.nav-right{display:flex;gap:14px;align-items:center}
+.nav-login{color:rgba(255,255,255,0.65);font-size:13px;font-weight:500;text-decoration:none;transition:color 0.2s}
+.nav-login:hover{color:#fff}
+.btn-nav{
+  padding:8px 20px;background:var(--accent);color:#fff;
+  border:none;border-radius:6px;font-family:'Inter',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;
+  transition:all 0.18s;display:inline-block;
+}
+.btn-nav:hover{background:#1D4ED8;transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,0.45)}
 
-/* NAV */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.nav-logo{font-size:18px;font-weight:800;color:var(--navy);letter-spacing:-1px;display:flex;align-items:center;gap:8px}
-.nav-logo svg{width:28px;height:28px;flex-shrink:0}
-.nav-links{display:flex;gap:32px;flex:1;margin-left:60px;list-style:none}
-.nav-links a{text-decoration:none;color:var(--text-secondary);font-size:13px;font-weight:500;transition:color 0.2s}
-.nav-links a:hover{color:var(--navy)}
-.nav-right{display:flex;gap:12px;align-items:center}
-.btn-nav{padding:8px 18px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.btn-nav:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.3)}
+/* ── HERO ── */
+.hero{
+  min-height:100vh;background:var(--dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:124px 24px 88px;
+  position:relative;overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.065) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,0.065) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+.hero-glow{
+  position:absolute;width:900px;height:900px;pointer-events:none;
+  background:radial-gradient(circle,rgba(37,99,235,0.2) 0%,transparent 62%);
+  top:50%;left:50%;transform:translate(-50%,-52%);
+  animation:glow-shift 9s ease-in-out infinite alternate;
+}
+@keyframes glow-shift{
+  0%{opacity:0.55;transform:translate(-50%,-52%) scale(1)}
+  100%{opacity:1;transform:translate(-50%,-46%) scale(1.12)}
+}
+.hero-inner{position:relative;z-index:1;max-width:900px;width:100%}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.28);
+  color:var(--accent-3);padding:7px 16px;border-radius:20px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  margin-bottom:32px;
+}
+.badge-dot{width:6px;height:6px;background:var(--accent-3);border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
+.hero h1{
+  font-size:clamp(44px,7.5vw,80px);font-weight:900;line-height:1.03;
+  color:#fff;letter-spacing:-2.5px;margin-bottom:24px;
+}
+.hero h1 em{color:var(--accent-3);font-style:normal}
+.hero-sub{
+  font-size:clamp(16px,2vw,19px);color:rgba(255,255,255,0.58);
+  line-height:1.78;margin-bottom:48px;
+  max-width:620px;margin-left:auto;margin-right:auto;
+}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.btn-cta{
+  padding:15px 38px;background:var(--accent);color:#fff;
+  border:none;border-radius:8px;font-family:'Inter',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;
+  transition:all 0.18s;display:inline-block;
+}
+.btn-cta:hover{background:#1D4ED8;transform:translateY(-2px);box-shadow:0 14px 36px rgba(37,99,235,0.45)}
+.btn-ghost{
+  padding:15px 38px;
+  background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.82);
+  border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:all 0.18s;display:inline-block;
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.28)}
+.trust-row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,0.42);font-size:12px;font-weight:500}
+.trust-icon{opacity:0.65;flex-shrink:0}
 
-/* HERO */
-.hero{background:linear-gradient(135deg,#f0f4ff 0%,#fafbfc 100%);padding:80px 48px;text-align:center}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.15);color:var(--navy-accent);padding:8px 16px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:24px}
-.hero h1{font-size:clamp(48px,8vw,72px);font-weight:800;line-height:1.1;color:var(--navy);margin-bottom:16px;max-width:900px;margin-left:auto;margin-right:auto}
-.hero-sub{font-size:18px;color:var(--text-secondary);line-height:1.8;margin-bottom:40px;max-width:700px;margin-left:auto;margin-right:auto}
-.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn-primary{padding:14px 36px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;text-decoration:none}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(37,99,235,0.4)}
-.btn-secondary{padding:14px 36px;background:#fff;color:var(--navy);border:2px solid var(--navy);border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;text-decoration:none}
-.btn-secondary:hover{background:var(--navy);color:#fff;transform:translateY(-2px)}
+/* ── PAIN BAR ── */
+.pain-bar{
+  background:var(--dark-3);
+  border-top:1px solid rgba(255,255,255,0.05);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  padding:72px 48px;
+}
+.pain-bar-grid{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;gap:0;align-items:center}
+.pain-divider{background:rgba(255,255,255,0.07);height:80px;align-self:center}
+.pain-stat{text-align:center;padding:0 40px}
+.pain-num{font-size:clamp(50px,6vw,68px);font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;margin-bottom:12px}
+.pain-num em{color:var(--accent-3);font-style:normal}
+.pain-label{font-size:14px;color:rgba(255,255,255,0.5);line-height:1.55;font-weight:500;max-width:220px;margin:0 auto}
 
-/* DEMO SECTION */
-.demo-section{padding:80px 48px;background:#fff}
-.demo-container{max-width:1200px;margin:0 auto}
-.demo-header{text-align:center;margin-bottom:60px}
-.demo-header h2{font-size:48px;font-weight:800;color:var(--navy);margin-bottom:12px}
-.demo-header p{font-size:16px;color:var(--text-secondary);margin-bottom:32px}
-.industry-switcher{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
-.industry-btn{padding:10px 20px;border:2px solid var(--border);background:#fff;color:var(--text-secondary);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.industry-btn:hover{border-color:var(--navy-accent);color:var(--navy-accent)}
-.industry-btn.active{background:var(--navy-accent);color:#fff;border-color:var(--navy-accent)}
+/* ── SHARED SECTION ATOMS ── */
+.sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);display:block;margin-bottom:12px}
+.sec-title{font-size:clamp(30px,4vw,46px);font-weight:800;color:var(--text);line-height:1.08;letter-spacing:-1px;margin-bottom:14px}
+.sec-sub{font-size:16px;color:var(--text-2);line-height:1.72;max-width:540px}
 
-.chat-demo-container{background:#f8fafc;border-radius:16px;padding:40px;box-shadow:0 8px 32px rgba(0,0,0,0.08);max-width:700px;margin:0 auto;border:1px solid var(--border)}
-.chat-demo-header{background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:12px;margin:-40px -40px 24px -40px}
-.chat-avatar{width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
-.chat-info h3{font-size:15px;font-weight:700}
-.chat-info p{font-size:12px;opacity:0.8}
-.chat-messages{display:flex;flex-direction:column;gap:16px;margin-bottom:24px;max-height:400px;overflow-y:auto;padding:8px 0}
+/* ── HOW IT WORKS ── */
+.how-section{padding:108px 48px;background:#fff}
+.how-inner{max-width:1100px;margin:0 auto}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:68px;position:relative}
+.how-connector{position:absolute;top:27px;left:calc(16.67% + 32px);right:calc(16.67% + 32px);height:1px;background:linear-gradient(90deg,rgba(37,99,235,0.35) 0%,rgba(37,99,235,0.1) 100%)}
+.how-step{text-align:center;position:relative}
+.step-num{
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;font-size:20px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  box-shadow:0 0 0 8px rgba(37,99,235,0.09),0 4px 14px rgba(37,99,235,0.35);
+}
+.step-icon{font-size:34px;margin-bottom:16px;display:block}
+.how-step h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:9px}
+.how-step p{font-size:14px;color:var(--text-2);line-height:1.68}
+
+/* ── DEMO ── (JS-dependent classes preserved exactly) */
+.demo-section{padding:108px 48px;background:#F5F7FA}
+.demo-container{max-width:1100px;margin:0 auto}
+.demo-header{text-align:center;margin-bottom:52px}
+
+/* Industry switcher — same class names, new styles */
+.industry-switcher{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.industry-btn{
+  padding:9px 22px;border:1.5px solid var(--border);background:#fff;
+  color:var(--text-2);border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+  cursor:pointer;transition:all 0.18s;
+}
+.industry-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(37,99,235,0.04)}
+.industry-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 14px rgba(37,99,235,0.3)}
+
+/* Chat UI — same class names, new styles */
+.chat-demo-container{
+  max-width:580px;margin:0 auto;background:#fff;border-radius:20px;
+  box-shadow:0 28px 72px rgba(0,0,0,0.13),0 6px 20px rgba(0,0,0,0.06);
+  overflow:hidden;border:1px solid rgba(0,0,0,0.05);
+}
+.chat-demo-header{
+  background:linear-gradient(135deg,#0B1525 0%,#0F2040 100%);
+  color:#fff;padding:20px 24px;display:flex;align-items:center;gap:14px;
+}
+.chat-avatar{
+  width:42px;height:42px;background:var(--accent);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:800;color:#fff;flex-shrink:0;
+  box-shadow:0 0 0 3px rgba(255,255,255,0.14);
+}
+.chat-info h3{font-size:15px;font-weight:700;color:#fff}
+.chat-info p{font-size:12px;color:rgba(255,255,255,0.55);margin-top:1px}
+.chat-messages{
+  display:flex;flex-direction:column;gap:14px;
+  padding:22px;background:#F8FAFC;
+  max-height:420px;overflow-y:auto;
+}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .msg-bot{display:flex;gap:10px;align-items:flex-start}
-.msg-avatar{width:32px;height:32px;background:var(--navy-accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.msg-bubble{background:#fff;border:1px solid var(--border);padding:12px 16px;border-radius:8px;font-size:13px;color:var(--text-primary);line-height:1.5;max-width:85%;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.msg-user{display:flex;justify-content:flex-end;gap:10px}
-.msg-user .msg-bubble{background:var(--navy-accent);color:#fff;border:none;border-radius:12px 4px 12px 12px}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.chip{padding:8px 14px;border:1.5px solid var(--border);background:#fff;border-radius:20px;font-size:12px;font-weight:600;color:var(--text-primary);cursor:pointer;transition:all 0.2s}
-.chip:hover{border-color:var(--navy-accent);color:var(--navy-accent)}
-.chip.selected{background:var(--navy-accent);color:#fff;border-color:var(--navy-accent)}
+.msg-avatar{
+  width:30px;height:30px;background:var(--accent);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.msg-bubble{
+  background:#fff;border:1px solid var(--border);
+  padding:10px 14px;border-radius:4px 12px 12px 12px;
+  font-size:13px;color:var(--text);line-height:1.55;max-width:85%;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.msg-user{display:flex;justify-content:flex-end}
+.msg-user .msg-bubble{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:12px 4px 12px 12px;
+}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;margin-left:40px}
+.chip{
+  padding:7px 13px;border:1.5px solid var(--border);background:#fff;
+  border-radius:20px;font-size:12px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:all 0.15s;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* FORM SECTION */
-.form-section{padding:80px 48px;background:linear-gradient(135deg,#f0f4ff 0%,#fafbfc 100%)}
-.form-container{max-width:500px;margin:0 auto;text-align:center}
-.form-container h2{font-size:36px;font-weight:800;color:var(--navy);margin-bottom:16px}
-.form-container p{font-size:16px;color:var(--text-secondary);margin-bottom:40px}
-.form-group{margin-bottom:16px;text-align:left}
-.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
-.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);background:#fff;color:var(--text-primary);font-family:'Inter',sans-serif;font-size:14px;border-radius:8px;outline:none;transition:all 0.2s}
-.form-input:focus{border-color:var(--navy-accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.industries-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
-.industry-option{padding:11px;border:1.5px solid var(--border);background:#fff;border-radius:8px;cursor:pointer;text-align:center;font-size:13px;font-weight:600;color:var(--text-secondary);transition:all 0.2s}
-.industry-option:hover{border-color:var(--navy-accent);background:#f0f4ff;color:var(--navy-accent)}
-.industry-option.selected{border-color:var(--navy-accent);background:var(--navy-accent);color:#fff}
-.form-submit{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy-light),var(--navy-accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.04em;margin-top:8px}
-.form-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,0.3)}
-.form-footer{font-size:11px;color:var(--text-muted);margin-top:12px}
-.form-footer a{color:var(--navy-accent);text-decoration:none;font-weight:600}
+/* SMS mock */
+.sms-mock{
+  max-width:580px;margin:20px auto 0;
+  background:var(--dark);border-radius:12px;padding:18px 22px;
+  display:flex;align-items:center;gap:14px;
+  border:1px solid rgba(255,255,255,0.07);
+}
+.sms-text{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.5}
+.sms-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.38);margin-bottom:5px}
 
-/* FOOTER */
-.footer{background:var(--navy);color:#fff;padding:48px;text-align:center;font-size:13px}
-.footer a{color:#fff;text-decoration:none;font-weight:500}
+/* ── FEATURES ── */
+.features-section{padding:108px 48px;background:var(--dark)}
+.features-inner{max-width:1100px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:60px}
+.feature-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px 28px;
+  transition:all 0.25s;
+}
+.feature-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(37,99,235,0.35);transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,0.3)}
+.feature-icon-wrap{
+  width:52px;height:52px;border-radius:12px;font-size:24px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.feature-card h3{font-size:17px;font-weight:700;color:#fff;margin-bottom:10px}
+.feature-card p{font-size:14px;color:rgba(255,255,255,0.52);line-height:1.72}
+
+/* ── PRICING ── */
+.pricing-section{padding:108px 48px;background:#fff}
+.pricing-inner{max-width:880px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:60px}
+.pricing-card{
+  border:1.5px solid var(--border);border-radius:18px;padding:40px 36px;
+  position:relative;transition:box-shadow 0.2s;
+}
+.pricing-card.popular{
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(37,99,235,0.09),0 20px 56px rgba(37,99,235,0.14);
+}
+.popular-badge{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+  padding:5px 18px;border-radius:20px;white-space:nowrap;
+}
+.pricing-tier{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-2);margin-bottom:14px}
+.pricing-amount{display:flex;align-items:flex-end;gap:2px;line-height:1;margin-bottom:8px}
+.price-dollar{font-size:22px;font-weight:700;color:var(--text);padding-bottom:6px}
+.price-number{font-size:58px;font-weight:900;color:var(--text);letter-spacing:-2px}
+.price-period{font-size:14px;color:var(--text-2);font-weight:500;padding-bottom:10px}
+.pricing-tagline{font-size:13px;color:var(--text-2);margin-bottom:28px;line-height:1.55}
+.pricing-cta{
+  display:block;width:100%;padding:13px;text-align:center;
+  border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;text-decoration:none;transition:all 0.18s;margin-bottom:28px;border:none;
+}
+.pricing-cta.solid{background:var(--accent);color:#fff}
+.pricing-cta.solid:hover{background:#1D4ED8;transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,0.38)}
+.pricing-cta.outline{background:#fff;color:var(--accent);border:1.5px solid var(--accent)}
+.pricing-cta.outline:hover{background:rgba(37,99,235,0.04)}
+.pricing-sep{height:1px;background:var(--border);margin-bottom:24px}
+.pricing-feat{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:14px;color:var(--text);line-height:1.5}
+.pricing-check{color:var(--accent);font-size:14px;flex-shrink:0;margin-top:1px;font-weight:700}
+.pricing-footer{text-align:center;margin-top:36px;font-size:14px;color:var(--text-2)}
+.pricing-footer a{color:var(--accent);font-weight:600;text-decoration:none}
+.pricing-footer a:hover{text-decoration:underline}
+
+/* ── TESTIMONIALS ── */
+.testimonials-section{padding:108px 48px;background:#F5F7FA}
+.testimonials-inner{max-width:1100px;margin:0 auto}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:60px}
+.t-card{
+  background:#fff;border:1px solid var(--border);border-radius:16px;
+  padding:32px 28px;transition:box-shadow 0.2s;
+}
+.t-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.08)}
+.stars{display:flex;gap:3px;margin-bottom:16px}
+.star{color:#F59E0B;font-size:13px}
+.t-quote{font-size:14px;color:var(--text);line-height:1.78;margin-bottom:24px;font-style:italic}
+.t-author{display:flex;align-items:center;gap:12px}
+.t-avatar{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.t-name{font-size:14px;font-weight:700;color:var(--text)}
+.t-role{font-size:12px;color:var(--text-2);margin-top:2px}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  padding:108px 48px;background:var(--dark);
+  text-align:center;position:relative;overflow:hidden;
+}
+.final-cta::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.065) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,0.065) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+.final-cta-inner{position:relative;z-index:1}
+.final-cta h2{
+  font-size:clamp(34px,5.5vw,60px);font-weight:900;color:#fff;
+  line-height:1.05;letter-spacing:-1.5px;margin-bottom:16px;
+}
+.final-cta p{font-size:17px;color:rgba(255,255,255,0.55);line-height:1.65;max-width:480px;margin:0 auto 44px}
+
+/* ── FOOTER ── */
+.footer{
+  background:#060D1A;padding:44px 48px;text-align:center;
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.footer-logo{display:inline-flex;align-items:center;gap:9px;margin-bottom:22px;text-decoration:none}
+.footer-logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.4px}
+.footer-logo-text em{color:var(--accent-3);font-style:normal}
+.footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:22px;flex-wrap:wrap}
+.footer-links a{color:rgba(255,255,255,0.4);font-size:13px;font-weight:500;text-decoration:none;transition:color 0.2s}
+.footer-links a:hover{color:rgba(255,255,255,0.8)}
+.footer-copy{font-size:12px;color:rgba(255,255,255,0.25)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:100px 20px 64px}
+  .hero h1{letter-spacing:-1.2px}
+  .hero-ctas{flex-direction:column;align-items:center}
+  .btn-cta,.btn-ghost{width:100%;max-width:320px;text-align:center}
+  .pain-bar{padding:56px 20px}
+  .pain-bar-grid{grid-template-columns:1fr;gap:40px}
+  .pain-divider{display:none}
+  .pain-stat{padding:0}
+  .how-section,.demo-section,.features-section,.pricing-section,.testimonials-section,.final-cta{padding:76px 20px}
+  .how-steps{grid-template-columns:1fr;gap:40px}
+  .how-connector{display:none}
+  .features-grid,.testimonials-grid{grid-template-columns:1fr;gap:16px}
+  .pricing-grid{grid-template-columns:1fr}
+  .pricing-card.popular{margin-top:14px}
+  .footer{padding:36px 20px}
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-logo">
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect x="2" y="2" width="28" height="28" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
-    <span style="color:var(--navy)">Vetto<span style="color:var(--navy-accent)">Chat</span></span>
-  </div>
+<!-- ── NAV ── -->
+<nav class="nav" id="main-nav">
+  <a href="vettochat-landing.html" class="nav-logo">
+    <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+    <div class="nav-logo-text">Vetto<em>Chat</em></div>
+  </a>
   <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
     <li><a href="#demo">Demo</a></li>
-    <li><a href="#features">How it works</a></li>
     <li><a href="#pricing">Pricing</a></li>
   </ul>
   <div class="nav-right">
-    <a href="auth.html" style="text-decoration:none;color:var(--text-secondary);font-size:13px;font-weight:500">Log In</a>
-    <a href="auth.html#signup" style="text-decoration:none"><button class="btn-nav">Get Started</button></a>
+    <a href="auth.html" class="nav-login">Log In</a>
+    <a href="auth.html#signup" class="btn-nav">Get Started</a>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ── HERO ── -->
 <section class="hero">
-  <div class="hero-badge">AI-Powered Lead Qualification</div>
-  <h1>Let AI handle lead qualification</h1>
-  <p class="hero-sub">Get qualified leads automatically. Your chatbot asks the right questions, disqualifies tire-kickers, and sends you only serious prospects ready to buy.</p>
-  <div class="hero-ctas">
-    <a href="auth.html#signup" class="btn-primary">Get started free →</a>
-    <button class="btn-secondary" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">See demo below ↓</button>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="badge-dot"></span>AI-Powered Lead Qualification</div>
+    <h1>The job goes to whoever<br><em>calls back first.</em></h1>
+    <p class="hero-sub">VettoChat qualifies every visitor on your website in under 60 seconds — scoring them Hot, Warm, or Cold — so you only talk to leads who are ready to buy.</p>
+    <div class="hero-ctas">
+      <a href="auth.html#signup" class="btn-cta">Start Free Trial →</a>
+      <a href="#demo" class="btn-ghost">See How It Works ↓</a>
+    </div>
+    <div class="trust-row">
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L8.4 5.2H12.3L9.2 7.4L10.3 11.2L7 9L3.7 11.2L4.8 7.4L1.7 5.2H5.6L7 1.5Z" fill="currentColor"/></svg>
+        No credit card required
+      </div>
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 4V7.5L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        30-day free trial
+      </div>
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7.5L5.5 11L12 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Setup in under 10 minutes
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- DEMO SECTION -->
-<section id="demo-section" class="demo-section">
+<!-- ── PAIN POINT BAR ── -->
+<section class="pain-bar">
+  <div class="pain-bar-grid">
+    <div class="pain-stat">
+      <div class="pain-num"><em>78%</em></div>
+      <div class="pain-label">of jobs go to whoever calls back first — not the best contractor</div>
+    </div>
+    <div class="pain-divider"></div>
+    <div class="pain-stat">
+      <div class="pain-num"><em>47</em> min</div>
+      <div class="pain-label">average contractor response time. VettoChat responds in 30 seconds</div>
+    </div>
+    <div class="pain-divider"></div>
+    <div class="pain-stat">
+      <div class="pain-num"><em>3×</em></div>
+      <div class="pain-label">more qualified conversations captured vs. relying on phone calls alone</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how" class="how-section">
+  <div class="how-inner">
+    <span class="sec-label">Simple setup</span>
+    <div class="sec-title">Three steps.<br>One line of code.</div>
+    <p class="sec-sub">No developers. No IT. No migration. If you can paste text into a website, you can go live today.</p>
+    <div class="how-steps">
+      <div class="how-connector"></div>
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <span class="step-icon">💻</span>
+        <h3>Paste one line of code</h3>
+        <p>Drop a single script tag onto your website. Works on WordPress, Squarespace, Wix, or any custom site.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <span class="step-icon">🤖</span>
+        <h3>AI qualifies every visitor</h3>
+        <p>VettoChat asks the right questions, filters out tire-kickers, and scores every lead — automatically, 24/7, while you sleep.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <span class="step-icon">📲</span>
+        <h3>You get only the hot leads</h3>
+        <p>Instant SMS with name, service, budget, and phone number. No junk. No manual sorting. Just call them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DEMO ── (all JS-dependent classes preserved exactly as original) -->
+<section id="demo" class="demo-section">
   <div class="demo-container">
     <div class="demo-header">
-      <h2>See it in action</h2>
-      <p>Select an industry to see how Aria qualifies leads for your business</p>
+      <span class="sec-label" style="display:block">Live demo</span>
+      <div class="sec-title" style="text-align:center;color:var(--text);margin-top:4px">Watch it qualify a real lead</div>
+      <p style="text-align:center;font-size:15px;color:var(--text-2);margin-top:10px">Select your industry to see how Aria handles the conversation</p>
     </div>
-    
+
     <div class="industry-switcher">
-      <button class="industry-btn active" onclick="switchIndustry('roofing', this)">Roofing</button>
-      <button class="industry-btn" onclick="switchIndustry('plumbing', this)">Plumbing</button>
-      <button class="industry-btn" onclick="switchIndustry('hvac', this)">HVAC</button>
-      <button class="industry-btn" onclick="switchIndustry('electrical', this)">Electrical</button>
+      <button class="industry-btn active" onclick="switchIndustry('roofing', this)">🏠 Roofing</button>
+      <button class="industry-btn" onclick="switchIndustry('plumbing', this)">🔧 Plumbing</button>
+      <button class="industry-btn" onclick="switchIndustry('hvac', this)">❄️ HVAC</button>
+      <button class="industry-btn" onclick="switchIndustry('electrical', this)">⚡ Electrical</button>
     </div>
 
     <div class="chat-demo-container">
@@ -144,6 +475,10 @@ body{overflow-x:hidden}
         <div class="chat-info">
           <h3>Aria</h3>
           <p>Online · Replies instantly</p>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+          <div style="width:7px;height:7px;background:#22C55E;border-radius:50%;animation:blink 2s ease-in-out infinite"></div>
+          <span style="font-size:11px;color:rgba(255,255,255,0.5);font-weight:500">Live</span>
         </div>
       </div>
       <div class="chat-messages">
@@ -218,84 +553,186 @@ body{overflow-x:hidden}
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- FEATURES SECTION -->
-<section style="padding:100px 48px;background:linear-gradient(135deg,#f8fbff 0%,#f0f4ff 100%)">
-  <div style="max-width:1200px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:80px">
-      <h2 style="font-size:48px;font-weight:800;color:var(--navy);margin-bottom:12px">Built for your process</h2>
-      <p style="font-size:17px;color:var(--text-secondary);margin:0">Customize every aspect of Aria to match exactly how you qualify leads</p>
-    </div>
-    
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden;hover-transform:translateY(-4px)">
-        <div style="width:56px;height:56px;background:linear-gradient(135deg,#2563EB 0%,#3B82F6 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">?</div>
-        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">Custom Questions</h3>
-        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Build the exact qualification flow you need. Drag to reorder, toggle to enable, deploy instantly.</p>
-      </div>
-      
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden">
-        <div style="width:56px;height:56px;background:linear-gradient(135deg,#F59E0B 0%,#FBBF24 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">★</div>
-        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">Smart Scoring</h3>
-        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Auto-score every lead as hot, warm, or cold. Get SMS alerts only for prospects worth your time.</p>
-      </div>
-      
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:40px 28px;transition:all 0.3s;cursor:default;position:relative;overflow:hidden">
-        <div style="width:56px;height:56px;background:linear-gradient(135deg,#10B981 0%,#34D399 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px;color:#fff">↔</div>
-        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin-bottom:10px">CRM Sync</h3>
-        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin:0">Sync to Salesforce, HubSpot, Pipedrive, Zapier, or any platform. Zero manual data entry.</p>
+    <div class="sms-mock">
+      <div style="font-size:26px;flex-shrink:0">📲</div>
+      <div>
+        <div class="sms-label">Instant SMS Alert → Your Phone</div>
+        <div class="sms-text">🔥 <strong>Hot Lead:</strong> James Carter · Storm Damage · $2K–$8K · Emergency · (214) 555-0192</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FORM SECTION -->
-<section id="form-section" class="form-section">
-  <div class="form-container">
-    <h2>Ready to qualify leads?</h2>
-    <p>Start your 14-day free trial. No credit card required.</p>
-    
-    <form>
-      <div class="form-group">
-        <label class="form-label">Company Name</label>
-        <input type="text" class="form-input" placeholder="e.g., Texas Star Roofing">
+<!-- ── FEATURES ── -->
+<section id="features" class="features-section">
+  <div class="features-inner">
+    <span class="sec-label" style="color:var(--accent-3)">Why it works</span>
+    <div class="sec-title" style="color:#fff;margin-top:8px">Built for contractors,<br>not tech people.</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:rgba(37,99,235,0.15);border:1px solid rgba(37,99,235,0.2)">🔥</div>
+        <h3>Instant Lead Scoring</h3>
+        <p>Every visitor is automatically scored Hot, Warm, or Cold the moment they finish the chat — based on their service type, urgency, and budget. You always know who to call first.</p>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-input" placeholder="owner@company.com">
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.2)">📲</div>
+        <h3>Real-Time SMS Alerts</h3>
+        <p>The second a hot lead finishes the chat, you get a text with their name, service needed, budget, and phone number. No dashboard required — just pick up and call.</p>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">Phone</label>
-        <input type="tel" class="form-input" placeholder="(972) 555-1234">
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.2)">⚡</div>
+        <h3>Done-For-You Setup</h3>
+        <p>We configure your bot, your qualification questions, and your lead scoring in under 24 hours. Paste one line of code on your site. You're live before lunch.</p>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">Industry</label>
-        <div class="industries-grid">
-          <button type="button" class="industry-option" onclick="selectIndustry(this)">Roofing</button>
-          <button type="button" class="industry-option" onclick="selectIndustry(this)">Plumbing</button>
-          <button type="button" class="industry-option" onclick="selectIndustry(this)">HVAC</button>
-          <button type="button" class="industry-option" onclick="selectIndustry(this)">Electrical</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-inner">
+    <div style="text-align:center">
+      <span class="sec-label" style="display:inline-block">Pricing</span>
+      <div class="sec-title" style="margin-top:8px">Simple, transparent pricing.</div>
+      <p class="sec-sub" style="margin:12px auto 0;text-align:center">30 days free. No credit card. Cancel any time.</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- STARTER -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Starter</div>
+        <div class="pricing-amount">
+          <span class="price-dollar">$</span>
+          <span class="price-number">97</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-tagline">Everything you need to stop missing leads from your website.</div>
+        <a href="auth.html#signup" class="pricing-cta outline">Start Free Trial</a>
+        <div class="pricing-sep"></div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Chat widget on your website</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Up to 50 qualified leads/mo</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Real-time CRM dashboard</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Email notifications</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Bot customization</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Standard support</div>
+      </div>
+      <!-- PRO -->
+      <div class="pricing-card popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-amount">
+          <span class="price-dollar">$</span>
+          <span class="price-number">197</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="pricing-tagline">For contractors who want every hot lead and zero missed opportunities.</div>
+        <a href="auth.html#signup" class="pricing-cta solid">Start Free Trial</a>
+        <div class="pricing-sep"></div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Everything in Starter</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span><strong>Unlimited</strong> leads per month</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Instant SMS alerts on hot leads</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Hot / Warm / Cold lead scoring</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Service area qualification</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Full CRM with notes &amp; pipeline</div>
+        <div class="pricing-feat"><span class="pricing-check">✓</span>Priority support</div>
+      </div>
+    </div>
+    <p class="pricing-footer">Start your 30-day free trial — <a href="auth.html#signup">no credit card required →</a></p>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div style="text-align:center">
+      <span class="sec-label" style="display:inline-block">Real results</span>
+      <div class="sec-title" style="margin-top:8px">Contractors closing more jobs.</div>
+    </div>
+    <div class="testimonials-grid">
+      <div class="t-card">
+        <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">"A lead came in at 11pm on a Tuesday. VettoChat qualified them and texted me immediately. Called back at 7am, signed a $12,400 full replacement that afternoon. That job alone paid for a year of VettoChat."</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#1D4ED8,#3B82F6)">MR</div>
+          <div>
+            <div class="t-name">Marcus Reynolds</div>
+            <div class="t-role">Owner · Reynolds Roofing · Plano, TX</div>
+          </div>
         </div>
       </div>
-      
-      <button type="submit" class="form-submit">Get started free</button>
-      <div class="form-footer">No credit card required. 14-day free trial. <a href="#">Privacy</a> · <a href="#">Terms</a></div>
-    </form>
+      <div class="t-card">
+        <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">"We were paying HomeAdvisor $200 a lead — competing with four other HVAC companies for the same customer. Now I get exclusive leads straight from my own site. Cut cost per job by more than half in 60 days."</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#0891B2,#22D3EE)">TK</div>
+          <div>
+            <div class="t-name">Tony Kowalski</div>
+            <div class="t-role">Owner · Kowalski HVAC · Fort Worth, TX</div>
+          </div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <p class="t-quote">"I used to miss calls while I was under a sink. Now they go through VettoChat and wait in my dashboard. I come up from a job and have three hot leads ready to call. My close rate went up because I'm only talking to serious buyers."</p>
+        <div class="t-author">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#059669,#34D399)">DS</div>
+          <div>
+            <div class="t-name">Derek Salinas</div>
+            <div class="t-role">Owner · Salinas Plumbing · Dallas, TX</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ── FINAL CTA ── -->
+<section class="final-cta">
+  <div class="final-cta-inner">
+    <h2>Stop losing jobs to<br>faster competitors.</h2>
+    <p>Set up in under 10 minutes. Every lead qualified automatically. Every hot prospect texted to you the second they're done.</p>
+    <a href="auth.html#signup" class="btn-cta" style="font-size:16px;padding:16px 48px">Start Free Trial →</a>
+    <div class="trust-row" style="margin-top:28px">
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L8.4 5.2H12.3L9.2 7.4L10.3 11.2L7 9L3.7 11.2L4.8 7.4L1.7 5.2H5.6L7 1.5Z" fill="currentColor"/></svg>
+        No credit card required
+      </div>
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 4V7.5L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        30-day free trial
+      </div>
+      <div class="trust-item">
+        <svg class="trust-icon" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7.5L5.5 11L12 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Setup in under 10 minutes
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
 <footer class="footer">
-  <p>&copy; 2026 VettoChat. AI lead qualification for service companies.</p>
-  <p style="margin-top:12px"><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Contact</a></p>
+  <a href="vettochat-landing.html" class="footer-logo">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+    <div class="footer-logo-text">Vetto<em>Chat</em></div>
+  </a>
+  <div class="footer-links">
+    <a href="#how">How it works</a>
+    <a href="#demo">Demo</a>
+    <a href="#pricing">Pricing</a>
+    <a href="auth.html">Log In</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+  <div class="footer-copy">© 2026 VettoChat. AI lead qualification for home service contractors.</div>
 </footer>
 
 <script>
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+// ── INDUSTRY SWITCHER (unchanged from original) ──
 const industries = {
   roofing: {
     services: ['Full Replacement', 'Leak Repair', 'Storm Damage', 'New Install'],
@@ -322,37 +759,37 @@ const industries = {
 function switchIndustry(industry, btn) {
   document.querySelectorAll('.industry-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  
+
   const data = industries[industry];
-  
+
   // Update service chips
   const serviceChips = document.querySelectorAll('.chat-messages .chips')[0];
   if(serviceChips) {
-    serviceChips.innerHTML = data.services.map((s, i) => 
+    serviceChips.innerHTML = data.services.map((s, i) =>
       `<div class="chip${i === 2 ? ' selected' : ''}">${s}</div>`
     ).join('');
   }
-  
+
   // Update budget chips - select middle/average option (index 1)
   const budgetChips = document.querySelectorAll('.chat-messages .chips')[1];
   if(budgetChips) {
-    budgetChips.innerHTML = data.budgets.map((b, i) => 
+    budgetChips.innerHTML = data.budgets.map((b, i) =>
       `<div class="chip${i === 1 ? ' selected' : ''}">${b}</div>`
     ).join('');
   }
-  
+
   // Update bot message to mention the industry
   const botMessages = document.querySelectorAll('.chat-messages .msg-bubble');
   if(botMessages[1]) {
     botMessages[1].innerHTML = `Nice to meet you, James! What ${industry} service do you need?`;
   }
-  
+
   // Update user response
   const userMsgs = document.querySelectorAll('.chat-messages .msg-user');
   if(userMsgs[1]) {
     userMsgs[1].innerHTML = `<div class="msg-bubble">${data.services[2]}</div>`;
   }
-  
+
   // Update budget response (index 3 after reordering)
   if(userMsgs[3]) {
     userMsgs[3].innerHTML = `<div class="msg-bubble">${data.budgets[1]}</div>`;
