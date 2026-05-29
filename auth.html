@@ -269,12 +269,6 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-// Register auth state listener immediately (before DOMContentLoaded) so we
-// never miss a SIGNED_IN event, including the OAuth return redirect.
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN' && session) afterLogin(session.user);
-});
-
 window.addEventListener('DOMContentLoaded', async () => {
   // Handle ?tab=signup or #signup in URL
   const params = new URLSearchParams(window.location.search);
@@ -282,9 +276,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     switchTab('signup');
   }
 
-  // If already logged in (existing session), redirect immediately
+  // If already logged in, redirect immediately
   const { data: { session } } = await supabase.auth.getSession();
-  if (session) { afterLogin(session.user); }
+  if (session) { afterLogin(session.user); return; }
+
+  // Handle OAuth callback (Google) — fires on return from provider
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) afterLogin(session.user);
+  });
 });
 
 function afterLogin(user) {
@@ -340,10 +339,7 @@ async function handleSignup() {
   const { data, error } = await supabase.auth.signUp({
     email,
     password: pw,
-    options: {
-      data: { full_name: name },
-      emailRedirectTo: window.location.href.split('?')[0].split('#')[0], // back to auth.html
-    },
+    options: { data: { full_name: name } },
   });
   setLoading('signup-btn', false, 'Create Account →', btn);
 
@@ -360,18 +356,11 @@ async function handleSignup() {
 
 // ── GOOGLE OAUTH ──────────────────────────────────────────────────────────────
 async function signInGoogle() {
-  // Build a clean absolute redirect URL that works whether served via HTTP or opened as a file
-  const redirectTo = window.location.href.split('?')[0].split('#')[0];
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo },
+    options: { redirectTo: window.location.origin + window.location.pathname },
   });
-  if (error) {
-    const msg = error.message.includes('provider is not enabled')
-      ? 'Google sign-in is not enabled yet. Use email & password instead, or enable Google in your Supabase dashboard.'
-      : error.message;
-    alert$('login-alert', 'err', msg);
-  }
+  if (error) alert$('login-alert', 'err', error.message);
 }
 
 // ── FORGOT PASSWORD ───────────────────────────────────────────────────────────
