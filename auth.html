@@ -164,97 +164,140 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const API = 'https://vettochat-backend.onrender.com';
+  // ── INIT SUPABASE ──────────────────────────────────────────────
+  const supabaseUrl = 'https://xneegnjcegsfkyvonziy.supabase.co';
+  // Use the exact Anon Key you already have in auth.js
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE';
+  
+  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const API = 'https://vettochat-backend.onrender.com';
 
-function showView(v) {
-  document.getElementById('view-login').classList.toggle('active', v === 'login');
-  document.getElementById('view-signup').classList.toggle('active', v === 'signup');
-  document.getElementById('tab-login').classList.toggle('active', v === 'login');
-  document.getElementById('tab-signup').classList.toggle('active', v === 'signup');
-  document.title = v === 'login' ? 'VettoChat — Log in' : 'VettoChat — Sign up';
-  clearErrors();
-}
+  // ── UI HELPERS ─────────────────────────────────────────────────
+  function showView(view) {
+    // Toggle active classes on the views
+    document.getElementById('view-login').classList.toggle('active', view === 'login');
+    document.getElementById('view-signup').classList.toggle('active', view === 'signup');
 
-function clearErrors() {
-  ['login-err','signup-err'].forEach(id => {
+    // Toggle active classes on the tabs
+    document.getElementById('tab-login').classList.toggle('active', view === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', view === 'signup');
+
+    // Hide any lingering errors when switching
+    document.getElementById('login-err').style.display = 'none';
+    document.getElementById('signup-err').style.display = 'none';
+  }
+
+  function showErr(id, msg) {
     const el = document.getElementById(id);
-    el.textContent = '';
-    el.classList.remove('visible');
-  });
-}
-
-function showErr(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.classList.add('visible');
-}
-
-function setLoading(btnId, loading, label) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.innerHTML = loading ? '<span class="spinner"></span>Please wait' : label;
-}
-
-function handleGoogle() {
-  // Placeholder — wire to your OAuth provider when ready
-  showErr('login-err', 'Google login is not configured yet.');
-  showErr('signup-err', 'Google sign-up is not configured yet.');
-}
-
-async function handleLogin() {
-  const email    = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  if (!email || !password) { showErr('login-err', 'Please fill in all fields.'); return; }
-
-  setLoading('login-btn', true, 'Log in');
-  try {
-    const res  = await fetch(`${API}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed. Please check your credentials.');
-    localStorage.setItem('vc_tenant_id', data.tenantId);
-    localStorage.setItem('vc_token', data.token);
-    window.location.href = 'VettoChat_Dashboard.html';
-  } catch (err) {
-    showErr('login-err', err.message);
-    setLoading('login-btn', false, 'Log in');
-  }
-}
-
-async function handleSignup() {
-  const biz      = document.getElementById('signup-biz').value.trim();
-  const name     = document.getElementById('signup-name').value.trim();
-  const email    = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
-  if (!biz || !name || !email || !password) {
-    showErr('signup-err', 'Please fill in all fields.');
-    return;
+    el.style.display = 'block';
+    el.innerText = msg;
   }
 
-  setLoading('signup-btn', true, 'Create my account');
-  try {
-    const res  = await fetch(`${API}/api/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, businessName: biz, ownerFullName: name }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Signup failed. Please try again.');
-    localStorage.setItem('vc_tenant_id', data.tenantId);
-    window.location.href = 'onboarding.html';
-  } catch (err) {
-    showErr('signup-err', err.message);
-    setLoading('signup-btn', false, 'Create my account');
+  function setLoading(btnId, isLoading, text) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = isLoading;
+    btn.innerHTML = isLoading ? '<div class="spinner"></div> Processing...' : text;
   }
-}
 
-if (new URLSearchParams(window.location.search).get('tab') === 'signup' || window.location.hash === '#signup') {
-  showView('signup');
-}
+  function handleGoogle() {
+    // We will wire this up to Supabase OAuth in Phase 2
+    alert("Google Sign-In integration coming soon!");
+  }
+
+  // ── AUTHENTICATION LOGIC ───────────────────────────────────────
+  
+  async function handleSignup() {
+    const biz      = document.getElementById('signup-biz').value.trim();
+    const name     = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    
+    if (!biz || !name || !email || !password) {
+      showErr('signup-err', 'Please fill in all fields.');
+      return;
+    }
+
+    setLoading('signup-btn', true, 'Create my account');
+    try {
+      // 1. Create the user directly in Supabase
+      const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+      });
+
+      if (authErr) throw authErr;
+      if (!authData.user) throw new Error("Signup failed. Please try again.");
+
+      // 2. Ping your Node backend to provision the Prisma database workspace
+      const res = await fetch(`${API}/api/clients/setup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          supabaseUserId: authData.user.id,
+          email: email, 
+          businessName: biz, 
+          ownerFullName: name 
+        }),
+      });
+
+      const dbData = await res.json();
+      if (!res.ok) throw new Error(dbData.error || 'Failed to setup workspace.');
+
+      // 3. Store tokens & redirect
+      localStorage.setItem('vc_token', authData.session.access_token);
+      localStorage.setItem('vc_tenant_id', dbData.client.id); // From your server.js response
+      
+      window.location.href = 'onboarding.html';
+    } catch (err) {
+      showErr('signup-err', err.message);
+      setLoading('signup-btn', false, 'Create my account');
+    }
+  }
+
+  async function handleLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    
+    if (!email || !password) {
+      showErr('login-err', 'Email and password required.');
+      return;
+    }
+
+    setLoading('login-btn', true, 'Log in');
+    try {
+      // 1. Authenticate user directly against Supabase
+      const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (authErr) throw authErr;
+
+      // 2. Get their workspace profile from Node backend to grab Tenant ID
+      const res = await fetch(`${API}/api/clients/me`, {
+        method: 'GET',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authData.session.access_token}` 
+        }
+      });
+      
+      const dbData = await res.json();
+      if (!res.ok) throw new Error('Could not load workspace profile.');
+
+      // 3. Store the JWT token & Dashboard Tenant ID
+      localStorage.setItem('vc_token', authData.session.access_token);
+      localStorage.setItem('vc_tenant_id', dbData.client.id);
+      
+      window.location.href = 'VettoChat_Dashboard.html';
+    } catch (err) {
+      showErr('login-err', err.message);
+      setLoading('login-btn', false, 'Log in');
+    }
+  }
 </script>
 </body>
 </html>
