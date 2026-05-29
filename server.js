@@ -21,21 +21,21 @@ io.on('connection', (socket) => {
 
 // 2. Lead Capture & Scoring Endpoint
 app.post('/api/leads/capture', async (req, res) => {
-  // Extract tenantId (from embed.js) and map it to orgId
-  const { tenantId, orgId, firstName, phone, intent, urgency } = req.body;
+  // Extract variables (matching new schema)
+  const { companyId, fullName, phone, intent, urgency } = req.body;
   
-  // The exact ID coming from your test frontend
-  const activeOrgId = orgId || tenantId || 'test-tenant-id';
+  // Fallback ID if none provided during testing
+  const activeCompanyId = companyId || 'test-company-id';
 
   try {
-    // 🔴 THE FIX: Auto-provision the Organization so the Foreign Key never fails
-    await prisma.organization.upsert({
-      where: { id: activeOrgId },
+    // Auto-provision the Client so the Foreign Key never fails
+    await prisma.client.upsert({
+      where: { id: activeCompanyId },
       update: {}, // If it exists, do nothing
       create: {
-        id: activeOrgId,
-        name: "Demo Contractor LLC",
-        ownerName: "Demo User",
+        id: activeCompanyId,
+        businessName: "Demo Contractor LLC",
+        ownerFullName: "Demo User",
         ownerPhone: "Not Provided",
         industry: "Home Services"
       }
@@ -49,11 +49,11 @@ app.post('/api/leads/capture', async (req, res) => {
     
     const status = score >= 50 ? 'Hot' : (score >= 20 ? 'Warm' : 'Cold');
 
-    // Write strictly mapping to your Prisma schema columns
+    // Write strictly mapping to your new Leads schema
     const dbLead = await prisma.lead.create({
       data: {
-        orgId: activeOrgId,
-        firstName: firstName,
+        companyId: activeCompanyId,
+        fullName: fullName || "Unknown Visitor",
         phone: phone || "No phone provided",
         intent: intent || "Not specified",
         urgency: urgency || "Not specified",
@@ -63,14 +63,13 @@ app.post('/api/leads/capture', async (req, res) => {
     });
 
     // Fire Real-Time Alert to Dashboard
-    console.log(`✅ Lead [${dbLead.firstName}] secured! Org: ${activeOrgId}`);
+    console.log(`✅ Lead [${dbLead.fullName}] secured! Company ID: ${activeCompanyId}`);
     io.emit('new_lead', dbLead); 
     
     return res.status(200).json({ success: true, lead: dbLead });
-
   } catch (error) {
-    console.error("Prisma Ingestion Error:", error);
-    return res.status(500).json({ error: "Failed to process lead" });
+    console.error("❌ Database Error:", error);
+    return res.status(500).json({ error: "Failed to save lead" });
   }
 });
 
