@@ -158,16 +158,6 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
       <label>Password</label>
       <input type="password" id="signup-password" placeholder="Choose a password" autocomplete="new-password">
     </div>
-    <div class="field">
-      <label>Industry</label>
-      <select id="signup-industry">
-        <option value="" disabled selected>Select your industry</option>
-        <option value="roofing">Roofing</option>
-        <option value="plumbing">Plumbing</option>
-        <option value="hvac">HVAC</option>
-        <option value="electrical">Electrical</option>
-      </select>
-    </div>
     <button class="submit" id="signup-btn" onclick="handleSignup()">Create my account</button>
     <div class="err-msg" id="signup-err"></div>
     <p class="switch-text">Already have an account? <span onclick="showView('login')">Log in</span></p>
@@ -240,8 +230,7 @@ async function handleSignup() {
   const name     = document.getElementById('signup-name').value.trim();
   const email    = document.getElementById('signup-email').value.trim();
   const password = document.getElementById('signup-password').value;
-  const industry = document.getElementById('signup-industry').value;
-  if (!biz || !name || !email || !password || !industry) {
+  if (!biz || !name || !email || !password) {
     showErr('signup-err', 'Please fill in all fields.');
     return;
   }
@@ -251,12 +240,11 @@ async function handleSignup() {
     const res  = await fetch(`${API}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, businessName: biz, ownerFullName: name, industry }),
+      body: JSON.stringify({ email, password, businessName: biz, ownerFullName: name }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Signup failed. Please try again.');
     localStorage.setItem('vc_tenant_id', data.tenantId);
-    localStorage.setItem('vc_tenant_industry', industry);
     window.location.href = 'onboarding.html';
   } catch (err) {
     showErr('signup-err', err.message);
