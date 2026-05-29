@@ -1,9 +1,6 @@
-const jwt = require('jsonwebtoken');
-
-const requireAuth = (req, res, next) => {
+// ── AUTH GUARD MIDDLEWARE (Updated for ES256) ────────────────────────────────
+const requireAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-
-  // Check if the Authorization header exists and follows the Bearer schema
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
@@ -11,19 +8,23 @@ const requireAuth = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verify the token using your Supabase JWT Secret
-    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET);
-    
-    // Supabase stores the unique User ID inside the 'sub' (subject) claim of the JWT
-    req.user = {
-      id: decoded.sub,
-      email: decoded.email
-    };
+    // Ping Supabase directly to validate the token and get the user
+    const response = await fetch('https://xneegnjcegsfkyvonziy.supabase.co/auth/v1/user', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE'
+      }
+    });
 
-    next(); // Token is valid, proceed to the route handler
+    if (!response.ok) {
+      return res.status(401).json({ error: 'Invalid or expired token.' });
+    }
+
+    const user = await response.json();
+    req.user = { id: user.id, email: user.email };
+    next(); 
   } catch (error) {
-    console.error('Security Alert: Invalid or expired token attempted:', error.message);
-    return res.status(401).json({ error: 'Invalid or expired token.' });
+    return res.status(500).json({ error: 'Auth service unreachable.' });
   }
 };
 
