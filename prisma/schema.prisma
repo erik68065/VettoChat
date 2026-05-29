@@ -11,14 +11,16 @@ datasource db {
 
 // 1. CLIENTS (The Business / Contractor)
 model Client {
-  id            String   @id @default(uuid())
-  businessName  String
-  ownerFullName String
-  ownerPhone    String
-  industry      String
-  createdAt     DateTime @default(now())
+  id              String   @id @default(uuid())
+  supabaseUserId  String?  @unique  // Links to Supabase auth.users.id
+  email           String?
+  businessName    String
+  ownerFullName   String
+  ownerPhone      String
+  industry        String
+  createdAt       DateTime @default(now())
 
-  leads         Lead[]
+  leads           Lead[]
 
   @@map("clients")
 }

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VettoChat — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F1F3D;--navy-light:#1E40AF;--accent:#2563EB;--accent-dark:#1D4ED8;
+  --text:#0F1F3D;--text-2:#6B7280;--text-3:#9CA3AF;
+  --border:#E5E7EB;--bg:#F8FAFC;--surface:#FFFFFF;
+  --error:#DC2626;--error-bg:#FEF2F2;--success:#16A34A;--success-bg:#F0FDF4;
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;min-height:100vh}
+
+/* ── SPLIT LAYOUT ── */
+.split{display:flex;width:100%;min-height:100vh}
+
+/* ── BRAND PANEL ── */
+.brand{
+  width:42%;flex-shrink:0;
+  background:linear-gradient(145deg,#0A1628 0%,#0F2347 50%,#1E3A6B 100%);
+  display:flex;flex-direction:column;justify-content:center;padding:60px 56px;
+  color:#fff;position:relative;overflow:hidden
+}
+.brand::before{content:'';position:absolute;top:-120px;right:-120px;width:450px;height:450px;background:radial-gradient(circle,rgba(37,99,235,0.35) 0%,transparent 65%);pointer-events:none}
+.brand::after{content:'';position:absolute;bottom:-80px;left:-80px;width:350px;height:350px;background:radial-gradient(circle,rgba(30,64,175,0.25) 0%,transparent 65%);pointer-events:none}
+.brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:64px;position:relative;z-index:1}
+.brand-logo-text{font-size:21px;font-weight:800;letter-spacing:-0.4px}
+.brand-logo-text span{color:#60A5FA}
+.brand-headline{font-size:clamp(26px,2.8vw,36px);font-weight:800;line-height:1.2;margin-bottom:18px;position:relative;z-index:1}
+.brand-sub{font-size:15px;color:rgba(255,255,255,0.65);line-height:1.75;max-width:370px;margin-bottom:52px;position:relative;z-index:1}
+.brand-stats{display:flex;gap:44px;position:relative;z-index:1}
+.stat-num{font-size:30px;font-weight:800;color:#60A5FA;line-height:1}
+.stat-label{font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;font-weight:500}
+.brand-testimonial{margin-top:56px;padding:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;position:relative;z-index:1}
+.testimonial-text{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;margin-bottom:12px;font-style:italic}
+.testimonial-author{display:flex;align-items:center;gap:10px}
+.testimonial-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.testimonial-name{font-size:12px;font-weight:600;color:rgba(255,255,255,0.9)}
+.testimonial-role{font-size:11px;color:rgba(255,255,255,0.5)}
+
+/* ── FORM PANEL ── */
+.form-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;overflow-y:auto}
+.auth-card{width:100%;max-width:408px}
+.auth-logo-mobile{display:none;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.auth-logo-mobile-text{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-0.4px}
+.auth-logo-mobile-text span{color:var(--accent)}
+.auth-card-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.auth-card-sub{font-size:14px;color:var(--text-2);margin-bottom:24px}
+
+/* ── TABS ── */
+.auth-tabs{display:flex;background:#F3F4F6;border-radius:10px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13.5px;font-weight:600;color:var(--text-2);border-radius:7px;cursor:pointer;transition:all 0.18s;border:none;background:transparent;font-family:'Inter',sans-serif}
+.auth-tab.active{background:var(--surface);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+
+/* ── GOOGLE BUTTON ── */
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all 0.18s;margin-bottom:18px}
+.btn-google:hover{border-color:#9CA3AF;box-shadow:0 2px 8px rgba(0,0,0,0.07);background:#FAFAFA}
+
+/* ── DIVIDER ── */
+.or-divider{display:flex;align-items:center;gap:12px;margin-bottom:18px;color:var(--text-3);font-size:12px;font-weight:500}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── FORM FIELDS ── */
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:11.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.055em;margin-bottom:5px}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;border-radius:8px;outline:none;transition:all 0.18s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.form-input.err{border-color:var(--error);box-shadow:0 0 0 3px rgba(220,38,38,0.08)}
+
+/* ── PASSWORD ── */
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);font-size:15px;line-height:1;padding:4px}
+.pw-toggle:hover{color:var(--text-2)}
+.pw-strength{margin-top:7px}
+.strength-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.strength-bar{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;width:0}
+.strength-hint{font-size:11px;color:var(--text-3)}
+
+/* ── FORGOT LINK ── */
+.forgot-link{display:block;text-align:right;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;margin-top:5px;cursor:pointer}
+.forgot-link:hover{text-decoration:underline}
+
+/* ── PRIMARY BUTTON ── */
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--navy-light),var(--accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.18s;margin-top:4px}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,0.35)}
+.btn-primary:disabled{opacity:0.65;cursor:not-allowed}
+.btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.75s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── ALERT ── */
+.auth-alert{padding:11px 13px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:14px;display:none;align-items:flex-start;gap:8px;line-height:1.5}
+.auth-alert.err{background:var(--error-bg);color:var(--error);border:1px solid #FECACA;display:flex}
+.auth-alert.ok{background:var(--success-bg);color:var(--success);border:1px solid #BBF7D0;display:flex}
+
+/* ── FOOTER LINK ── */
+.auth-foot{text-align:center;font-size:13px;color:var(--text-2);margin-top:18px}
+.auth-foot a{color:var(--accent);font-weight:600;text-decoration:none;cursor:pointer}
+.auth-foot a:hover{text-decoration:underline}
+.terms{font-size:11px;color:var(--text-3);text-align:center;margin-top:10px;line-height:1.6}
+.terms a{color:var(--accent);text-decoration:none;font-weight:500}
+
+/* ── BACK LINK ── */
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--text-2);font-weight:500;cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;padding:0;margin-bottom:18px}
+.back-btn:hover{color:var(--navy)}
+
+/* ── CONFIRM SCREEN ── */
+.confirm-wrap{text-align:center;padding:8px 0}
+.confirm-icon{font-size:52px;margin-bottom:18px}
+.confirm-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.confirm-sub{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:20px}
+.confirm-notice{background:var(--success-bg);border:1px solid #BBF7D0;border-radius:8px;padding:13px;font-size:13px;color:var(--success);margin-bottom:20px;text-align:left;line-height:1.5}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .brand{display:none}
+  .form-panel{padding:32px 20px}
+  .auth-logo-mobile{display:flex}
+}
+</style>
+</head>
+<body>
+<div class="split">
+
+  <!-- ── BRAND PANEL ── -->
+  <div class="brand">
+    <div class="brand-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+      <div class="brand-logo-text">Vetto<span>Chat</span></div>
+    </div>
+    <div class="brand-headline">Qualify leads while<br>you sleep</div>
+    <p class="brand-sub">Your AI assistant works around the clock to capture, score, and qualify inbound leads — so you only talk to serious buyers.</p>
+    <div class="brand-stats">
+      <div><div class="stat-num">3×</div><div class="stat-label">More qualified leads</div></div>
+      <div><div class="stat-num">60s</div><div class="stat-label">Avg qualification</div></div>
+      <div><div class="stat-num">24/7</div><div class="stat-label">Always online</div></div>
+    </div>
+    <div class="brand-testimonial">
+      <div class="testimonial-text">"We closed 4 new roofing jobs in the first week. Setup took 10 minutes. The bot qualifies better than our front desk."</div>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">MR</div>
+        <div>
+          <div class="testimonial-name">Marcus Reynolds</div>
+          <div class="testimonial-role">Owner, Reynolds Roofing Co.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FORM PANEL ── -->
+  <div class="form-panel">
+    <div class="auth-card">
+
+      <!-- Mobile logo (hidden on desktop) -->
+      <div class="auth-logo-mobile">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+        <div class="auth-logo-mobile-text">Vetto<span>Chat</span></div>
+      </div>
+
+      <!-- ── LOGIN VIEW ── -->
+      <div id="view-login">
+        <div class="auth-card-title">Welcome back</div>
+        <div class="auth-card-sub">Sign in to your VettoChat account</div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchTab('login')">Log In</button>
+          <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        <div class="auth-alert" id="login-alert"></div>
+        <button class="btn-google" onclick="signInGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          Continue with Google
+        </button>
+        <div class="or-divider">or sign in with email</div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="login-email" placeholder="you@company.com" autocomplete="email" onkeydown="if(event.key==='Enter')handleLogin()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="login-pw" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()">
+            <button class="pw-toggle" onclick="togglePw('login-pw',this)" type="button">👁</button>
+          </div>
+          <span class="forgot-link" onclick="switchView('forgot')">Forgot password?</span>
+        </div>
+        <button class="btn-primary" id="login-btn" onclick="handleLogin()">Log In</button>
+        <div class="auth-foot">No account yet? <a onclick="switchTab('signup')">Create one free</a></div>
+      </div>
+
+      <!-- ── SIGNUP VIEW ── -->
+      <div id="view-signup" style="display:none">
+        <div class="auth-card-title">Create your account</div>
+        <div class="auth-card-sub">Start qualifying leads with AI — free to try</div>
+        <div class="auth-tabs">
+          <button class="auth-tab" onclick="switchTab('login')">Log In</button>
+          <button class="auth-tab active" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        <div class="auth-alert" id="signup-alert"></div>
+        <button class="btn-google" onclick="signInGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          Sign up with Google
+        </button>
+        <div class="or-divider">or sign up with email</div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="signup-name" placeholder="James Carter" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Work Email</label>
+          <input type="email" class="form-input" id="signup-email" placeholder="you@company.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="pw-wrap">
+            <input type="password" class="form-input" id="signup-pw" placeholder="Min. 8 characters" autocomplete="new-password" oninput="checkPwStrength(this.value)" onkeydown="if(event.key==='Enter')handleSignup()">
+            <button class="pw-toggle" onclick="togglePw('signup-pw',this)" type="button">👁</button>
+          </div>
+          <div class="pw-strength">
+            <div class="strength-track"><div class="strength-bar" id="strength-bar"></div></div>
+            <div class="strength-hint" id="strength-hint">Use 8+ characters with letters and numbers</div>
+          </div>
+        </div>
+        <button class="btn-primary" id="signup-btn" onclick="handleSignup()">Create Account →</button>
+        <div class="terms">By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+        <div class="auth-foot">Already have an account? <a onclick="switchTab('login')">Log in</a></div>
+      </div>
+
+      <!-- ── FORGOT PASSWORD VIEW ── -->
+      <div id="view-forgot" style="display:none">
+        <button class="back-btn" onclick="switchView('login')">← Back to login</button>
+        <div class="auth-card-title">Reset your password</div>
+        <div class="auth-card-sub">Enter your email and we'll send you a reset link</div>
+        <div class="auth-alert" id="forgot-alert"></div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="forgot-email" placeholder="you@company.com" onkeydown="if(event.key==='Enter')handleForgot()">
+        </div>
+        <button class="btn-primary" id="forgot-btn" onclick="handleForgot()">Send Reset Link</button>
+        <div class="auth-foot" style="margin-top:14px">Remember it? <a onclick="switchView('login')">Log in</a></div>
+      </div>
+
+      <!-- ── EMAIL CONFIRM VIEW ── -->
+      <div id="view-confirm" style="display:none">
+        <div class="confirm-wrap">
+          <div class="confirm-icon">📬</div>
+          <div class="confirm-title">Check your inbox</div>
+          <div class="confirm-sub">We sent a confirmation link to<br><strong id="confirm-email"></strong></div>
+          <div class="confirm-notice">After clicking the link in your email, you'll be taken through a quick workspace setup — takes about 5 minutes.</div>
+          <button class="back-btn" style="margin:0 auto;justify-content:center" onclick="switchView('login')">← Back to login</button>
+        </div>
+      </div>
+
+    </div><!-- /auth-card -->
+  </div><!-- /form-panel -->
+</div><!-- /split -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+// Get your anon key from: Supabase Dashboard → Project Settings → API → anon/public key
+const SUPABASE_URL  = 'https://xneegnjcegsfkyvonziy.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Handle ?tab=signup or #signup in URL
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('tab') === 'signup' || window.location.hash === '#signup') {
+    switchTab('signup');
+  }
+
+  // If already logged in, redirect immediately
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) { afterLogin(session.user); return; }
+
+  // Handle OAuth callback (Google) — fires on return from provider
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) afterLogin(session.user);
+  });
+});
+
+function afterLogin(user) {
+  const onboarded = localStorage.getItem('vc_onboarded_' + user.id);
+  // Store minimal user info for onboarding page to read
+  localStorage.setItem('vc_user', JSON.stringify({
+    id:    user.id,
+    email: user.email,
+    name:  user.user_metadata?.full_name || user.user_metadata?.name || '',
+  }));
+  window.location.href = onboarded ? 'VettoChat_Dashboard.html' : 'onboarding.html';
+}
+
+// ── VIEWS ─────────────────────────────────────────────────────────────────────
+function switchView(v) {
+  ['login','signup','forgot','confirm'].forEach(id =>
+    document.getElementById('view-' + id).style.display = id === v ? '' : 'none'
+  );
+}
+
+function switchTab(tab) {
+  if (tab === 'login')  { switchView('login');  }
+  else                  { switchView('signup'); }
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', tab === 'login' ? i === 0 : i === 1)
+  );
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-pw').value;
+  if (!email || !pw) { return alert$('login-alert', 'err', 'Please fill in all fields.'); }
+
+  const btn = setLoading('login-btn', true, 'Signing in…');
+  const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+  setLoading('login-btn', false, 'Log In', btn);
+
+  if (error) alert$('login-alert', 'err', error.message);
+  // onAuthStateChange handles redirect on success
+}
+
+// ── SIGNUP ────────────────────────────────────────────────────────────────────
+async function handleSignup() {
+  const name  = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pw    = document.getElementById('signup-pw').value;
+
+  if (!name || !email || !pw) { return alert$('signup-alert', 'err', 'Please fill in all fields.'); }
+  if (pw.length < 8)          { return alert$('signup-alert', 'err', 'Password must be at least 8 characters.'); }
+
+  const btn = setLoading('signup-btn', true, 'Creating account…');
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: pw,
+    options: { data: { full_name: name } },
+  });
+  setLoading('signup-btn', false, 'Create Account →', btn);
+
+  if (error) { alert$('signup-alert', 'err', error.message); return; }
+
+  // Email confirmation required (Supabase setting)
+  if (data.user && !data.session) {
+    document.getElementById('confirm-email').textContent = email;
+    switchView('confirm');
+    return;
+  }
+  // Auto-confirmed — onAuthStateChange fires and redirects
+}
+
+// ── GOOGLE OAUTH ──────────────────────────────────────────────────────────────
+async function signInGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname },
+  });
+  if (error) alert$('login-alert', 'err', error.message);
+}
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────────────────────
+async function handleForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { return alert$('forgot-alert', 'err', 'Please enter your email.'); }
+
+  const btn = setLoading('forgot-btn', true, 'Sending…');
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/auth.html',
+  });
+  setLoading('forgot-btn', false, 'Send Reset Link', btn);
+
+  if (error) { alert$('forgot-alert', 'err', error.message); return; }
+  alert$('forgot-alert', 'ok', 'Reset link sent! Check your inbox.');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function alert$(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = 'auth-alert ' + type;
+  el.textContent = (type === 'err' ? '⚠ ' : '✓ ') + msg;
+  el.style.display = 'flex';
+}
+
+function setLoading(btnId, on, label) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = on;
+  btn.innerHTML = on ? '<span class="btn-spinner"></span>' + label : label;
+  return btn;
+}
+
+function togglePw(inputId, btn) {
+  const el = document.getElementById(inputId);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  btn.textContent = el.type === 'password' ? '👁' : '🙈';
+}
+
+function checkPwStrength(val) {
+  const bar  = document.getElementById('strength-bar');
+  const hint = document.getElementById('strength-hint');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const pct    = (score / 4) * 100;
+  const colors = ['','#EF4444','#F59E0B','#10B981','#2563EB'];
+  const labels = ['Use 8+ characters with letters and numbers','Weak','Fair','Good — almost there','Strong'];
+  bar.style.width      = pct + '%';
+  bar.style.background = colors[score];
+  hint.textContent     = labels[score];
+  hint.style.color     = score > 0 ? colors[score] : '';
+}
+</script>
+</body>
+</html>

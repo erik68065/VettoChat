@@ -717,6 +717,9 @@ td.muted{font-size:12px;color:var(--muted)}
     <button class="sb-settings-btn" onclick="openCFM()" title="Manage contact fields & profile">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7.5" cy="7.5" r="2"/><path d="M7.5 1v1.2M7.5 12.8V14M1 7.5h1.2M12.8 7.5H14M2.99 2.99l.85.85M11.16 11.16l.85.85M11.16 3.84l.85-.85M2.99 12.01l.85-.85" stroke-linecap="round"/></svg>
     </button>
+    <button id="signOutBtn" title="Sign out" style="background:none;border:none;cursor:pointer;color:var(--sb-label);padding:5px;border-radius:6px;transition:all 0.15s;display:flex;align-items:center;line-height:0;flex-shrink:0;margin-left:2px" onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.color='';this.style.background=''">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2H12.5C13.05 2 13.5 2.45 13.5 3V12C13.5 12.55 13.05 13 12.5 13H9M6 10.5L2.5 7.5L6 4.5M2.5 7.5H10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1282,7 +1285,6 @@ Phone: (214) 555-0192
           <option value="plumbing">🔧 Plumbing</option>
           <option value="hvac">❄️ HVAC</option>
           <option value="electrical">⚡ Electrical</option>
-          <option value="landscaping">🌿 Landscaping</option>
           <option value="">Other</option>
         </select>
       </div>
@@ -1958,29 +1960,6 @@ const INDUSTRY_TEMPLATES = {
       {id:'budget',label:'Budget',question:'Budget?',answers:[
         {label:'$10K+',tier:'hot'},{label:'$3K–$10K',tier:'hot'},{label:'$500–$3K',tier:'warm'},
         {label:'Need Estimate',tier:'warm'},{label:'Under $500',tier:'cold'}]},
-    ]
-  },
-  landscaping: {
-    id:'landscaping', name:'Landscaping', icon:'🌿', description:'Lawn care, trees & hardscaping',
-    botName:'Leaf', chatLabel:'Transform your yard — free quote →',
-    steps:[
-      {key:'name',     type:'text',  question:'',                                              placeholder:'Enter your full name…',  enabled:true, chips:[]},
-      {key:'service',  type:'chips', question:'What landscaping service do you need?',         placeholder:'Or describe it…',        enabled:true, chips:['Full Landscaping','Lawn Maintenance','Tree Removal','Irrigation','Hardscaping','Seasonal Cleanup']},
-      {key:'location', type:'city-picker', question:'Select your city &amp; state',            placeholder:'Search for your city…',  enabled:true, chips:[]},
-      {key:'urgency',  type:'chips', question:"What's your timeline?",                        placeholder:'Or describe it…',        enabled:true, chips:['This week','This month','Next season','Ongoing contract']},
-      {key:'budget',   type:'chips', question:"What's your budget for this project?",         placeholder:'Or enter an amount…',    enabled:true, chips:['$15K+','$5K–$15K','$1K–$5K','Under $1K','Need Estimate']},
-      {key:'phone',    type:'phone', question:'What number should we call you at?',            placeholder:'10-digit number…',       enabled:true, chips:[]},
-    ],
-    scoring:[
-      {id:'service',label:'Service Type',question:'What landscaping service?',answers:[
-        {label:'Full Landscaping',tier:'hot'},{label:'Hardscaping',tier:'hot'},{label:'Tree Removal',tier:'warm'},
-        {label:'Irrigation',tier:'warm'},{label:'Lawn Maintenance',tier:'cold'},{label:'Seasonal Cleanup',tier:'cold'}]},
-      {id:'urgency',label:'Timeline',question:'Timeline?',answers:[
-        {label:'This week',tier:'hot'},{label:'This month',tier:'warm'},
-        {label:'Next season',tier:'cold'},{label:'Ongoing contract',tier:'warm'}]},
-      {id:'budget',label:'Budget',question:'Budget?',answers:[
-        {label:'$15K+',tier:'hot'},{label:'$5K–$15K',tier:'hot'},{label:'$1K–$5K',tier:'warm'},
-        {label:'Need Estimate',tier:'warm'},{label:'Under $1K',tier:'cold'}]},
     ]
   }
 };
@@ -3850,6 +3829,45 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('page-overview').classList.add('visible');
   });
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── AUTH GUARD ────────────────────────────────────────────────────────────────
+(async () => {
+  const SUPABASE_URL  = 'https://xneegnjcegsfkyvonziy.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE';
+  const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+
+  const user = session.user;
+
+  // Populate sidebar with real user info
+  const stored   = JSON.parse(localStorage.getItem('vc_user') || '{}');
+  const fullName = stored.name || user.user_metadata?.full_name || user.email;
+  const bizName  = localStorage.getItem('vc_bizName') || fullName;
+  const initials = fullName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+  const sbName   = document.getElementById('sbUserName');
+  const sbAvatar = document.getElementById('sbAvatar');
+  const sbBiz    = document.getElementById('sbClientName');
+  const sbRole   = document.getElementById('sbUserRole');
+
+  if (sbName)   sbName.textContent   = fullName;
+  if (sbAvatar) sbAvatar.textContent = initials;
+  if (sbBiz)    sbBiz.textContent    = bizName;
+  if (sbRole)   sbRole.textContent   = 'Account Owner';
+
+  // Sign out button (if one exists)
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', async () => {
+      await _sb.auth.signOut();
+      window.location.href = 'auth.html';
+    });
+  }
+})();
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>

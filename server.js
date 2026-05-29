@@ -90,6 +90,48 @@ app.post('/api/leads/capture', async (req, res) => {
   }
 });
 
+// ── Client Setup (Onboarding) ─────────────────────────────────────────────────
+// Creates or updates the Client record tied to a Supabase auth user.
+app.post('/api/clients/setup', async (req, res) => {
+  const { supabaseUserId, email, businessName, ownerFullName, ownerPhone, industry } = req.body;
+
+  if (!supabaseUserId || !businessName || !ownerFullName) {
+    return res.status(400).json({ error: 'supabaseUserId, businessName, and ownerFullName are required' });
+  }
+
+  try {
+    const client = await prisma.client.upsert({
+      where: { supabaseUserId },
+      update: { businessName, ownerFullName, ownerPhone: ownerPhone || '', industry: industry || 'General' },
+      create: {
+        supabaseUserId,
+        email:         email || '',
+        businessName,
+        ownerFullName,
+        ownerPhone:    ownerPhone || '',
+        industry:      industry || 'General',
+      },
+    });
+
+    console.log(`✅ Client setup: ${client.businessName} (${supabaseUserId})`);
+    return res.status(200).json({ success: true, client });
+  } catch (error) {
+    console.error('Client setup error:', error);
+    return res.status(500).json({ error: 'Failed to set up workspace' });
+  }
+});
+
+// ── Client Lookup by Supabase User ID ────────────────────────────────────────
+app.get('/api/clients/me/:userId', async (req, res) => {
+  try {
+    const client = await prisma.client.findUnique({ where: { supabaseUserId: req.params.userId } });
+    if (!client) return res.status(404).json({ error: 'No workspace found' });
+    return res.status(200).json({ client });
+  } catch (error) {
+    return res.status(500).json({ error: 'Lookup failed' });
+  }
+});
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

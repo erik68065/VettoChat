@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VettoChat — Workspace Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0F1F3D;--accent:#2563EB;--accent-light:#EFF6FF;--accent-dark:#1D4ED8;
+  --text:#0F1F3D;--text-2:#6B7280;--text-3:#9CA3AF;
+  --border:#E5E7EB;--bg:#F8FAFC;--surface:#fff;
+  --success:#16A34A;--success-bg:#F0FDF4;
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+
+/* ── SHELL ── */
+.shell{min-height:100vh;display:flex;flex-direction:column}
+.ob-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ob-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+.ob-logo-text{font-size:18px;font-weight:800;color:var(--navy);letter-spacing:-0.3px}
+.ob-logo-text span{color:var(--accent)}
+.ob-exit{font-size:13px;color:var(--text-2);text-decoration:none;font-weight:500}
+.ob-exit:hover{color:var(--navy)}
+
+/* ── PROGRESS ── */
+.progress-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px}
+.progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.progress-label{font-size:13px;font-weight:700;color:var(--navy)}
+.progress-count{font-size:12px;color:var(--text-2);font-weight:500}
+.progress-track{height:5px;background:#E9EDF2;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#1E40AF,#2563EB);border-radius:3px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
+
+/* ── MAIN ── */
+.ob-body{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px 80px}
+.ob-card{width:100%;max-width:560px}
+
+/* ── WELCOME SCREEN ── */
+.welcome-wrap{text-align:center}
+.welcome-emoji{font-size:52px;margin-bottom:18px;display:block}
+.welcome-title{font-size:28px;font-weight:800;color:var(--navy);margin-bottom:10px}
+.welcome-sub{font-size:15px;color:var(--text-2);line-height:1.75;margin-bottom:36px;max-width:460px;margin-left:auto;margin-right:auto}
+.welcome-steps{display:flex;flex-direction:column;gap:0;margin-bottom:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.welcome-step{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.welcome-step:last-child{border-bottom:none}
+.ws-icon{width:36px;height:36px;border-radius:8px;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ws-text{font-size:13.5px;font-weight:600;color:var(--navy)}
+.ws-sub{font-size:12px;color:var(--text-2);margin-top:2px}
+.welcome-timing{font-size:12px;color:var(--text-3);margin-bottom:28px}
+.welcome-timing strong{color:var(--text-2)}
+
+/* ── STEP SECTIONS ── */
+.step-wrap{display:none}
+.step-wrap.active{display:block}
+.step-icon-wrap{margin-bottom:22px}
+.step-icon{width:48px;height:48px;border-radius:12px;background:var(--accent-light);color:var(--accent);font-size:24px;display:flex;align-items:center;justify-content:center}
+.step-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--text-2);margin-bottom:28px;line-height:1.6}
+
+/* ── FORM ELEMENTS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11.5px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.055em;margin-bottom:5px}
+.form-input{width:100%;padding:11px 13px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;border-radius:8px;outline:none;transition:all 0.18s}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.form-hint{font-size:11.5px;color:var(--text-3);margin-top:5px}
+
+/* ── INDUSTRY GRID ── */
+.industry-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:6px}
+.industry-card{padding:14px 16px;border:1.5px solid var(--border);background:var(--surface);border-radius:10px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:12px;user-select:none}
+.industry-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.industry-card.selected{border-color:var(--accent);background:var(--accent-light)}
+.industry-card.selected .ic-dot{background:var(--accent)}
+.ic-emoji{font-size:22px;flex-shrink:0}
+.ic-name{font-size:13.5px;font-weight:600;color:var(--navy)}
+.ic-dot{width:8px;height:8px;border-radius:50%;background:var(--border);margin-left:auto;flex-shrink:0;transition:background 0.18s}
+
+/* ── COLOR PICKER ── */
+.color-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.color-swatch{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2.5px solid transparent;transition:all 0.15s;flex-shrink:0}
+.color-swatch.selected{border-color:var(--navy);transform:scale(1.12)}
+.color-custom{padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);background:var(--surface);cursor:pointer;transition:all 0.15s}
+.color-custom:hover{border-color:var(--accent);color:var(--accent)}
+input[type="color"]{display:none}
+
+/* ── PHONE INPUT ── */
+.phone-wrap{display:flex;gap:8px}
+.phone-prefix{padding:11px 13px;border:1.5px solid var(--border);background:#F9FAFB;border-radius:8px;font-size:14px;font-weight:600;color:var(--text-2);flex-shrink:0;line-height:1}
+
+/* ── SERVICE AREA ── */
+.sa-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;margin-bottom:16px}
+.sa-toggle-label{font-size:14px;font-weight:600;color:var(--navy)}
+.sa-toggle-sub{font-size:12px;color:var(--text-2);margin-top:2px}
+.toggle{width:44px;height:24px;background:#E5E7EB;border-radius:12px;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left 0.2s}
+.toggle.on::after{left:23px}
+.state-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.state-chip{padding:7px 13px;border:1.5px solid var(--border);background:var(--surface);border-radius:20px;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;transition:all 0.15s}
+.state-chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.sa-skip-note{font-size:12px;color:var(--text-3);margin-top:8px}
+
+/* ── BOT PREVIEW ── */
+.bot-preview{background:var(--navy);border-radius:12px;padding:20px;margin-bottom:20px}
+.bp-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.bp-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.bp-name{font-size:14px;font-weight:700;color:#fff}
+.bp-status{font-size:11px;color:rgba(255,255,255,0.55)}
+.bp-msg{background:rgba(255,255,255,0.1);border-radius:8px;padding:10px 13px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5}
+
+/* ── LAUNCH SUMMARY ── */
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.summary-row{display:flex;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);gap:12px}
+.summary-row:last-child{border-bottom:none}
+.summary-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0}
+.summary-key{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:0.05em;width:110px;flex-shrink:0}
+.summary-val{font-size:13.5px;font-weight:600;color:var(--navy);flex:1}
+.summary-edit{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap}
+.summary-edit:hover{text-decoration:underline}
+.launch-notice{background:var(--success-bg);border:1px solid #BBF7D0;border-radius:10px;padding:14px 16px;font-size:13px;color:var(--success);line-height:1.6;margin-bottom:24px}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:12px;margin-top:8px}
+.btn-primary{flex:1;padding:13px;background:linear-gradient(135deg,#1E40AF,var(--accent));color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.18s}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,0.35)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+.btn-back{padding:13px 18px;background:transparent;color:var(--text-2);border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.btn-back:hover{border-color:var(--navy);color:var(--navy)}
+.btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.75s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── ACCOUNT STEP (step 1 read-only) ── */
+.account-info{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.ai-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#1E40AF);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.ai-name{font-size:15px;font-weight:700;color:var(--navy)}
+.ai-email{font-size:13px;color:var(--text-2);margin-top:2px}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;background:var(--success-bg);color:var(--success);border:1px solid #BBF7D0;border-radius:20px;font-size:11px;font-weight:700;padding:3px 9px;margin-top:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:520px){
+  .form-row{grid-template-columns:1fr}
+  .industry-grid{grid-template-columns:1fr}
+  .ob-body{padding:28px 16px 64px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header class="ob-header">
+    <a href="vettochat-landing.html" class="ob-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M10 18C10 18 12 20 16 20C20 20 22 18 22 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="13" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+      <div class="ob-logo-text">Vetto<span>Chat</span></div>
+    </a>
+    <a href="auth.html" class="ob-exit">Save &amp; exit</a>
+  </header>
+
+  <!-- Progress bar (hidden on welcome) -->
+  <div class="progress-wrap" id="progress-wrap" style="display:none">
+    <div class="progress-meta">
+      <span class="progress-label" id="progress-label">Account Setup</span>
+      <span class="progress-count" id="progress-count">Step 1 of 6</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:16.67%"></div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <main class="ob-body">
+    <div class="ob-card">
+
+      <!-- ══════════════════════════════════════════
+           WELCOME SCREEN
+      ═══════════════════════════════════════════ -->
+      <div id="screen-welcome" class="welcome-wrap">
+        <span class="welcome-emoji">👋</span>
+        <div class="welcome-title">Welcome to VettoChat</div>
+        <p class="welcome-sub">Let's set up your AI lead qualification bot. We'll walk you through everything — from your business profile to going live on your website.</p>
+
+        <div class="welcome-steps">
+          <div class="welcome-step">
+            <div class="ws-icon">🏢</div>
+            <div>
+              <div class="ws-text">Your business profile</div>
+              <div class="ws-sub">Name, industry, and contact info</div>
+            </div>
+          </div>
+          <div class="welcome-step">
+            <div class="ws-icon">📍</div>
+            <div>
+              <div class="ws-text">Service area</div>
+              <div class="ws-sub">Where you serve customers</div>
+            </div>
+          </div>
+          <div class="welcome-step">
+            <div class="ws-icon">🎨</div>
+            <div>
+              <div class="ws-text">Customize your bot</div>
+              <div class="ws-sub">Brand colors, name, and greeting</div>
+            </div>
+          </div>
+          <div class="welcome-step">
+            <div class="ws-icon">🚀</div>
+            <div>
+              <div class="ws-text">Go live</div>
+              <div class="ws-sub">Get your embed code and launch</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="welcome-timing">Takes about <strong>5 minutes</strong> to complete setup</p>
+        <button class="btn-primary" style="max-width:240px;margin:0 auto;display:block;padding:14px 0" onclick="goToStep(1)">Continue Setup →</button>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 1 — ACCOUNT
+      ═══════════════════════════════════════════ -->
+      <div id="step-1" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">👤</div></div>
+        <div class="step-title">Your account</div>
+        <p class="step-sub">We'll use these details to personalise your workspace. Your email is verified and cannot be changed here.</p>
+
+        <div class="account-info">
+          <div class="ai-avatar" id="step1-avatar">?</div>
+          <div>
+            <div class="ai-name" id="step1-name">—</div>
+            <div class="ai-email" id="step1-email">—</div>
+            <div class="verified-badge">✓ Verified</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="f-name" placeholder="James Carter" autocomplete="name">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToWelcome()">← Back</button>
+          <button class="btn-primary" onclick="nextStep(1)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 2 — BUSINESS INFO
+      ═══════════════════════════════════════════ -->
+      <div id="step-2" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">🏢</div></div>
+        <div class="step-title">Your business</div>
+        <p class="step-sub">Tell us about your company. This is displayed in your dashboard and helps personalise your bot's conversations.</p>
+
+        <div class="form-group">
+          <label class="form-label">Business Name</label>
+          <input type="text" class="form-input" id="f-biz" placeholder="e.g. Reynolds Roofing Co.">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Industry</label>
+          <div class="industry-grid" id="industry-grid">
+            <div class="industry-card" onclick="selectIndustry('Roofing',this)">
+              <div class="ic-emoji">🏠</div>
+              <div><div class="ic-name">Roofing</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('Plumbing',this)">
+              <div class="ic-emoji">🔧</div>
+              <div><div class="ic-name">Plumbing</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('HVAC',this)">
+              <div class="ic-emoji">❄️</div>
+              <div><div class="ic-name">HVAC</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('Electrical',this)">
+              <div class="ic-emoji">⚡</div>
+              <div><div class="ic-name">Electrical</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('General Contractor',this)">
+              <div class="ic-emoji">🔨</div>
+              <div><div class="ic-name">General Contractor</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('Solar',this)">
+              <div class="ic-emoji">☀️</div>
+              <div><div class="ic-name">Solar</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('Pest Control',this)">
+              <div class="ic-emoji">🐛</div>
+              <div><div class="ic-name">Pest Control</div></div>
+              <div class="ic-dot"></div>
+            </div>
+            <div class="industry-card" onclick="selectIndustry('Other',this)">
+              <div class="ic-emoji">🏗️</div>
+              <div><div class="ic-name">Other</div></div>
+              <div class="ic-dot"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 3 — CONTACT INFO
+      ═══════════════════════════════════════════ -->
+      <div id="step-3" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">📞</div></div>
+        <div class="step-title">Contact information</div>
+        <p class="step-sub">Your phone number is used for lead notifications and will appear on your dashboard profile.</p>
+
+        <div class="form-group">
+          <label class="form-label">Business Phone</label>
+          <div class="phone-wrap">
+            <div class="phone-prefix">🇺🇸 +1</div>
+            <input type="tel" class="form-input" id="f-phone" placeholder="(555) 000-0000" maxlength="14" oninput="formatPhone(this)">
+          </div>
+          <div class="form-hint">We'll never share your number. Used only for lead alerts.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToStep(2)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 4 — SERVICE AREA
+      ═══════════════════════════════════════════ -->
+      <div id="step-4" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">📍</div></div>
+        <div class="step-title">Service area</div>
+        <p class="step-sub">Enable this to restrict leads to your operating territory. The bot will gracefully decline leads outside your area.</p>
+
+        <div class="sa-toggle-row">
+          <div>
+            <div class="sa-toggle-label">Enable service area filtering</div>
+            <div class="sa-toggle-sub">Only accept leads from the states you select</div>
+          </div>
+          <div class="toggle" id="sa-toggle" onclick="toggleSA()"></div>
+        </div>
+
+        <div id="sa-states-wrap" style="display:none">
+          <label class="form-label" style="margin-bottom:10px">Select your states</label>
+          <div class="state-chips" id="state-chips"></div>
+          <div class="sa-skip-note">You can add specific cities from your dashboard after setup.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToStep(3)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(4)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 5 — BOT CUSTOMIZATION
+      ═══════════════════════════════════════════ -->
+      <div id="step-5" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">🎨</div></div>
+        <div class="step-title">Customize your bot</div>
+        <p class="step-sub">Give your AI assistant a name and brand it to match your business. You can update this any time from the dashboard.</p>
+
+        <div class="form-group">
+          <label class="form-label">Assistant Name</label>
+          <input type="text" class="form-input" id="f-botname" placeholder="e.g. Aria, Alex, Max" maxlength="20" oninput="updateBotPreview()">
+          <div class="form-hint">Keep it short and friendly — 1 word works best.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Brand Color</label>
+          <div class="color-row" id="color-row">
+            <div class="color-swatch selected" style="background:#2563EB" data-color="#2563EB" onclick="selectColor('#2563EB',this)" title="VettoChat Blue"></div>
+            <div class="color-swatch" style="background:#DC2626" data-color="#DC2626" onclick="selectColor('#DC2626',this)" title="Red"></div>
+            <div class="color-swatch" style="background:#16A34A" data-color="#16A34A" onclick="selectColor('#16A34A',this)" title="Green"></div>
+            <div class="color-swatch" style="background:#D97706" data-color="#D97706" onclick="selectColor('#D97706',this)" title="Amber"></div>
+            <div class="color-swatch" style="background:#7C3AED" data-color="#7C3AED" onclick="selectColor('#7C3AED',this)" title="Purple"></div>
+            <div class="color-swatch" style="background:#0F766E" data-color="#0F766E" onclick="selectColor('#0F766E',this)" title="Teal"></div>
+            <div class="color-swatch" style="background:#1E293B" data-color="#1E293B" onclick="selectColor('#1E293B',this)" title="Slate"></div>
+            <button class="color-custom" onclick="document.getElementById('color-picker').click()">Custom</button>
+            <input type="color" id="color-picker" value="#2563EB" onchange="selectColor(this.value, null, true)">
+          </div>
+          <div class="form-hint">Used as your chat header and button color.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Opening Message</label>
+          <input type="text" class="form-input" id="f-greeting" placeholder="Hi! I'm Aria. I can get you a free quote in 60 seconds." oninput="updateBotPreview()">
+          <div class="form-hint">The first message your bot sends to every visitor.</div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="bot-preview" id="bot-preview">
+          <div class="bp-header">
+            <div class="bp-avatar" id="bp-avatar" style="background:#2563EB">A</div>
+            <div>
+              <div class="bp-name" id="bp-name">Aria</div>
+              <div class="bp-status">Online · Replies instantly</div>
+            </div>
+          </div>
+          <div class="bp-msg" id="bp-msg">Hi! I'm Aria. I can get you a free quote in 60 seconds.</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToStep(4)">← Back</button>
+          <button class="btn-primary" onclick="nextStep(5)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           STEP 6 — LAUNCH
+      ═══════════════════════════════════════════ -->
+      <div id="step-6" class="step-wrap">
+        <div class="step-icon-wrap"><div class="step-icon">🚀</div></div>
+        <div class="step-title">Ready to launch</div>
+        <p class="step-sub">Here's a summary of your workspace. Everything looks good — click Launch to go live.</p>
+
+        <div class="summary-card" id="summary-card">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="launch-notice">
+          🎉 Your AI chatbot will be ready the moment you click Launch. You'll get an embed code to add to any website in under 2 minutes.
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goToStep(5)">← Back</button>
+          <button class="btn-primary" id="launch-btn" onclick="handleLaunch()">🚀 Launch My Bot</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           SUCCESS SCREEN
+      ═══════════════════════════════════════════ -->
+      <div id="screen-success" style="display:none;text-align:center;padding:16px 0">
+        <div style="font-size:60px;margin-bottom:20px">🎉</div>
+        <div style="font-size:26px;font-weight:800;color:var(--navy);margin-bottom:10px">You're live!</div>
+        <p style="font-size:15px;color:var(--text-2);line-height:1.7;margin-bottom:32px;max-width:400px;margin-left:auto;margin-right:auto">Your AI bot is set up and ready to qualify leads. Head to your dashboard to get your embed code and start capturing customers.</p>
+        <button class="btn-primary" style="max-width:280px;margin:0 auto;display:block;padding:14px 0" onclick="window.location.href='VettoChat_Dashboard.html'">Go to Dashboard →</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://xneegnjcegsfkyvonziy.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE';
+const SERVER_URL    = 'https://vettochat-backend.onrender.com';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentStep = 0; // 0 = welcome
+let vcUser      = null;
+const formData  = {
+  name:      '',
+  bizName:   '',
+  industry:  '',
+  phone:     '',
+  saEnabled: false,
+  saStates:  [],
+  botName:   'Aria',
+  botColor:  '#2563EB',
+  greeting:  '',
+};
+
+const STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+  'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+  'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+  'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY',
+];
+
+const STEPS = [
+  { label: 'Account Setup',       pct: 16.67  },
+  { label: 'Business Info',       pct: 33.33  },
+  { label: 'Contact Info',        pct: 50     },
+  { label: 'Service Area',        pct: 66.67  },
+  { label: 'Bot Customization',   pct: 83.33  },
+  { label: 'Launch',              pct: 100    },
+];
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Load Supabase user
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+
+  vcUser = session.user;
+
+  // Populate from stored user info
+  const stored = JSON.parse(localStorage.getItem('vc_user') || '{}');
+  formData.name    = stored.name || vcUser.user_metadata?.full_name || '';
+  formData.botName = 'Aria';
+
+  // Populate step 1 account card
+  document.getElementById('step1-name').textContent  = formData.name || 'Your Name';
+  document.getElementById('step1-email').textContent = vcUser.email;
+  document.getElementById('step1-avatar').textContent = (formData.name || vcUser.email).charAt(0).toUpperCase();
+  if (formData.name) document.getElementById('f-name').value = formData.name;
+
+  // Build state chips
+  buildStateChips();
+
+  // Default greeting
+  document.getElementById('f-greeting').value = `Hi! I'm Aria. I can get you a free quote in 60 seconds.`;
+  updateBotPreview();
+});
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function goToWelcome() {
+  currentStep = 0;
+  hideAll();
+  document.getElementById('screen-welcome').style.display = '';
+  document.getElementById('progress-wrap').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function goToStep(n) {
+  currentStep = n;
+  hideAll();
+  document.getElementById('step-' + n).classList.add('active');
+  document.getElementById('progress-wrap').style.display = '';
+
+  const s = STEPS[n - 1];
+  document.getElementById('progress-label').textContent = s.label;
+  document.getElementById('progress-count').textContent = `Step ${n} of 6`;
+  document.getElementById('progress-fill').style.width  = s.pct + '%';
+
+  if (n === 6) buildSummary();
+  window.scrollTo(0, 0);
+}
+
+function hideAll() {
+  document.getElementById('screen-welcome').style.display = 'none';
+  document.getElementById('screen-success').style.display = 'none';
+  for (let i = 1; i <= 6; i++) {
+    document.getElementById('step-' + i).classList.remove('active');
+  }
+}
+
+// ── STEP VALIDATION + ADVANCE ─────────────────────────────────────────────────
+function nextStep(from) {
+  if (from === 1) {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { return shake('f-name', 'Please enter your full name.'); }
+    formData.name = name;
+    // Update avatar
+    document.getElementById('step1-avatar').textContent = name.charAt(0).toUpperCase();
+  }
+  if (from === 2) {
+    const biz = document.getElementById('f-biz').value.trim();
+    if (!biz)            { return shake('f-biz', 'Please enter your business name.'); }
+    if (!formData.industry) { return alert('Please select your industry.'); }
+    formData.bizName = biz;
+  }
+  if (from === 3) {
+    const phone = document.getElementById('f-phone').value.replace(/\D/g, '');
+    if (phone.length < 10) { return shake('f-phone', 'Please enter a valid 10-digit phone number.'); }
+    formData.phone = phone;
+  }
+  if (from === 4) {
+    if (formData.saEnabled && formData.saStates.length === 0) {
+      return alert('Please select at least one state, or disable service area filtering.');
+    }
+  }
+  if (from === 5) {
+    const botName = document.getElementById('f-botname').value.trim() || 'Aria';
+    const greeting = document.getElementById('f-greeting').value.trim();
+    formData.botName = botName;
+    formData.greeting = greeting || `Hi! I'm ${botName}. I can get you a free quote in 60 seconds.`;
+    formData.botColor = document.querySelector('.color-swatch.selected')?.dataset.color || '#2563EB';
+  }
+  goToStep(from + 1);
+}
+
+// ── LAUNCH ────────────────────────────────────────────────────────────────────
+async function handleLaunch() {
+  const btn = document.getElementById('launch-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spinner"></span>Setting up your workspace…';
+
+  try {
+    // Save widget config to localStorage (picked up by dashboard + widget)
+    const config = {
+      brandColor:  formData.botColor,
+      botName:     formData.botName,
+      chatLabel:   `Chat with ${formData.botName}`,
+      openingMessage: formData.greeting || `Hi! I'm ${formData.botName}. I can get you a free quote in 60 seconds.`,
+    };
+    localStorage.setItem('vettochat_config', JSON.stringify(config));
+
+    // Save service area config
+    if (formData.saEnabled && formData.saStates.length > 0) {
+      const saConfig = {
+        enabled: true,
+        states: formData.saStates,
+        cities: [],
+      };
+      localStorage.setItem('vettochat_service_area', JSON.stringify(saConfig));
+    }
+
+    // POST to backend — create/update Client record
+    const payload = {
+      supabaseUserId: vcUser.id,
+      email:          vcUser.email,
+      businessName:   formData.bizName,
+      ownerFullName:  formData.name,
+      ownerPhone:     formData.phone,
+      industry:       formData.industry,
+    };
+
+    const r = await fetch(`${SERVER_URL}/api/clients/setup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.error || 'Setup failed. Please try again.');
+    }
+
+    const { client } = await r.json();
+
+    // Store company ID and mark onboarded
+    localStorage.setItem('vc_companyId', client.id);
+    localStorage.setItem('vc_onboarded_' + vcUser.id, '1');
+
+    // Show success
+    hideAll();
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('screen-success').style.display = '';
+    window.scrollTo(0, 0);
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Launch My Bot';
+    alert('Error: ' + err.message);
+  }
+}
+
+// ── INDUSTRY ──────────────────────────────────────────────────────────────────
+function selectIndustry(name, el) {
+  document.querySelectorAll('.industry-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.industry = name;
+}
+
+// ── COLOR ─────────────────────────────────────────────────────────────────────
+function selectColor(hex, el, isCustom) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  if (el) {
+    el.classList.add('selected');
+  } else if (isCustom) {
+    // Add a temporary swatch for the custom color
+    const row = document.getElementById('color-row');
+    let custom = row.querySelector('.color-swatch[data-custom]');
+    if (!custom) {
+      custom = document.createElement('div');
+      custom.className = 'color-swatch';
+      custom.dataset.custom = '1';
+      custom.onclick = () => selectColor(hex, custom);
+      row.insertBefore(custom, row.children[row.children.length - 2]);
+    }
+    custom.style.background = hex;
+    custom.dataset.color = hex;
+    custom.classList.add('selected');
+  }
+  formData.botColor = hex;
+  updateBotPreview();
+}
+
+// ── SERVICE AREA ──────────────────────────────────────────────────────────────
+function toggleSA() {
+  const t = document.getElementById('sa-toggle');
+  formData.saEnabled = !formData.saEnabled;
+  t.classList.toggle('on', formData.saEnabled);
+  document.getElementById('sa-states-wrap').style.display = formData.saEnabled ? '' : 'none';
+}
+
+function buildStateChips() {
+  const container = document.getElementById('state-chips');
+  STATES.forEach(s => {
+    const chip = document.createElement('div');
+    chip.className = 'state-chip';
+    chip.textContent = s;
+    chip.onclick = () => {
+      chip.classList.toggle('selected');
+      if (chip.classList.contains('selected')) {
+        if (!formData.saStates.includes(s)) formData.saStates.push(s);
+      } else {
+        formData.saStates = formData.saStates.filter(x => x !== s);
+      }
+    };
+    container.appendChild(chip);
+  });
+}
+
+// ── BOT PREVIEW ───────────────────────────────────────────────────────────────
+function updateBotPreview() {
+  const name     = document.getElementById('f-botname').value.trim() || 'Aria';
+  const greeting = document.getElementById('f-greeting').value.trim() ||
+                   `Hi! I'm ${name}. I can get you a free quote in 60 seconds.`;
+  const color    = formData.botColor || '#2563EB';
+
+  document.getElementById('bp-avatar').textContent   = name.charAt(0).toUpperCase();
+  document.getElementById('bp-avatar').style.background = color;
+  document.getElementById('bp-name').textContent     = name;
+  document.getElementById('bp-msg').textContent      = greeting;
+}
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+function buildSummary() {
+  const rows = [
+    { icon:'👤', key:'Name',      val: formData.name,    step: 1 },
+    { icon:'🏢', key:'Business',  val: formData.bizName, step: 2 },
+    { icon:'🏗️', key:'Industry',  val: formData.industry,step: 2 },
+    { icon:'📞', key:'Phone',     val: formData.phone ? formatPhoneDisplay(formData.phone) : '—', step: 3 },
+    { icon:'📍', key:'Area',      val: formData.saEnabled ? (formData.saStates.join(', ') || 'All areas') : 'All areas', step: 4 },
+    { icon:'🤖', key:'Bot Name',  val: formData.botName, step: 5 },
+    { icon:'🎨', key:'Color',     val: formData.botColor,step: 5, isColor: true },
+  ];
+
+  const card = document.getElementById('summary-card');
+  card.innerHTML = rows.map(r => `
+    <div class="summary-row">
+      <span class="summary-icon">${r.icon}</span>
+      <span class="summary-key">${r.key}</span>
+      <span class="summary-val">${r.isColor
+        ? `<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:16px;height:16px;border-radius:4px;background:${r.val};display:inline-block;border:1px solid rgba(0,0,0,0.1)"></span>${r.val}</span>`
+        : r.val || '—'
+      }</span>
+      <span class="summary-edit" onclick="goToStep(${r.step})">Edit</span>
+    </div>
+  `).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function shake(inputId, msg) {
+  const el = document.getElementById(inputId);
+  el.classList.add('err');
+  el.focus();
+  setTimeout(() => el.classList.remove('err'), 2500);
+  // Inline error message
+  let errEl = el.parentElement.querySelector('.field-err');
+  if (!errEl) {
+    errEl = document.createElement('div');
+    errEl.className = 'field-err';
+    errEl.style.cssText = 'font-size:12px;color:#DC2626;margin-top:5px';
+    el.parentElement.appendChild(errEl);
+  }
+  errEl.textContent = msg;
+  setTimeout(() => { errEl.textContent = ''; el.classList.remove('err'); }, 3000);
+}
+
+function formatPhone(input) {
+  let val = input.value.replace(/\D/g, '').slice(0, 10);
+  if (val.length >= 6) val = `(${val.slice(0,3)}) ${val.slice(3,6)}-${val.slice(6)}`;
+  else if (val.length >= 3) val = `(${val.slice(0,3)}) ${val.slice(3)}`;
+  input.value = val;
+}
+
+function formatPhoneDisplay(digits) {
+  const d = digits.replace(/\D/g, '');
+  if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  return digits;
+}
+</script>
+</body>
+</html>
