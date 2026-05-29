@@ -2352,10 +2352,10 @@ function ingestFilteredLead(lead) {
   const now = Date.now();
   filteredLeads[id] = {
     id,
-    name:     lead.name     || lead.firstName || 'Unknown',
+    name:     lead.fullName || lead.name || lead.firstName || 'Unknown',
     phone:    (lead.phone   || '').replace(/\D/g, '').replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'),
     location: lead.location || lead.city || lead.zip || '',
-    service:  lead.service  || lead.intent || '',
+    service:  lead.intent   || lead.service || '',
     reason:   lead.reason   || 'out_of_area',
     created:  now
   };
@@ -2843,7 +2843,7 @@ window.addEventListener('beforeunload', (e) => {
 // Deduplicate: returns true if a lead with the same name+phone was ingested within 60s
 function _isDuplicateLead(lead) {
   const now   = Date.now();
-  const name  = (lead.name  || lead.firstName || '').toLowerCase().trim();
+  const name  = (lead.fullName || lead.name || lead.firstName || '').toLowerCase().trim();
   const phone = (lead.phone || '').replace(/\D/g, '');
   if (!name && !phone) return false;
   return Object.values(crmLeads).some(l => {
@@ -2894,7 +2894,7 @@ function crmIngestLead(lead) {
   if (!crmInited) loadCRMData();
 
   // Drop clearly invalid/spam leads before any processing
-  const rawName  = (lead.name || lead.firstName || '').trim();
+  const rawName  = (lead.fullName || lead.name || lead.firstName || '').trim();
   const rawPhone = (lead.phone || '').replace(/\D/g, '');
   if (!rawName || rawName.length < 2)            return { id: null, blocked: true, reason: 'invalid' };
   if (rawPhone.length > 0 && rawPhone.length !== 10) return { id: null, blocked: true, reason: 'invalid' };
@@ -2941,7 +2941,7 @@ function crmIngestLead(lead) {
 
   crmLeads[id] = {
     id,
-    name:        lead.name     || lead.firstName || 'Unknown',
+    name:        lead.fullName || lead.name || lead.firstName || 'Unknown',
     phone,
     email:       lead.email    || '',
     value,
@@ -3877,7 +3877,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save to CRM first — all data persisted before touching UI
     const ingested = crmIngestLead(lead);
 
-    const leadName = lead.name || lead.firstName || 'Unknown';
+    const leadName = lead.fullName || lead.name || lead.firstName || 'Unknown';
     const ls       = (lead.status || '').toLowerCase();
     const badgeClass = (ls === 'hot' || ls === 'high') ? 'pill-hot' : (ls === 'warm' || ls === 'medium') ? 'pill-warm' : 'pill-cold';
     const badgeLabel = (ls === 'hot' || ls === 'high') ? 'High'     : (ls === 'warm' || ls === 'medium') ? 'Medium'    : 'Low';

@@ -522,8 +522,9 @@ function _handleSpamHit(category) {
       try {
         const rawName = (S.data.name || S.data.firstName || 'Unknown').replace(/\b\w/g, c => c.toUpperCase());
         localStorage.setItem('vettochat_filtered_lead', JSON.stringify({
-          name: rawName, phone: S.data.phone || '', location: S.data.location || '',
-          service: S.data.service || '', reason: 'spam',
+          fullName: rawName, phone: S.data.phone || '', location: S.data.location || '',
+          intent: S.data.service || '', reason: 'spam', status: 'filtered',
+          companyId: _vc_config.companyId || null,
           _nonce: Date.now().toString(36) + Math.random().toString(36).slice(2), _ts: Date.now()
         }));
       } catch(_) {}
@@ -815,13 +816,15 @@ async function _submitOutOfArea(location) {
   // Write to filtered (not main) localStorage so the dashboard tracks it separately
   try {
     localStorage.setItem('vettochat_filtered_lead', JSON.stringify({
-      name:     fullName,
-      phone:    S.data.phone || '',
+      fullName,
+      phone:     S.data.phone || '',
       location,
-      service:  S.data.service || '',
-      reason:   'out_of_area',
-      _nonce:   Date.now().toString(36) + Math.random().toString(36).slice(2),
-      _ts:      Date.now()
+      intent:    S.data.service || '',
+      status:    'out_of_area',
+      companyId: _vc_config.companyId || null,
+      reason:    'out_of_area',
+      _nonce:    Date.now().toString(36) + Math.random().toString(36).slice(2),
+      _ts:       Date.now()
     }));
   } catch (_) {}
 }
@@ -844,24 +847,23 @@ async function finishConversation() {
     return;
   }
 
-  const locRaw   = S.data.location || '';
-  const locCity  = (locRaw.split(',')[0] || '').trim();
+  const locRaw = S.data.location || '';
 
+  // Leads table schema: id, phone, intent, urgency, score, status, createdAt, companyId, fullName
   const leadPayload = {
-    name:       fullName,
-    firstName:  fullName,
-    phone:      S.data.phone || 'N/A',
-    intent:     S.data.service || S.data.intent || 'General Inquiry',
-    service:    S.data.service || S.data.intent || 'General Inquiry',
-    urgency:    S.data.urgency || 'Not specified',
-    budget:     S.data.budget || '',
-    location:   locRaw,
-    city:       locCity,
-    source_url: window.location.hostname
+    fullName:  fullName,
+    phone:     S.data.phone || '',
+    intent:    S.data.service || S.data.intent || 'General Inquiry',
+    urgency:   S.data.urgency || 'Not specified',
+    score:     0,
+    status:    'new',
+    companyId: _vc_config.companyId || null,
+    // extra context for dashboard display (not stored in Leads table)
+    location:  locRaw,
+    budget:    S.data.budget || '',
   };
 
-  // Write lead to localStorage immediately so the dashboard tab picks it up
-  // with exact field names, independent of how the backend re-broadcasts it.
+  // Write to localStorage so dashboard tab picks it up instantly
   try {
     localStorage.setItem('vettochat_pending_lead', JSON.stringify({
       ...leadPayload,
