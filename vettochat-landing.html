@@ -123,18 +123,21 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
 
 /* PRICING */
 .pricing-section{padding:80px 40px;background:var(--light);border-top:1px solid var(--lborder)}
-.pricing-inner{max-width:420px;margin:0 auto;text-align:center}
+.pricing-inner{max-width:480px;margin:0 auto;text-align:center}
 .pricing-header{margin-bottom:28px}
 .pricing-header h2{font-size:clamp(26px,3.5vw,36px);font-weight:800;color:var(--lh);letter-spacing:-0.8px;line-height:1.1;margin-bottom:8px}
 .pricing-header p{font-size:15px;color:var(--lbody);line-height:1.6}
-.pricing-card{border:1px solid var(--lborder);border-radius:10px;padding:36px}
-.pricing-amount{display:flex;align-items:baseline;gap:2px;justify-content:center;margin-bottom:28px}
+.pricing-card{border:1px solid var(--lborder);border-top:3px solid var(--accent);border-radius:12px;padding:36px;box-shadow:0 4px 24px rgba(0,0,0,0.07)}
+.pricing-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);background:rgba(37,99,235,0.07);padding:4px 12px;border-radius:20px;margin-bottom:20px}
+.pricing-amount{display:flex;align-items:baseline;gap:2px;justify-content:center;margin-bottom:10px}
 .p-dollar{font-size:20px;font-weight:700;color:var(--lh);align-self:flex-start;margin-top:8px}
 .p-figure{font-size:54px;font-weight:800;color:var(--lh);letter-spacing:-2px;line-height:1}
 .p-period{font-size:14px;color:var(--lbody);font-weight:500;margin-left:2px}
+.pricing-value{font-size:13px;color:var(--lmuted);line-height:1.5;margin-bottom:24px}
 .pricing-list{list-style:none;text-align:left;border-top:1px solid var(--lborder);margin-bottom:28px}
-.pricing-list li{font-size:14px;color:var(--lh);padding:10px 0;border-bottom:1px solid var(--lborder)}
-.pricing-cta{display:block;width:100%;padding:12px;text-align:center;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--accent);color:#fff;border:none;transition:background 0.15s;margin-bottom:12px}
+.pricing-list li{font-size:14px;color:var(--lh);padding:11px 0 11px 26px;border-bottom:1px solid var(--lborder);position:relative}
+.pricing-list li::before{content:'✓';position:absolute;left:0;color:var(--accent);font-weight:700;font-size:13px}
+.pricing-cta{display:block;width:100%;padding:13px;text-align:center;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--accent);color:#fff;border:none;transition:background 0.15s;margin-bottom:12px}
 .pricing-cta:hover{background:var(--accent-h)}
 .pricing-note{font-size:12px;color:var(--lmuted)}
 
