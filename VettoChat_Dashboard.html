@@ -1139,7 +1139,7 @@ Phone: (214) 555-0192
               <h3>Embed on Your Website</h3>
               <p>Add your chatbot to any website by pasting one line of code. Works with WordPress, Wix, Squarespace, Webflow, and any custom HTML site.</p>
             </div>
-            <a id="embedPreviewLink" href="widget.html?preview=true" target="_blank" class="prev-btn" style="text-decoration:none">
+            <a id="embedPreviewLink" href="widget.html?preview=true" target="_blank" class="prev-btn" style="text-decoration:none" onclick="flushConfigForPreview()">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="2" width="12" height="9" rx="1.5"/><path d="M5 11v1.5M9 11v1.5M3.5 12.5h7" stroke-linecap="round"/></svg>
               Preview Widget
             </a>
@@ -2119,11 +2119,35 @@ function _doApplyTemplate(id) {
   showToastMsg(`${tmpl.icon} ${tmpl.name} template applied`, 'Click Save All Changes to push to chatbot.', '#7C3AED');
 }
 
+// Silently write current in-memory bot config to localStorage so the preview iframe
+// always reflects the selected industry template and any unsaved edits — no toasts.
+function flushConfigForPreview() {
+  try {
+    const name  = document.getElementById('identityName')?.value.trim()  || '';
+    const label = document.getElementById('identityLabel')?.value.trim() || '';
+    const color = document.getElementById('identityColor')?.value.trim() || '#1E40AF';
+    localStorage.setItem('vettochat_config', JSON.stringify({
+      configVersion:  CONFIG_VERSION,
+      assistantName:  name,
+      chatLabel:      label,
+      brandColor:     color,
+      openingMessage: buildOpeningMsg(name),
+      steps:          questionsToSteps(questions),
+      activeTemplate: _activeTemplate,
+      scoring:        SCORING_QUESTIONS.map(sq => ({
+        id: sq.id, label: sq.label, question: sq.question,
+        answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+      })),
+    }));
+  } catch(e) { console.warn('flushConfigForPreview failed', e); }
+}
+
 function openPreview() {
   const bg = document.getElementById('prevBg');
   const frame = document.getElementById('prevFrame');
   if (!bg) return;
-  // Reload iframe to pick up latest localStorage config, always in preview mode
+  // Flush current industry/question state so the iframe always shows what's configured now
+  flushConfigForPreview();
   if (frame) frame.src = 'widget.html?preview=true';
   bg.classList.add('open');
 }
