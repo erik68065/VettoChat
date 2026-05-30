@@ -350,7 +350,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
   <div class="pricing-inner">
     <div class="pricing-header">
       <h2>Try it free for 30 days.</h2>
-      <p>No credit card. No commitment. See if it works before you pay anything.</p>
+      <p>No credit card required. Pick your plan now and your trial starts immediately &mdash; you won't be charged until day 31.</p>
     </div>
     <div class="billing-toggle">
       <button id="btn-monthly" class="active" onclick="setBilling('monthly')">Monthly</button>
@@ -363,7 +363,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
         <span class="p-figure" id="price-figure">197</span>
         <span class="p-period">/mo</span>
       </div>
-      <p class="pricing-value" id="pricing-value">Billed monthly &mdash; cancel anytime</p>
+      <p class="pricing-value" id="pricing-value">After trial &mdash; billed monthly &mdash; cancel anytime</p>
       <ul class="pricing-list">
         <li>Unlimited leads</li>
         <li>Built-in CRM dashboard</li>
@@ -374,7 +374,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
         <li>30-day free trial included</li>
       </ul>
       <a href="auth.html" class="pricing-cta">Start Free Trial</a>
-      <p class="pricing-note">No credit card required</p>
+      <p class="pricing-note">30 days free &mdash; no credit card required &mdash; cancel anytime</p>
     </div>
   </div>
 </section>
@@ -471,8 +471,8 @@ function setBilling(plan) {
   document.getElementById('btn-annual').classList.toggle('active', isAnnual);
   document.getElementById('price-figure').textContent = isAnnual ? '164' : '197';
   document.getElementById('pricing-value').textContent = isAnnual
-    ? 'Billed $1,970/yr — save $394 (2 months free)'
-    : 'Billed monthly — cancel anytime';
+    ? 'After trial — billed $1,970/yr — save $394 (2 months free)'
+    : 'After trial — billed monthly — cancel anytime';
   document.getElementById('pricing-badge').textContent = isAnnual
     ? 'Best value'
     : 'All features included';
