@@ -140,6 +140,10 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
 .pricing-cta{display:block;width:100%;padding:13px;text-align:center;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;background:var(--accent);color:#fff;border:none;transition:background 0.15s;margin-bottom:12px}
 .pricing-cta:hover{background:var(--accent-h)}
 .pricing-note{font-size:12px;color:var(--lmuted)}
+.billing-toggle{display:inline-flex;align-items:center;background:var(--lborder);border-radius:100px;padding:4px;margin-bottom:28px;gap:2px}
+.billing-toggle button{border:none;background:transparent;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--lbody);padding:7px 18px;border-radius:100px;cursor:pointer;transition:all 0.15s}
+.billing-toggle button.active{background:#fff;color:var(--lh);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.10)}
+.billing-save{display:inline-block;font-size:11px;font-weight:600;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;padding:3px 10px;border-radius:20px;margin-left:6px;vertical-align:middle}
 
 /* TESTIMONIALS */
 .testimonials-section{padding:80px 40px;background:var(--light-2);border-top:1px solid var(--lborder)}
@@ -346,14 +350,20 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);o
   <div class="pricing-inner">
     <div class="pricing-header">
       <h2>Try it free for 30 days.</h2>
-      <p>No credit card. No commitment. See if it works before you pay anything. $197 per month after your trial.</p>
+      <p>No credit card. No commitment. See if it works before you pay anything.</p>
+    </div>
+    <div class="billing-toggle">
+      <button id="btn-monthly" class="active" onclick="setBilling('monthly')">Monthly</button>
+      <button id="btn-annual" onclick="setBilling('annual')">Annual <span class="billing-save">2 months free</span></button>
     </div>
     <div class="pricing-card">
+      <div class="pricing-badge" id="pricing-badge">All features included</div>
       <div class="pricing-amount">
         <span class="p-dollar">$</span>
-        <span class="p-figure">197</span>
+        <span class="p-figure" id="price-figure">197</span>
         <span class="p-period">/mo</span>
       </div>
+      <p class="pricing-value" id="pricing-value">Billed monthly &mdash; cancel anytime</p>
       <ul class="pricing-list">
         <li>Unlimited leads</li>
         <li>Built-in CRM dashboard</li>
@@ -453,6 +463,19 @@ function switchIndustry(industry, btn) {
 function selectIndustry(btn) {
   document.querySelectorAll('.industry-option').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+}
+
+function setBilling(plan) {
+  const isAnnual = plan === 'annual';
+  document.getElementById('btn-monthly').classList.toggle('active', !isAnnual);
+  document.getElementById('btn-annual').classList.toggle('active', isAnnual);
+  document.getElementById('price-figure').textContent = isAnnual ? '164' : '197';
+  document.getElementById('pricing-value').textContent = isAnnual
+    ? 'Billed $1,970/yr — save $394 (2 months free)'
+    : 'Billed monthly — cancel anytime';
+  document.getElementById('pricing-badge').textContent = isAnnual
+    ? 'Best value'
+    : 'All features included';
 }
 </script>
 </body>
