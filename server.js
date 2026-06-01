@@ -324,6 +324,41 @@ app.get('/api/leads', requireAuth, async (req, res) => {
   }
 });
 
+// server.js - THE NEW ONBOARDING SAVE ENDPOINT
+app.put('/api/clients/:id/settings', async (req, res) => {
+  const { id } = req.params; // This is the tenantId / client_id
+  const { industry, botName, themeColor, companyWebsite, businessName } = req.body;
+  
+  try {
+    // Note: Assuming you are using Prisma. If you are using Supabase JS directly on the server, 
+    // the syntax changes slightly to supabase.from('onboarding_settings').upsert(...)
+    
+    const settings = await prisma.onboarding_settings.upsert({
+      where: { client_id: id },
+      update: { 
+        botName: botName,
+        themeColor: themeColor,
+        companyWebsite: companyWebsite,
+        businessName: businessName, // Saves the name for easy UI reading
+        onboardingCompleted: true
+      },
+      create: {
+        client_id: id,
+        botName: botName,
+        themeColor: themeColor,
+        companyWebsite: companyWebsite,
+        businessName: businessName,
+        onboardingCompleted: true
+      }
+    });
+
+    res.status(200).json({ success: true, settings });
+  } catch (error) {
+    console.error("Settings Update Failed:", error);
+    res.status(500).json({ error: "Failed to save onboarding config" });
+  }
+});
+
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
