@@ -188,16 +188,14 @@ app.put('/api/clients/:id/settings', async (req, res) => {
   const { industry, botName, themeColor, companyWebsite, businessName } = req.body;
   
   try {
-    // Note: Assuming you are using Prisma. If you are using Supabase JS directly on the server, 
-    // the syntax changes slightly to supabase.from('onboarding_settings').upsert(...)
-    
-    const settings = await prisma.onboarding_settings.upsert({
+    // 🔥 FIXED: Changed prisma.onboarding_settings to prisma.onboardingSettings
+    const settings = await prisma.onboardingSettings.upsert({
       where: { client_id: id },
       update: { 
         botName: botName,
         themeColor: themeColor,
         companyWebsite: companyWebsite,
-        businessName: businessName, // Saves the name for easy UI reading
+        businessName: businessName,
         onboardingCompleted: true
       },
       create: {
