@@ -227,6 +227,26 @@ app.get('/api/organizations/:id', async (req, res) => {
   }
 });
 
+// server.js - FETCH ONBOARDING SETTINGS FOR DASHBOARD
+app.get('/api/clients/:id/settings', async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const settings = await prisma.onboardingSettings.findUnique({
+      where: { client_id: id }
+    });
+    
+    if (!settings) {
+      return res.status(404).json({ error: "Settings not found" });
+    }
+    
+    res.status(200).json(settings);
+  } catch (error) {
+    console.error("Failed to fetch settings:", error);
+    res.status(500).json({ error: "Failed to fetch onboarding config" });
+  }
+});
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
