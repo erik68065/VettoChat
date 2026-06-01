@@ -17,7 +17,7 @@
   // If no token is found, kick them to the login page immediately
   if (!token || !tenantId) {
     console.warn("Unauthorized access. Redirecting to login.");
-    window.location.href = "auth.html";
+    window.location.href = "get-started.html";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -77,7 +77,7 @@
   function handleLogout() {
     localStorage.removeItem('vc_token');
     localStorage.removeItem('vc_tenant_id');
-    window.location.href = "auth.html";
+    window.location.href = "get-started.html";
   }
 </script>
 <style>
@@ -4033,7 +4033,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
   const { data: { session } } = await _sb.auth.getSession();
-  if (!session) { window.location.href = 'auth.html'; return; }
+  if (!session) { window.location.href = 'get-started.html'; return; }
 
   const user = session.user;
 
@@ -4058,7 +4058,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async () => {
       await _sb.auth.signOut();
-      window.location.href = 'auth.html';
+      window.location.href = 'get-started.html';
     });
   }
 })();
