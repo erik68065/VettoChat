@@ -16,38 +16,40 @@
 html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 
 /* LOGO */
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;justify-content:center;margin-bottom:36px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;justify-content:center;margin-bottom:28px}
 .logo-mark{width:32px;height:32px;background:#1E40AF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-text{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.2px}
 .logo-text span{color:#60A5FA}
 
 /* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:52px 64px 48px;width:100%;max-width:680px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px 60px 36px;width:100%;max-width:780px}
 
 /* TABS */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px}
-.tab{flex:1;padding:13px 0;text-align:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px}
+.tab{flex:1;padding:11px 0;text-align:center;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s}
 .tab:hover{color:var(--body)}
 .tab.active{color:var(--h);border-bottom-color:var(--accent)}
 
 /* GOOGLE BUTTON */
 .btn-google{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  padding:12px 16px;background:rgba(255,255,255,0.05);
+  padding:11px 16px;background:rgba(255,255,255,0.05);
   border:1px solid var(--border-2);border-radius:8px;
   font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--body);
-  cursor:pointer;transition:all 0.15s;margin-bottom:20px;
+  cursor:pointer;transition:all 0.15s;margin-bottom:16px;
 }
 .btn-google:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.18);color:var(--h)}
 
 /* DIVIDER */
-.divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .divider span{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
 
 /* FORM */
-.form-head{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:24px}
-.field{margin-bottom:20px}
+.form-head{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:20px}
+.field{margin-bottom:16px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.field-row .field{margin-bottom:0}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
 .field input,.field select{
   width:100%;padding:12px 14px;
@@ -74,7 +76,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .err-msg.visible{display:block}
 
 /* SWITCH */
-.switch-text{text-align:center;font-size:13px;color:var(--muted);margin-top:24px}
+.switch-text{text-align:center;font-size:13px;color:var(--muted);margin-top:18px}
 .switch-text span{color:var(--accent);cursor:pointer;font-weight:600}
 .switch-text span:hover{text-decoration:underline}
 
@@ -142,21 +144,25 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 
     <div class="divider"><span>or sign up with email</span></div>
 
-    <div class="field">
-      <label>Business name</label>
-      <input type="text" id="signup-biz" placeholder="Your company name" autocomplete="organization">
+    <div class="field-row">
+      <div class="field">
+        <label>Business name</label>
+        <input type="text" id="signup-biz" placeholder="Your company name" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label>Your full name</label>
+        <input type="text" id="signup-name" placeholder="First and last name" autocomplete="name">
+      </div>
     </div>
-    <div class="field">
-      <label>Your full name</label>
-      <input type="text" id="signup-name" placeholder="First and last name" autocomplete="name">
-    </div>
-    <div class="field">
-      <label>Email address</label>
-      <input type="email" id="signup-email" placeholder="you@company.com" autocomplete="email">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="signup-password" placeholder="Choose a password" autocomplete="new-password">
+    <div class="field-row">
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" id="signup-email" placeholder="you@company.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="Choose a password" autocomplete="new-password">
+      </div>
     </div>
     <button class="submit" id="signup-btn" onclick="handleSignup()">Create my account</button>
     <div class="err-msg" id="signup-err"></div>
