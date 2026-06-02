@@ -277,38 +277,6 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
     alert("Google Sign-In integration coming soon!");
   }
 
-  // ── EMAIL CONFIRMATION HANDLER ─────────────────────────────────
-  // Fires when Supabase redirects back after the user clicks the confirmation link
-  supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      const pending = JSON.parse(localStorage.getItem('vc_pending_signup') || 'null');
-      if (!pending) return; // existing login, not a new signup confirmation
-
-      try {
-        const res = await fetch(`${API}/api/clients/setup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            supabaseUserId: session.user.id,
-            email: session.user.email,
-            businessName: pending.biz,
-            ownerFullName: pending.name
-          }),
-        });
-        const dbData = await res.json();
-        if (!res.ok) throw new Error(dbData.error || 'Failed to set up workspace.');
-
-        localStorage.removeItem('vc_pending_signup');
-        localStorage.setItem('vc_token', session.access_token);
-        localStorage.setItem('vc_tenant_id', dbData.client.id);
-        window.location.href = 'on-boarding.html';
-      } catch (err) {
-        showView('signup');
-        showErr('signup-err', err.message);
-      }
-    }
-  });
-
   // ── AUTHENTICATION LOGIC ───────────────────────────────────────
 
   async function handleSignup() {
@@ -327,11 +295,16 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
       const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin + '/get-started.html' }
+        options: { emailRedirectTo: window.location.origin + '/verify.html' }
       });
 
       if (authErr) throw authErr;
       if (!authData.user) throw new Error('Signup failed. Please try again.');
+
+      // Duplicate email — Supabase returns an empty identities array for existing accounts
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        throw new Error('An account with this email already exists. Please sign in or use a different email address.');
+      }
 
       // Store biz/name so the confirmation handler can use them after redirect
       localStorage.setItem('vc_pending_signup', JSON.stringify({ biz, name, email }));
@@ -385,7 +358,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
       const { error } = await supabaseClient.auth.resend({
         type: 'signup',
         email: pending.email,
-        options: { emailRedirectTo: window.location.origin + '/get-started.html' }
+        options: { emailRedirectTo: window.location.origin + '/verify.html' }
       });
 
       if (error) throw error;
