@@ -85,16 +85,24 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .view.active{display:block}
 
 /* VERIFY EMAIL */
-.verify-wrap{text-align:center;padding:12px 0 8px}
-.verify-icon{font-size:52px;margin-bottom:18px;display:block}
-.verify-title{font-size:20px;font-weight:700;color:var(--h);margin-bottom:10px}
-.verify-sub{font-size:14px;color:var(--body);line-height:1.7;margin-bottom:20px}
-.verify-sub strong{color:var(--h)}
-.verify-note{font-size:13px;color:var(--muted);margin-top:20px}
-.verify-note span{color:var(--accent);cursor:pointer;font-weight:600}
-.verify-note span:hover{text-decoration:underline}
-.verify-back{margin-top:14px;display:block;font-size:13px;color:var(--muted);cursor:pointer;transition:color 0.15s}
-.verify-back:hover{color:var(--body)}
+.verify-wrap{text-align:center;padding:8px 0 4px}
+.verify-icon-ring{width:88px;height:88px;border-radius:50%;background:rgba(37,99,235,0.1);border:2px solid rgba(37,99,235,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;position:relative;animation:ringPulse 2.5s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.15)}50%{box-shadow:0 0 0 10px rgba(37,99,235,0)}}
+.verify-icon-ring svg{width:40px;height:40px}
+.verify-badge{position:absolute;bottom:0;right:0;width:24px;height:24px;background:#16A34A;border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center}
+.verify-badge svg{width:12px;height:12px}
+.verify-title{font-size:22px;font-weight:800;color:var(--h);margin-bottom:10px;letter-spacing:-0.4px}
+.verify-email-pill{display:inline-block;background:rgba(255,255,255,0.06);border:1px solid var(--border-2);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--body);margin-bottom:20px}
+.verify-desc{font-size:14px;color:var(--body);line-height:1.75;max-width:400px;margin:0 auto 28px}
+.verify-btn-primary{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s;margin-bottom:10px}
+.verify-btn-primary:hover{background:var(--accent-h)}
+.verify-btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+.verify-btn-ghost{width:100%;padding:12px;background:rgba(255,255,255,0.04);color:var(--body);border:1px solid var(--border-2);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-bottom:24px}
+.verify-btn-ghost:hover{background:rgba(255,255,255,0.08);color:var(--h)}
+.verify-divider{height:1px;background:var(--border);margin-bottom:20px}
+.verify-spam{font-size:12px;color:var(--muted);line-height:1.6}
+.verify-resent{display:none;font-size:13px;color:#22C55E;font-weight:600;margin-bottom:10px;align-items:center;justify-content:center;gap:6px}
+.verify-resent.show{display:flex}
 
 /* SPINNER */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
@@ -184,12 +192,35 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   <!-- VERIFY EMAIL VIEW -->
   <div class="view" id="view-verify">
     <div class="verify-wrap">
-      <span class="verify-icon">📬</span>
-      <div class="verify-title">Check your inbox</div>
-      <p class="verify-sub">We sent a confirmation link to<br><strong id="verify-email-display"></strong></p>
-      <p style="font-size:13px;color:var(--body);line-height:1.6">Click the link in that email to activate your account and get started. It may take a minute to arrive.</p>
-      <p class="verify-note">Didn't get it? Check your spam folder or <span onclick="resendEmail()">resend the email</span>.</p>
-      <span class="verify-back" onclick="showView('signup')">← Back to sign up</span>
+
+      <!-- Animated icon -->
+      <div class="verify-icon-ring">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="20" fill="rgba(37,99,235,0.12)"/>
+          <path d="M8 14a2 2 0 012-2h20a2 2 0 012 2v12a2 2 0 01-2 2H10a2 2 0 01-2-2V14z" stroke="#60A5FA" stroke-width="1.5"/>
+          <path d="M8 14l12 9 12-9" stroke="#60A5FA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="verify-badge">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="verify-title">You're Almost There!</div>
+      <div class="verify-email-pill" id="verify-email-display"></div>
+      <p class="verify-desc">We've sent a verification email to your inbox. Please click the confirmation link in the email to activate your account and complete your signup.</p>
+
+      <!-- Resent confirmation -->
+      <div class="verify-resent" id="verify-resent">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="#22C55E"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Verification email sent!
+      </div>
+
+      <button class="verify-btn-primary" id="resend-btn" onclick="resendEmail()">Resend Verification Email</button>
+      <button class="verify-btn-ghost" onclick="changeEmail()">Change Email Address</button>
+
+      <div class="verify-divider"></div>
+      <p class="verify-spam">Can't find the email? Check your spam or junk folder. Emails can take up to a minute to arrive.</p>
+
     </div>
   </div>
 
@@ -207,15 +238,20 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 
   // ── UI HELPERS ─────────────────────────────────────────────────
   function showView(view) {
-    // Toggle active classes on the views
     document.getElementById('view-login').classList.toggle('active', view === 'login');
     document.getElementById('view-signup').classList.toggle('active', view === 'signup');
+    document.getElementById('view-verify').classList.toggle('active', view === 'verify');
 
-    // Toggle active classes on the tabs
+    // Hide tabs and logo link on verify screen — they're not relevant there
+    const tabs = document.querySelector('.tabs');
+    const logo = document.querySelector('.logo');
+    const isVerify = view === 'verify';
+    if (tabs) tabs.style.display = isVerify ? 'none' : '';
+    if (logo) logo.style.marginBottom = isVerify ? '0' : '';
+
     document.getElementById('tab-login').classList.toggle('active', view === 'login');
     document.getElementById('tab-signup').classList.toggle('active', view === 'signup');
 
-    // Hide any lingering errors when switching
     document.getElementById('login-err').style.display = 'none';
     document.getElementById('signup-err').style.display = 'none';
   }
@@ -327,12 +363,26 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   async function resendEmail() {
     const pending = JSON.parse(localStorage.getItem('vc_pending_signup') || 'null');
     if (!pending) return;
+    const btn = document.getElementById('resend-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
     await supabaseClient.auth.resend({
       type: 'signup',
       email: pending.email,
       options: { emailRedirectTo: window.location.origin + '/get-started.html' }
     });
-    alert('Confirmation email resent. Check your inbox.');
+    const badge = document.getElementById('verify-resent');
+    badge.classList.add('show');
+    btn.textContent = 'Resend Verification Email';
+    // Re-enable after 30s to prevent spam
+    setTimeout(() => { btn.disabled = false; badge.classList.remove('show'); }, 30000);
+  }
+
+  function changeEmail() {
+    localStorage.removeItem('vc_pending_signup');
+    showView('signup');
+    // Pre-focus the email field so they can correct it quickly
+    setTimeout(() => document.getElementById('signup-email')?.focus(), 100);
   }
 
   async function handleLogin() {
