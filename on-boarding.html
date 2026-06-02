@@ -329,7 +329,11 @@ async function completeOnboardingAndRedirect(event) {
     // Clear temporary setup data (keep the auth token & tenant ID)
     localStorage.removeItem('vc_onboarding');
 
-    // Route to dashboard
+    // Tell the dashboard this is a new user so it auto-starts the guided demo
+    localStorage.setItem('vc_new_user', '1');
+    // Mark onboarding done so the dashboard's legacy overlay never shows
+    localStorage.setItem('vettochat_onboarding_done', '1');
+
     window.location.href = 'dashboard.html'; 
     
   } catch (error) {

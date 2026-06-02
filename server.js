@@ -19,69 +19,41 @@ io.on('connection', (socket) => {
 });
 
 // ── UNPROTECTED ENDPOINT: Lead Capture Widget ─────────────────────────────────
-// (Stays open to the public so websites can stream leads into your system)
 app.post('/api/leads/capture', async (req, res) => {
-  const {
-    companyId,
-    fullName,
-    phone,
-    intent,
-    urgency,
-    // optional extras stored in dashboard but not in Leads table
-    location,
-    budget,
-  } = req.body;
+  const { companyId, fullName, phone, intent, urgency, location, budget } = req.body;
 
-  const activeCompanyId = companyId || 'default-company';
+  if (!companyId) return res.status(400).json({ error: 'companyId is required' });
 
   try {
-    // Auto-provision the Client record so the foreign key never fails
-    await prisma.client.upsert({
-      where: { id: activeCompanyId },
-      update: {},
-      create: {
-        id:            activeCompanyId,
-        businessName:  'VettoChat Demo',
-        ownerFullName: 'Account Owner',
-        ownerPhone:    'Not provided',
-        industry:      'Home Services',
-      },
-    });
+    // Verify the company exists — never auto-create fake clients in production
+    const client = await prisma.client.findUnique({ where: { id: companyId } });
+    if (!client) return res.status(404).json({ error: 'Company not found' });
 
     // Score the lead
     let score = 0;
-    if (urgency === 'Emergency (Within 24h)') score += 50;
-    else if (urgency === 'This week')          score += 30;
-    if (intent === 'Storm Damage')             score += 40;
-    else if (intent === 'Full Replacement')    score += 30;
-    else if (intent === 'Leak Repair')         score += 20;
+    if (urgency === 'Emergency (Within 24h)' || urgency === 'Emergency (Right now)') score += 50;
+    else if (urgency === 'Today' || urgency === 'This week') score += 30;
+    if (intent && ['Storm Damage','Full Replacement','AC Replacement','Heater Replacement','Panel Upgrade','Generator','Emergency Leak','Pipe Replacement'].includes(intent)) score += 40;
+    else if (intent && ['Leak Repair','Water Heater','Wiring / Rewire','New Installation'].includes(intent)) score += 20;
 
     const status = score >= 70 ? 'hot' : score >= 30 ? 'warm' : 'new';
 
-    // Write to Leads table
     const lead = await prisma.lead.create({
       data: {
-        client: { 
-          connect: { id: activeCompanyId } 
-        },
-        fullName: fullName || "Unknown Visitor",
-        phone: phone || "No phone provided",
-        intent: intent || "Not specified",
-        urgency: urgency || "Not specified",
-        score: score,
-        status: status
+        client:   { connect: { id: companyId } },
+        fullName: fullName || 'Unknown Visitor',
+        phone:    phone    || 'No phone provided',
+        intent:   intent   || 'Not specified',
+        urgency:  urgency  || 'Not specified',
+        location: location || '',
+        budget:   budget   || '',
+        score,
+        status
       },
     });
 
-    console.log(`✅ Lead captured: ${lead.fullName} | Company: ${activeCompanyId}`);
-
-    // Broadcast to all connected dashboard tabs in real time
-    io.emit('new_lead', {
-      ...lead,
-      location: location || '',
-      budget:   budget   || '',
-    });
-
+    console.log(`✅ Lead captured: ${lead.fullName} | Company: ${companyId}`);
+    io.emit('new_lead', lead);
     return res.status(200).json({ success: true, lead });
 
   } catch (error) {
@@ -121,16 +93,8 @@ app.post('/api/clients/setup', async (req, res) => {
   }
 });
 
-// ── Client Lookup by Supabase User ID ────────────────────────────────────────
-app.get('/api/clients/me/:userId', async (req, res) => {
-  try {
-    const client = await prisma.client.findUnique({ where: { supabaseUserId: req.params.userId } });
-    if (!client) return res.status(404).json({ error: 'No workspace found' });
-    return res.status(200).json({ client });
-  } catch (error) {
-    return res.status(500).json({ error: 'Lookup failed' });
-  }
-});
+// ── Client Lookup (protected — use JWT, not userId in URL) ───────────────────
+// Old unprotected route removed. Use GET /api/clients/me instead.
 
 
 // ── PROTECTED ENDPOINTS: Dashboard Data Overrides ─────────────────────────────
@@ -182,8 +146,8 @@ app.get('/api/leads', requireAuth, async (req, res) => {
   }
 });
 
-// ONBOARDING SAVE ENDPOINT
-app.put('/api/clients/:id/settings', async (req, res) => {
+// ONBOARDING SAVE ENDPOINT (protected)
+app.put('/api/clients/:id/settings', requireAuth, async (req, res) => {
   const { id } = req.params;
   const { industry, botName, themeColor, companyWebsite, businessName, businessPhone } = req.body;
 
@@ -223,15 +187,6 @@ app.put('/api/clients/:id/settings', async (req, res) => {
   }
 });
 
-// ── GET ORGANIZATION PROFILE ───────────────────────────────────────
-app.get('/api/organizations/:id', async (req, res) => {
-  try {
-    const org = await prisma.organization.findUnique({ where: { id: req.params.id } });
-    res.status(200).json(org);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch organization" });
-  }
-});
 
 // Fetch onboarding settings + industry for the dashboard
 app.get('/api/clients/:id/settings', async (req, res) => {

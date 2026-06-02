@@ -34,6 +34,8 @@ model Lead {
   phone     String
   intent    String
   urgency   String
+  location  String?
+  budget    String?
   score     Int      @default(0)
   status    String   @default("new")
   createdAt DateTime @default(now())

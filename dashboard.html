@@ -51,15 +51,16 @@
         crmLeads = {}; 
         resData.leads.forEach(dbLead => {
           crmLeads[dbLead.id] = {
-            id: dbLead.id,
-            name: dbLead.firstName || "Unknown",
-            phone: dbLead.phone || "No phone",
-            location: dbLead.location || "N/A", 
-            reason: dbLead.intent || "Not specified",
-            urgency: dbLead.urgency || "Not specified",
-            priority: dbLead.status ? dbLead.status.toLowerCase() : 'cold', // Translates Hot/Warm/Cold to your UI pills
-            status: 'new', // Forces all pulled leads into the "New" CRM column by default
-            created: new Date(dbLead.createdAt).getTime(), 
+            id:       dbLead.id,
+            name:     dbLead.fullName  || dbLead.firstName || 'Unknown',
+            phone:    dbLead.phone     || 'No phone',
+            location: dbLead.location  || 'N/A',
+            budget:   dbLead.budget    || '',
+            reason:   dbLead.intent    || 'Not specified',
+            urgency:  dbLead.urgency   || 'Not specified',
+            priority: dbLead.status    ? dbLead.status.toLowerCase() : 'cold',
+            status:   'new',
+            created:  new Date(dbLead.createdAt).getTime(),
             activity: []
           };
         });
@@ -167,15 +168,22 @@
         }));
       }
 
-      // 5. Re-run loadIdentityForm so the form and widget reflect the server data,
-      //    overriding whatever stale localStorage was loaded synchronously on boot
+      // 5. Re-run loadIdentityForm so the form and widget reflect the server data
       if (typeof loadIdentityForm === 'function') loadIdentityForm();
 
-      // 6. If the bot-config page is already open, re-render its components
+      // 6. Re-render bot config page if already open
       if (typeof bcInited !== 'undefined' && bcInited) {
         if (typeof renderQB        === 'function') renderQB();
         if (typeof renderTemplates === 'function') renderTemplates();
         if (typeof renderScoring   === 'function') renderScoring();
+      }
+
+      // 7. Auto-start guided demo for new users arriving from onboarding
+      if (localStorage.getItem('vc_new_user') === '1') {
+        localStorage.removeItem('vc_new_user');
+        setTimeout(() => {
+          if (typeof startDemo === 'function') startDemo();
+        }, 1000);
       }
 
     } catch (error) {
@@ -1632,15 +1640,42 @@ function showToastMsg(title, sub, color) {
 
 // ─── DEMO ───────────────────────────────────────────────────────────────────
 let demoActive=false,demoTimers=[];
-const DEMO_STEPS=[
-  {step:'Step 1 of 4',desc:'Vetto qualified 28 leads this week — automatically, with no manual effort required.'},
-  {step:'Step 2 of 4',desc:'A new high-priority lead has been received: James Carter, Storm Damage Repair, $9,200 estimated budget.'},
-  {step:'Step 3 of 4',desc:'Each lead is scored and prioritised. Your team receives an immediate notification and can call directly from the dashboard.'},
-  {step:'Step 4 of 4',desc:'6 leads are waiting for a callback right now. The team that follows up first wins — 78% of roofing jobs go to whoever makes contact within the hour.'},
-];
-function buildPips(){const c=document.getElementById('hudPips');c.innerHTML=DEMO_STEPS.map((_,i)=>`<div class="pip" id="pip${i}"></div>`).join('');}
+let DEMO_STEPS=[];
+
+function buildDemoSteps() {
+  const biz     = (document.getElementById('sbClientName') || {}).textContent || 'your business';
+  const botName = (document.getElementById('identityName') || {}).value || 'Vetto';
+  const tmpl    = INDUSTRY_TEMPLATES[_activeTemplate] || INDUSTRY_TEMPLATES['roofing'];
+  const svcList = tmpl.steps.find(s => s.key === 'service');
+  const topSvc  = svcList && svcList.chips && svcList.chips[0] ? svcList.chips[0] : 'service request';
+  const tabs    = ['Overview', 'Bot Config', 'CRM', 'SMS Alerts', 'Lead Scoring'];
+
+  DEMO_STEPS = [
+    {
+      step: 'Step 1 of 5',
+      desc: `Welcome to ${biz}'s dashboard. ${botName} is live on your site and will qualify every visitor automatically — you'll never chase a cold lead again.`
+    },
+    {
+      step: 'Step 2 of 5',
+      desc: `This is your Overview. Every lead ${botName} captures appears here in real time, scored by urgency and budget before you ever make contact.`
+    },
+    {
+      step: 'Step 3 of 5',
+      desc: `Here's a new lead coming in. ${botName} already knows their service type, location, budget, and urgency. You have everything you need before your first call.`
+    },
+    {
+      step: 'Step 4 of 5',
+      desc: `Hot leads are flagged immediately. 78% of ${tmpl.name.toLowerCase()} jobs go to whoever responds first — your dashboard tells you exactly who to call and when.`
+    },
+    {
+      step: 'Step 5 of 5',
+      desc: `Explore Bot Config to customise ${botName}'s questions, CRM to manage your pipeline, SMS Alerts to set your phone number, and Lead Scoring to define what a qualified lead looks like for ${biz}.`
+    },
+  ];
+}
+function buildPips(){const c=document.getElementById('hudPips');if(c)c.innerHTML=DEMO_STEPS.map((_,i)=>`<div class="pip" id="pip${i}"></div>`).join('');}
 function setPips(a){DEMO_STEPS.forEach((_,i)=>{const p=document.getElementById('pip'+i);if(p)p.className='pip'+(i<a?' done':i===a?' active':'');});}
-function setStep(n){document.getElementById('hudStep').textContent=DEMO_STEPS[n].step;document.getElementById('hudDesc').textContent=DEMO_STEPS[n].desc;setPips(n);}
+function setStep(n){const s=DEMO_STEPS[n];if(!s)return;const hs=document.getElementById('hudStep');const hd=document.getElementById('hudDesc');if(hs)hs.textContent=s.step;if(hd)hd.textContent=s.desc;setPips(n);}
 function spot(el){const sp=document.getElementById('demoSpot');if(!el){sp.style.opacity='0';return;}const r=el.getBoundingClientRect();Object.assign(sp.style,{opacity:'1',left:(r.left-10)+'px',top:(r.top-10)+'px',width:(r.width+20)+'px',height:(r.height+20)+'px'});}
 function dd(ms){return new Promise(res=>{const t=setTimeout(res,ms);demoTimers.push(t);});}
 
@@ -1671,20 +1706,57 @@ function _restoreSnapshot(snap) {
 
 async function startDemo(){
   if(demoActive)return;demoActive=true;
-  // Snapshot real data before touching anything
+  buildDemoSteps(); // generate steps from real user data
   _demoSnapshot = _captureSnapshot();
-  showPage('overview');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.querySelectorAll('.nav-item')[0].classList.add('active');renderOverview(null);
-  const overlay=document.getElementById('demoOverlay');overlay.style.display='block';buildPips();
-  setStep(0);spot(document.querySelector('.stats'));
-  ['sc0','sc1','sc2','sc3'].forEach((id,i)=>{setTimeout(()=>{const el=document.getElementById(id);el.classList.add('demo-pop');setTimeout(()=>el.classList.remove('demo-pop'),600);},i*150);});
-  await dd(2400);if(!demoActive)return;
-  setStep(1);renderOverview('James Carter');document.getElementById('sv0').textContent='29';document.getElementById('sc0').classList.add('demo-pop');setTimeout(()=>document.getElementById('sc0').classList.remove('demo-pop'),600);const _db=document.getElementById('leadsBadge');if(_db){_db.textContent='5';_db.style.display='flex';}
-  await dd(400);const newRow=document.getElementById('demoRow');if(newRow)spot(newRow);showToast();
-  await dd(2600);if(!demoActive)return;
-  setStep(2);if(newRow){const btn=newRow.querySelector('.call-btn');if(btn)spot(btn);}
-  await dd(2200);if(!demoActive)return;
-  setStep(3);spot(document.getElementById('sc2'));document.getElementById('sc2').classList.add('demo-pop');
-  await dd(2600);endDemo();
+
+  // Always start on Overview
+  showPage('overview');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[0].classList.add('active');
+  renderOverview(null);
+
+  const overlay=document.getElementById('demoOverlay');
+  overlay.style.display='block';
+  buildPips();
+
+  // Step 1 — welcome, highlight stat cards
+  setStep(0);
+  spot(document.querySelector('.stats'));
+  ['sc0','sc1','sc2','sc3'].forEach((id,i)=>{
+    setTimeout(()=>{
+      const el=document.getElementById(id);
+      if(el){el.classList.add('demo-pop');setTimeout(()=>el.classList.remove('demo-pop'),600);}
+    },i*150);
+  });
+  await dd(3000);if(!demoActive)return;
+
+  // Step 2 — overview explained, highlight leads table
+  setStep(1);
+  spot(document.querySelector('.card'));
+  await dd(2800);if(!demoActive)return;
+
+  // Step 3 — new lead arrives
+  setStep(2);
+  renderOverview('New Lead');
+  document.getElementById('sv0').textContent=String((parseInt(document.getElementById('sv0').textContent)||0)+1);
+  document.getElementById('sc0').classList.add('demo-pop');
+  setTimeout(()=>document.getElementById('sc0').classList.remove('demo-pop'),600);
+  const _db=document.getElementById('leadsBadge');if(_db){_db.textContent='1';_db.style.display='flex';}
+  await dd(400);
+  const newRow=document.getElementById('demoRow');if(newRow)spot(newRow);
+  showToast();
+  await dd(2800);if(!demoActive)return;
+
+  // Step 4 — hot lead callout
+  setStep(3);
+  if(newRow){const btn=newRow.querySelector('.call-btn');if(btn)spot(btn);}
+  await dd(2800);if(!demoActive)return;
+
+  // Step 5 — show the nav, highlight all tabs
+  setStep(4);
+  spot(document.querySelector('.sb-nav'));
+  await dd(3000);
+  endDemo();
 }
 
 function endDemo(){
