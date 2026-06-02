@@ -308,30 +308,33 @@ async function completeOnboardingAndRedirect(event) {
 
   try {
     // 🔴 UPDATE URL TO YOUR LIVE RENDER SERVER
+    const token = localStorage.getItem('vc_token') || '';
     const response = await fetch(`https://vettochat-backend.onrender.com/api/clients/${tenantId}/settings`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
-        industry: onboardingData.industry,
-        botName: onboardingData.assistantName, // Matches your onboarding localstorage key
-        themeColor: onboardingData.brandColor,
-        companyWebsite: onboardingData.website,
-        businessName: "Client Business" // We will pull actual name later if needed
+        industry:      onboardingData.industry,
+        botName:       onboardingData.assistantName,
+        themeColor:    onboardingData.brandColor,
+        companyWebsite: onboardingData.websiteUrl || onboardingData.website || ''
       })
     });
 
     if (!response.ok) throw new Error("Failed to save settings to server.");
-    
-    // Clear temporary setup data (keep the auth token & tenant ID!)
+
+    // Clear temporary setup data (keep the auth token & tenant ID)
     localStorage.removeItem('vc_onboarding');
-    
+
     // Route to dashboard
-    window.location.href = '/dashboard'; 
+    window.location.href = 'dashboard.html'; 
     
   } catch (error) {
     console.error(error);
     alert("There was an issue saving your setup, but taking you to the dashboard anyway.");
-    window.location.href = '/dashboard';
+    window.location.href = 'dashboard.html';
   }
 }
 </script>

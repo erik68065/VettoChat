@@ -84,45 +84,77 @@
   // ── FETCH & APPLY ONBOARDING SETTINGS ──────────────────────────────
   async function fetchDashboardSettings() {
     if (!tenantId) return;
-
     try {
-      const response = await fetch(`${API_URL}/api/clients/${tenantId}/settings`);
-      if (!response.ok) {
-        console.warn("No onboarding settings found for this client yet.");
-        return;
-      }
+      const response = await fetch(`${API_URL}/api/clients/${tenantId}/settings`, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) return;
 
       const settings = await response.json();
 
-      // 1. Update the Business Name in the Sidebar
+      // 1. Sidebar business name
       const businessNameEl = document.querySelector('.sb-client-name');
       if (businessNameEl && settings.businessName) {
         businessNameEl.textContent = settings.businessName;
       }
 
-      // 2. Update Bot Name in the Configuration Tab
-      const botNameInput = document.getElementById('identityName');
-      if (botNameInput && settings.botName) {
-        botNameInput.value = settings.botName;
-        // This triggers your custom JS to visually update the chatbot preview!
-        if (typeof previewName === 'function') previewName(settings.botName);
+      // 2. Resolve values with fallbacks
+      const industry = settings.industry   || 'roofing';
+      const name     = settings.botName    || 'Vetto';
+      const color    = settings.themeColor || '#1E40AF';
+
+      // 3. Apply the industry template silently into memory
+      //    (same as _doApplyTemplate but without the toast)
+      const tmpl = (typeof INDUSTRY_TEMPLATES !== 'undefined') && INDUSTRY_TEMPLATES[industry];
+      if (tmpl) {
+        _activeTemplate = industry;
+        questions = tmpl.steps.map((s, i) => ({
+          id: i + 1, key: s.key,
+          text: s.key === 'name' ? Q1_DEFAULT_TEXT : s.question,
+          type: s.type, enabled: true,
+          placeholder: s.placeholder || '',
+          chips: Array.isArray(s.chips) ? [...s.chips] : []
+        }));
+        nextId = questions.length + 1;
+        SCORING_QUESTIONS.length = 0;
+        tmpl.scoring.forEach(sq => SCORING_QUESTIONS.push({
+          id: sq.id, label: sq.label, question: sq.question,
+          answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+        }));
       }
 
-      // 3. Update Brand Color in the Configuration Tab
-      const themeColorInput = document.getElementById('identityColor');
-      if (themeColorInput && settings.themeColor) {
-        themeColorInput.value = settings.themeColor;
-        // This triggers your custom JS to visually update the color swatch!
-        if (typeof previewColor === 'function') previewColor(settings.themeColor);
+      // 4. Write a complete vettochat_config to localStorage so every subsequent
+      //    read (widget, bot-config page, preview) sees the user's real settings
+      const chatLabel = (tmpl && tmpl.chatLabel) || 'Get a free quote →';
+      if (typeof CONFIG_VERSION !== 'undefined') {
+        localStorage.setItem('vettochat_config', JSON.stringify({
+          configVersion:  CONFIG_VERSION,
+          assistantName:  name,
+          brandColor:     color,
+          chatLabel:      chatLabel,
+          openingMessage: (typeof buildOpeningMsg === 'function') ? buildOpeningMsg(name) : '',
+          steps:          (typeof questionsToSteps === 'function') ? questionsToSteps(questions) : [],
+          activeTemplate: industry,
+          scoring:        SCORING_QUESTIONS.map(sq => ({
+            id: sq.id, label: sq.label, question: sq.question,
+            answers: sq.answers.map(a => ({ label: a.label, tier: a.tier }))
+          }))
+        }));
       }
 
-      // 4. Force a sync with your dashboard's internal saving system
-      if (typeof flushConfigForPreview === 'function') {
-        flushConfigForPreview();
+      // 5. Re-run loadIdentityForm so the form and widget reflect the server data,
+      //    overriding whatever stale localStorage was loaded synchronously on boot
+      if (typeof loadIdentityForm === 'function') loadIdentityForm();
+
+      // 6. If the bot-config page is already open, re-render its components
+      if (typeof bcInited !== 'undefined' && bcInited) {
+        if (typeof renderQB        === 'function') renderQB();
+        if (typeof renderTemplates === 'function') renderTemplates();
+        if (typeof renderScoring   === 'function') renderScoring();
       }
 
     } catch (error) {
-      console.error("Failed to load dashboard settings from Render:", error);
+      console.error("Failed to load dashboard settings:", error);
     }
   }
 </script>
