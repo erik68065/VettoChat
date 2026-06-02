@@ -185,7 +185,7 @@ app.get('/api/leads', requireAuth, async (req, res) => {
 // ONBOARDING SAVE ENDPOINT
 app.put('/api/clients/:id/settings', async (req, res) => {
   const { id } = req.params;
-  const { industry, botName, themeColor, companyWebsite, businessName } = req.body;
+  const { industry, botName, themeColor, companyWebsite, businessName, businessPhone } = req.body;
 
   try {
     // Save bot/branding settings to onboarding_settings table
@@ -208,12 +208,12 @@ app.put('/api/clients/:id/settings', async (req, res) => {
       }
     });
 
-    // Industry lives on the Client record — update it there
-    if (industry) {
-      await prisma.client.update({
-        where: { id },
-        data: { industry }
-      });
+    // Industry and phone live on the Client record — update them there
+    const clientUpdate = {};
+    if (industry)      clientUpdate.industry   = industry;
+    if (businessPhone) clientUpdate.ownerPhone = businessPhone;
+    if (Object.keys(clientUpdate).length) {
+      await prisma.client.update({ where: { id }, data: clientUpdate });
     }
 
     res.status(200).json({ success: true, settings: { ...settings, industry: industry || null } });
@@ -242,7 +242,7 @@ app.get('/api/clients/:id/settings', async (req, res) => {
     const settings = await prisma.onboardingSettings.findUnique({
       where: { client_id: id },
       include: {
-        client: { select: { industry: true, businessName: true, ownerFullName: true, email: true } }
+        client: { select: { industry: true, businessName: true, ownerFullName: true, email: true, ownerPhone: true } }
       }
     });
 
@@ -254,6 +254,8 @@ app.get('/api/clients/:id/settings', async (req, res) => {
         industry:      client.industry,
         businessName:  client.businessName,
         ownerFullName: client.ownerFullName,
+        ownerPhone:    client.ownerPhone,
+        email:         client.email,
         botName:       null,
         themeColor:    null,
         companyWebsite: null,
@@ -268,6 +270,7 @@ app.get('/api/clients/:id/settings', async (req, res) => {
       industry:      client.industry,
       businessName:  rest.businessName  || client.businessName,
       ownerFullName: client.ownerFullName,
+      ownerPhone:    client.ownerPhone,
       email:         client.email
     });
   } catch (error) {

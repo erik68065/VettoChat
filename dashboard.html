@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VettoChat — ABC Roofing</title>
+<title>VettoChat — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -92,20 +92,34 @@
 
       const settings = await response.json();
 
-      // 1. Sidebar — business name, owner name
+      // 1. Sidebar — business name + owner name
       const businessNameEl = document.querySelector('.sb-client-name');
-      if (businessNameEl && settings.businessName) {
-        businessNameEl.textContent = settings.businessName;
-      }
+      if (businessNameEl && settings.businessName) businessNameEl.textContent = settings.businessName;
       const sbUserNameEl = document.getElementById('sbUserName');
-      if (sbUserNameEl && settings.ownerFullName) {
-        sbUserNameEl.textContent = settings.ownerFullName;
+      if (sbUserNameEl && settings.ownerFullName) sbUserNameEl.textContent = settings.ownerFullName;
+
+      // 2. Page title
+      if (settings.businessName) document.title = `VettoChat — ${settings.businessName}`;
+
+      // 3. SMS phone + preview
+      const smsPhoneEl = document.getElementById('smsPhone');
+      if (smsPhoneEl && settings.ownerPhone) smsPhoneEl.value = settings.ownerPhone;
+      const smsContactEl = document.getElementById('smsContactName');
+      if (smsContactEl && settings.businessName) {
+        smsContactEl.innerHTML = `${settings.businessName} Alerts<span>VettoChat · via Twilio</span>`;
       }
-      // Populate account panel defaults if they haven't been customised yet
-      if (settings.ownerFullName && typeof accountProfile !== 'undefined' && !accountProfile.name) {
-        accountProfile.name        = settings.ownerFullName;
-        accountProfile.email       = settings.email || '';
-        accountProfile.companyName = settings.businessName || '';
+      const smsPreviewEl = document.getElementById('smsPreviewText');
+      if (smsPreviewEl && settings.businessName) {
+        smsPreviewEl.textContent =
+          `🔔 New Lead — ${settings.businessName}\n\nName: [Lead Name]\nService: [Service Type]\nBudget: [Budget]\nUrgency: [Urgency]\nPhone: [Lead Phone]\n\n→ Reply CALL to notify team`;
+      }
+
+      // 4. Account & Company panel — seed with server data if not already customised
+      if (typeof accountProfile !== 'undefined') {
+        if (!accountProfile.name)        accountProfile.name        = settings.ownerFullName || '';
+        if (!accountProfile.email)       accountProfile.email       = settings.email        || '';
+        if (!accountProfile.phone)       accountProfile.phone       = settings.ownerPhone   || '';
+        if (!accountProfile.companyName) accountProfile.companyName = settings.businessName || '';
         if (typeof renderCFM === 'function') renderCFM();
       }
 
@@ -852,7 +866,7 @@ td.muted{font-size:12px;color:var(--muted)}
   <div class="sb-client">
     <div style="display:flex;align-items:center;gap:7px;margin-bottom:2px">
       <div class="sb-client-logo" id="sbClientLogo" style="display:none"><img id="sbClientLogoImg" src="" alt=""></div>
-      <div class="sb-client-name" id="sbClientName">ABC Roofing &amp; Exteriors</div>
+      <div class="sb-client-name" id="sbClientName">My Workspace</div>
     </div>
     <div class="sb-client-sub">Pro Plan</div>
   </div>
@@ -873,7 +887,7 @@ td.muted{font-size:12px;color:var(--muted)}
   <div class="sb-footer">
     <div class="sb-avatar" id="sbAvatar">JM</div>
     <div style="flex:1;min-width:0;overflow:hidden">
-      <div class="sb-user-name" id="sbUserName" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Jason Miller</div>
+      <div class="sb-user-name" id="sbUserName" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Loading...</div>
       <div class="sb-user-role" id="sbUserRole">Account Owner</div>
     </div>
     <button class="sb-settings-btn" onclick="openCFM()" title="Manage contact fields & profile">
@@ -1001,7 +1015,7 @@ td.muted{font-size:12px;color:var(--muted)}
               <div class="sms-left">
                 <div class="sms-phone-wrap">
                   <label class="field-label">Send alerts to</label>
-                  <input class="field-input" id="smsPhone" type="tel" placeholder="+1 (972) 555-0000" value="+1 (972) 555-1800">
+                  <input class="field-input" id="smsPhone" type="tel" placeholder="+1 (555) 000-0000" value="">
                 </div>
 
                 <label class="field-label">Alert frequency</label>
@@ -1026,18 +1040,18 @@ td.muted{font-size:12px;color:var(--muted)}
                 <label class="field-label" style="margin-bottom:10px">Live message preview</label>
                 <div class="iphone-preview">
                   <div class="iphone-status">
-                    <div class="iphone-contact">ABC Roofing Alerts<span>VettoChat · via Twilio</span></div>
+                    <div class="iphone-contact" id="smsContactName">My Business Alerts<span>VettoChat · via Twilio</span></div>
                   </div>
                   <div class="iphone-msgs">
                     <div class="iphone-time">Today 9:14 AM</div>
                     <div class="iphone-bubble">
-                      <div class="iphone-bubble-text" id="smsPreviewText">🔔 New Lead — ABC Roofing
+                      <div class="iphone-bubble-text" id="smsPreviewText">🔔 New Lead
 
-Name: James Carter
-Service: Storm Damage
-Budget: $9,200
-Urgency: Emergency
-Phone: (214) 555-0192
+Name: [Lead Name]
+Service: [Service Type]
+Budget: [Budget]
+Urgency: [Urgency]
+Phone: [Lead Phone]
 
 → Reply CALL to notify team</div>
                     </div>
@@ -1493,7 +1507,7 @@ Phone: (214) 555-0192
 <!-- SMS TOAST -->
 <div class="sms-toast" id="smsToast">
   <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#16A34A" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  <div><strong>Test SMS sent</strong><span id="smsToastNum">to +1 (972) 555-1800</span></div>
+  <div><strong>Test SMS sent</strong><span id="smsToastNum"></span></div>
 </div>
 
 <script>
@@ -2248,7 +2262,7 @@ function closePreview() {
 
 // ─── BOT CONFIG — SMS ────────────────────────────────────────────────────────
 function sendTestSMS(){
-  const phone = document.getElementById('smsPhone').value.trim() || '+1 (972) 555-0000';
+  const phone = document.getElementById('smsPhone').value.trim();
   document.getElementById('smsToastNum').textContent = `to ${phone}`;
   const toast = document.getElementById('smsToast');
   toast.classList.add('show');
@@ -3730,7 +3744,7 @@ function _saValidate(locationStr) {
 }
 
 // ─── ACCOUNT PROFILE ─────────────────────────────────────────────────────────
-const DEFAULT_PROFILE = { name:'Jason Miller', role:'Account Owner', email:'', phone:'', photo:'', companyName:'', companyLogo:'' };
+const DEFAULT_PROFILE = { name:'', role:'Account Owner', email:'', phone:'', photo:'', companyName:'', companyLogo:'' };
 let accountProfile = { ...DEFAULT_PROFILE };
 
 // ─── WIDGET STATUS ────────────────────────────────────────────────────────────
@@ -3842,7 +3856,7 @@ function applyCompanyBranding() {
 
   // Sidebar company name
   const sbName = document.getElementById('sbClientName');
-  if (sbName) sbName.textContent = name || 'ABC Roofing & Exteriors';
+  if (sbName) sbName.textContent = name || '';
 
   // Sidebar company logo
   const sbLogo = document.getElementById('sbClientLogo');

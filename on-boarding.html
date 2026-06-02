@@ -316,10 +316,11 @@ async function completeOnboardingAndRedirect(event) {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        industry:      onboardingData.industry,
-        botName:       onboardingData.assistantName,
-        themeColor:    onboardingData.brandColor,
-        companyWebsite: onboardingData.websiteUrl || onboardingData.website || ''
+        industry:       onboardingData.industry,
+        botName:        onboardingData.assistantName,
+        themeColor:     onboardingData.brandColor,
+        companyWebsite: onboardingData.websiteUrl || onboardingData.website || '',
+        businessPhone:  onboardingData.businessPhone || ''
       })
     });
 
