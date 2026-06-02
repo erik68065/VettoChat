@@ -22,6 +22,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     fetchLiveLeads();
+    fetchDashboardSettings();
   });
 
   // ── 2. FETCH REAL LEADS FROM RENDER BACKEND ──────────────────────
@@ -78,6 +79,59 @@
     localStorage.removeItem('vc_token');
     localStorage.removeItem('vc_tenant_id');
     window.location.href = "get-started.html";
+  }
+
+  // ── FETCH & APPLY ONBOARDING SETTINGS ──────────────────────────────
+  // ── FETCH & APPLY ONBOARDING SETTINGS (JS STATE VERSION) ─────────
+  async function fetchDashboardSettings() {
+    if (!tenantId) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/clients/${tenantId}/settings`);
+      if (!response.ok) {
+        console.warn("No onboarding settings found for this client yet.");
+        return;
+      }
+
+      const settings = await response.json();
+
+      // 1. Update the Business Name in the Sidebar/Header
+      // If your UI relies on an HTML ID for the company name, we can set it here:
+      const businessNameEl = document.querySelector('.sb-client-name'); 
+      if (businessNameEl && settings.businessName) {
+        businessNameEl.textContent = settings.businessName;
+      }
+
+      // 2. Update your underlying JavaScript State Variables
+      // (These map to the global variables used in your JS files)
+      if (typeof _assistantName !== 'undefined' && settings.botName) {
+        _assistantName = settings.botName;
+      }
+      
+      // Update the brand color state variable if it exists in your script
+      if (typeof _brandColor !== 'undefined' && settings.themeColor) {
+        _brandColor = settings.themeColor;
+      }
+
+      // 3. Trigger your dashboard's re-render functions
+      // This tells your JavaScript to rebuild the UI with the new data
+      if (typeof renderQB === 'function') {
+        renderQB(); // Re-renders the Question Builder
+      }
+      
+      // If you have a specific render function for the configuration tab, call it here:
+      if (typeof renderTemplates === 'function') {
+         renderTemplates(); 
+      }
+
+      // If there's an active live-preview function, push the updates to it
+      if (typeof updatePreviewWidget === 'function') {
+         updatePreviewWidget();
+      }
+
+    } catch (error) {
+      console.error("Failed to load dashboard settings from Render:", error);
+    }
   }
 </script>
 <style>
