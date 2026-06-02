@@ -92,10 +92,21 @@
 
       const settings = await response.json();
 
-      // 1. Sidebar business name
+      // 1. Sidebar — business name, owner name
       const businessNameEl = document.querySelector('.sb-client-name');
       if (businessNameEl && settings.businessName) {
         businessNameEl.textContent = settings.businessName;
+      }
+      const sbUserNameEl = document.getElementById('sbUserName');
+      if (sbUserNameEl && settings.ownerFullName) {
+        sbUserNameEl.textContent = settings.ownerFullName;
+      }
+      // Populate account panel defaults if they haven't been customised yet
+      if (settings.ownerFullName && typeof accountProfile !== 'undefined' && !accountProfile.name) {
+        accountProfile.name        = settings.ownerFullName;
+        accountProfile.email       = settings.email || '';
+        accountProfile.companyName = settings.businessName || '';
+        if (typeof renderCFM === 'function') renderCFM();
       }
 
       // 2. Resolve values with fallbacks

@@ -184,31 +184,39 @@ app.get('/api/leads', requireAuth, async (req, res) => {
 
 // ONBOARDING SAVE ENDPOINT
 app.put('/api/clients/:id/settings', async (req, res) => {
-  const { id } = req.params; // This is the tenantId / client_id
+  const { id } = req.params;
   const { industry, botName, themeColor, companyWebsite, businessName } = req.body;
-  
+
   try {
-    // 🔥 FIXED: Changed prisma.onboarding_settings to prisma.onboardingSettings
+    // Save bot/branding settings to onboarding_settings table
     const settings = await prisma.onboardingSettings.upsert({
       where: { client_id: id },
-      update: { 
-        botName: botName,
-        themeColor: themeColor,
-        companyWebsite: companyWebsite,
-        businessName: businessName,
+      update: {
+        botName,
+        themeColor,
+        companyWebsite,
+        ...(businessName && { businessName }),
         onboardingCompleted: true
       },
       create: {
         client_id: id,
-        botName: botName,
-        themeColor: themeColor,
-        companyWebsite: companyWebsite,
-        businessName: businessName,
+        botName,
+        themeColor,
+        companyWebsite,
+        ...(businessName && { businessName }),
         onboardingCompleted: true
       }
     });
 
-    res.status(200).json({ success: true, settings });
+    // Industry lives on the Client record — update it there
+    if (industry) {
+      await prisma.client.update({
+        where: { id },
+        data: { industry }
+      });
+    }
+
+    res.status(200).json({ success: true, settings: { ...settings, industry: industry || null } });
   } catch (error) {
     console.error("Settings Update Failed:", error);
     res.status(500).json({ error: "Failed to save onboarding config" });
@@ -225,20 +233,43 @@ app.get('/api/organizations/:id', async (req, res) => {
   }
 });
 
-// server.js - FETCH ONBOARDING SETTINGS FOR DASHBOARD
+// Fetch onboarding settings + industry for the dashboard
 app.get('/api/clients/:id/settings', async (req, res) => {
   const { id } = req.params;
-  
+
   try {
+    // Join onboarding_settings with the client to get industry + businessName
     const settings = await prisma.onboardingSettings.findUnique({
-      where: { client_id: id }
+      where: { client_id: id },
+      include: {
+        client: { select: { industry: true, businessName: true, ownerFullName: true, email: true } }
+      }
     });
-    
+
     if (!settings) {
-      return res.status(404).json({ error: "Settings not found" });
+      // No onboarding record yet — return client basics so dashboard isn't blank
+      const client = await prisma.client.findUnique({ where: { id } });
+      if (!client) return res.status(404).json({ error: 'Client not found' });
+      return res.status(200).json({
+        industry:      client.industry,
+        businessName:  client.businessName,
+        ownerFullName: client.ownerFullName,
+        botName:       null,
+        themeColor:    null,
+        companyWebsite: null,
+        onboardingCompleted: false
+      });
     }
-    
-    res.status(200).json(settings);
+
+    // Merge: onboarding fields + client fields (industry lives on client)
+    const { client, ...rest } = settings;
+    res.status(200).json({
+      ...rest,
+      industry:      client.industry,
+      businessName:  rest.businessName  || client.businessName,
+      ownerFullName: client.ownerFullName,
+      email:         client.email
+    });
   } catch (error) {
     console.error("Failed to fetch settings:", error);
     res.status(500).json({ error: "Failed to fetch onboarding config" });
