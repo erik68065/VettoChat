@@ -84,6 +84,18 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 .view{display:none}
 .view.active{display:block}
 
+/* VERIFY EMAIL */
+.verify-wrap{text-align:center;padding:12px 0 8px}
+.verify-icon{font-size:52px;margin-bottom:18px;display:block}
+.verify-title{font-size:20px;font-weight:700;color:var(--h);margin-bottom:10px}
+.verify-sub{font-size:14px;color:var(--body);line-height:1.7;margin-bottom:20px}
+.verify-sub strong{color:var(--h)}
+.verify-note{font-size:13px;color:var(--muted);margin-top:20px}
+.verify-note span{color:var(--accent);cursor:pointer;font-weight:600}
+.verify-note span:hover{text-decoration:underline}
+.verify-back{margin-top:14px;display:block;font-size:13px;color:var(--muted);cursor:pointer;transition:color 0.15s}
+.verify-back:hover{color:var(--body)}
+
 /* SPINNER */
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -93,7 +105,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 <div class="card">
 
   <!-- Logo -->
-  <a href="vettochat-landing.html" class="logo">
+  <a href="index.html" class="logo">
     <div class="logo-mark">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/></svg>
     </div>
@@ -169,6 +181,18 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
     <p class="switch-text">Already have an account? <span onclick="showView('login')">Log in</span></p>
   </div>
 
+  <!-- VERIFY EMAIL VIEW -->
+  <div class="view" id="view-verify">
+    <div class="verify-wrap">
+      <span class="verify-icon">📬</span>
+      <div class="verify-title">Check your inbox</div>
+      <p class="verify-sub">We sent a confirmation link to<br><strong id="verify-email-display"></strong></p>
+      <p style="font-size:13px;color:var(--body);line-height:1.6">Click the link in that email to activate your account and get started. It may take a minute to arrive.</p>
+      <p class="verify-note">Didn't get it? Check your spam folder or <span onclick="resendEmail()">resend the email</span>.</p>
+      <span class="verify-back" onclick="showView('signup')">← Back to sign up</span>
+    </div>
+  </div>
+
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -213,14 +237,46 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
     alert("Google Sign-In integration coming soon!");
   }
 
+  // ── EMAIL CONFIRMATION HANDLER ─────────────────────────────────
+  // Fires when Supabase redirects back after the user clicks the confirmation link
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      const pending = JSON.parse(localStorage.getItem('vc_pending_signup') || 'null');
+      if (!pending) return; // existing login, not a new signup confirmation
+
+      try {
+        const res = await fetch(`${API}/api/clients/setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            supabaseUserId: session.user.id,
+            email: session.user.email,
+            businessName: pending.biz,
+            ownerFullName: pending.name
+          }),
+        });
+        const dbData = await res.json();
+        if (!res.ok) throw new Error(dbData.error || 'Failed to set up workspace.');
+
+        localStorage.removeItem('vc_pending_signup');
+        localStorage.setItem('vc_token', session.access_token);
+        localStorage.setItem('vc_tenant_id', dbData.client.id);
+        window.location.href = 'on-boarding.html';
+      } catch (err) {
+        showView('signup');
+        showErr('signup-err', err.message);
+      }
+    }
+  });
+
   // ── AUTHENTICATION LOGIC ───────────────────────────────────────
-  
+
   async function handleSignup() {
     const biz      = document.getElementById('signup-biz').value.trim();
     const name     = document.getElementById('signup-name').value.trim();
     const email    = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
-    
+
     if (!biz || !name || !email || !password) {
       showErr('signup-err', 'Please fill in all fields.');
       return;
@@ -228,45 +284,61 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 
     setLoading('signup-btn', true, 'Create my account');
     try {
-      // 1. Create the user directly in Supabase
       const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
-        email: email,
-        password: password,
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin + '/get-started.html' }
       });
 
       if (authErr) throw authErr;
-      if (!authData.user) throw new Error("Signup failed. Please try again.");
+      if (!authData.user) throw new Error('Signup failed. Please try again.');
 
-      // 2. Ping your Node backend to provision the Prisma database workspace
-      const res = await fetch(`${API}/api/clients/setup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          supabaseUserId: authData.user.id,
-          email: email, 
-          businessName: biz, 
-          ownerFullName: name 
-        }),
-      });
+      // Store biz/name so the confirmation handler can use them after redirect
+      localStorage.setItem('vc_pending_signup', JSON.stringify({ biz, name, email }));
 
-      const dbData = await res.json();
-      if (!res.ok) throw new Error(dbData.error || 'Failed to setup workspace.');
-
-      // 3. Store tokens & redirect
-      localStorage.setItem('vc_token', authData.session.access_token);
-      localStorage.setItem('vc_tenant_id', dbData.client.id); // From your server.js response
-      
-      window.location.href = 'on-boarding.html';
+      if (authData.session) {
+        // Email confirmation disabled — provision immediately
+        const res = await fetch(`${API}/api/clients/setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            supabaseUserId: authData.user.id,
+            email, businessName: biz, ownerFullName: name
+          }),
+        });
+        const dbData = await res.json();
+        if (!res.ok) throw new Error(dbData.error || 'Failed to set up workspace.');
+        localStorage.removeItem('vc_pending_signup');
+        localStorage.setItem('vc_token', authData.session.access_token);
+        localStorage.setItem('vc_tenant_id', dbData.client.id);
+        window.location.href = 'on-boarding.html';
+      } else {
+        // Email confirmation enabled — show check-your-inbox screen
+        document.getElementById('verify-email-display').textContent = email;
+        showView('verify');
+        setLoading('signup-btn', false, 'Create my account');
+      }
     } catch (err) {
       showErr('signup-err', err.message);
       setLoading('signup-btn', false, 'Create my account');
     }
   }
 
+  async function resendEmail() {
+    const pending = JSON.parse(localStorage.getItem('vc_pending_signup') || 'null');
+    if (!pending) return;
+    await supabaseClient.auth.resend({
+      type: 'signup',
+      email: pending.email,
+      options: { emailRedirectTo: window.location.origin + '/get-started.html' }
+    });
+    alert('Confirmation email resent. Check your inbox.');
+  }
+
   async function handleLogin() {
     const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    
+
     if (!email || !password) {
       showErr('login-err', 'Email and password required.');
       return;
@@ -274,30 +346,21 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 
     setLoading('login-btn', true, 'Log in');
     try {
-      // 1. Authenticate user directly against Supabase
-      const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
+      const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (authErr) throw authErr;
 
-      // 2. Get their workspace profile from Node backend to grab Tenant ID
       const res = await fetch(`${API}/api/clients/me`, {
         method: 'GET',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authData.session.access_token}` 
+          'Authorization': `Bearer ${authData.session.access_token}`
         }
       });
-      
       const dbData = await res.json();
       if (!res.ok) throw new Error('Could not load workspace profile.');
 
-      // 3. Store the JWT token & Dashboard Tenant ID
       localStorage.setItem('vc_token', authData.session.access_token);
       localStorage.setItem('vc_tenant_id', dbData.client.id);
-      
       window.location.href = 'dashboard.html';
     } catch (err) {
       showErr('login-err', err.message);
