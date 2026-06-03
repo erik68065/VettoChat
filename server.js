@@ -246,6 +246,21 @@ app.get('/api/clients/:id/settings', async (req, res) => {
   }
 });
 
+// In server.js (Phase 1: Minimum Viable Public Settings Route)
+app.get('/api/clients/:id/settings', async (req, res) => {
+  try {
+    const client = await prisma.client.findUnique({
+      where: { id: req.params.id },
+      select: { themeColor: true, botName: true, businessName: true } // ONLY select public UI fields
+    });
+    
+    if (!client) return res.status(404).json({ error: 'Not found' });
+    res.json(client);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
