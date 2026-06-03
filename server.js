@@ -18,6 +18,18 @@ io.on('connection', (socket) => {
   console.log('Dashboard connected:', socket.id);
 });
 
+const path = require('path');
+
+// Allow external websites to fetch your widget UI
+app.get('/widget.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'widget.html'));
+});
+
+// Allow external websites to fetch your embed script
+app.get('/embed.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'embed.js'));
+});
+
 // ── UNPROTECTED ENDPOINT: Lead Capture Widget ─────────────────────────────────
 app.post('/api/leads/capture', async (req, res) => {
   const { companyId, fullName, phone, intent, urgency, location, budget } = req.body;
