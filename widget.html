@@ -301,6 +301,35 @@ try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); }
   if (cid) _vc_config.companyId = cid;
 })();
 
+// ── 1. DYNAMIC CONFIGURATION LOADER ──
+document.addEventListener("DOMContentLoaded", async () => {
+  // Grab the companyId from the iframe URL (e.g., ?companyId=123)
+  const urlParams = new URLSearchParams(window.location.search);
+  const companyId = urlParams.get('companyId');
+
+  if (companyId) {
+    try {
+      // Fetch the public widget settings from your Render backend
+      const res = await fetch(`https://vettochat-backend.onrender.com/api/clients/${companyId}/settings`);
+      const data = await res.json();
+
+      if (data && data.themeColor) {
+        // Overwrite the root CSS variables with the database color
+        document.documentElement.style.setProperty('--navy', data.themeColor);
+        document.documentElement.style.setProperty('--navy-light', data.themeColor); // Adjust if you do math for lighter shades
+      }
+      
+      // Bonus: If you save botName in DB, you can inject it here too
+      if (data && data.botName) {
+        document.getElementById('bot-name-display').innerText = data.botName;
+      }
+      
+    } catch (err) {
+      console.warn("VettoChat: Could not load custom theme, using defaults.");
+    }
+  }
+});
+
 // ─── WIDGET LIVE / OFFLINE ────────────────────────────────────────────────────
 function _applyWidgetLive() {
   const isLive = localStorage.getItem('vettochat_widget_live') !== 'false';
