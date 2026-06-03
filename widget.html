@@ -303,27 +303,27 @@ try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); }
 
 // ── 1. DYNAMIC CONFIGURATION LOADER ──
 document.addEventListener("DOMContentLoaded", async () => {
-  // Grab the companyId from the iframe URL (e.g., ?companyId=123)
   const urlParams = new URLSearchParams(window.location.search);
   const companyId = urlParams.get('companyId');
 
   if (companyId) {
     try {
-      // Fetch the public widget settings from your Render backend
+      // Fetch the public widget settings from your live Render backend
       const res = await fetch(`https://vettochat-backend.onrender.com/api/clients/${companyId}/settings`);
-      const data = await res.json();
+      const dbData = await res.json();
 
-      if (data && data.themeColor) {
-        // Overwrite the root CSS variables with the database color
-        document.documentElement.style.setProperty('--navy', data.themeColor);
-        document.documentElement.style.setProperty('--navy-light', data.themeColor); // Adjust if you do math for lighter shades
+      if (dbData) {
+        // Map the Database fields (botName, themeColor) to the Widget's expected fields
+        const widgetConfig = {
+          brandColor: dbData.themeColor || '#2563EB', // Fallback to default blue if null
+          assistantName: dbData.botName || 'Vetto Assistant'
+        };
+        
+        // Pass it into your existing math/color injection engine!
+        if (typeof _vc_apply === 'function') {
+           _vc_apply(widgetConfig);
+        }
       }
-      
-      // Bonus: If you save botName in DB, you can inject it here too
-      if (data && data.botName) {
-        document.getElementById('bot-name-display').innerText = data.botName;
-      }
-      
     } catch (err) {
       console.warn("VettoChat: Could not load custom theme, using defaults.");
     }
