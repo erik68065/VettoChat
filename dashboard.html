@@ -82,7 +82,7 @@
     window.location.href = "get-started.html";
   }
 
-  // ── FETCH & APPLY ONBOARDING SETTINGS ──────────────────────────────
+  // ── FETCH & APPLY SETTINGS FROM SUPABASE ───────────────────────────
   async function fetchDashboardSettings() {
     if (!tenantId) return;
     try {
@@ -90,43 +90,48 @@
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
       if (!response.ok) return;
+      const s = await response.json(); // s = client record (single source of truth)
 
-      const settings = await response.json();
-
-      // 1. Sidebar — business name + owner name
-      const businessNameEl = document.querySelector('.sb-client-name');
-      if (businessNameEl && settings.businessName) businessNameEl.textContent = settings.businessName;
-      const sbUserNameEl = document.getElementById('sbUserName');
-      if (sbUserNameEl && settings.ownerFullName) sbUserNameEl.textContent = settings.ownerFullName;
+      // 1. Sidebar labels
+      const bizEl  = document.querySelector('.sb-client-name');
+      const nameEl = document.getElementById('sbUserName');
+      if (bizEl  && s.businessName)  bizEl.textContent  = s.businessName;
+      if (nameEl && s.ownerFullName) nameEl.textContent = s.ownerFullName;
 
       // 2. Page title
-      if (settings.businessName) document.title = `VettoChat — ${settings.businessName}`;
+      if (s.businessName) document.title = `VettoChat — ${s.businessName}`;
 
-      // 3. SMS phone + preview
-      const smsPhoneEl = document.getElementById('smsPhone');
-      if (smsPhoneEl && settings.ownerPhone) smsPhoneEl.value = settings.ownerPhone;
+      // 3. SMS settings
+      const smsPhoneEl   = document.getElementById('smsPhone');
       const smsContactEl = document.getElementById('smsContactName');
-      if (smsContactEl && settings.businessName) {
-        smsContactEl.innerHTML = `${settings.businessName} Alerts<span>VettoChat · via Twilio</span>`;
-      }
       const smsPreviewEl = document.getElementById('smsPreviewText');
-      if (smsPreviewEl && settings.businessName) {
+      const phone = s.smsPhone || s.ownerPhone || '';
+      if (smsPhoneEl)   smsPhoneEl.value = phone;
+      if (smsContactEl && s.businessName)
+        smsContactEl.innerHTML = `${s.businessName} Alerts<span>VettoChat · via Twilio</span>`;
+      if (smsPreviewEl && s.businessName)
         smsPreviewEl.textContent =
-          `🔔 New Lead — ${settings.businessName}\n\nName: [Lead Name]\nService: [Service Type]\nBudget: [Budget]\nUrgency: [Urgency]\nPhone: [Lead Phone]\n\n→ Reply CALL to notify team`;
-      }
+          `🔔 New Lead — ${s.businessName}\n\nName: [Lead Name]\nService: [Service Type]\nBudget: [Budget]\nUrgency: [Urgency]\nPhone: [Lead Phone]\n\n→ Reply CALL to notify team`;
 
-      // 4. Account & Company panel — seed with server data if not already customised
+      // 4. Account & Company panel
       if (typeof accountProfile !== 'undefined') {
-        if (!accountProfile.name)        accountProfile.name        = settings.ownerFullName || '';
-        if (!accountProfile.email)       accountProfile.email       = settings.email        || '';
-        if (!accountProfile.phone)       accountProfile.phone       = settings.ownerPhone   || '';
-        if (!accountProfile.companyName) accountProfile.companyName = settings.businessName || '';
+        if (!accountProfile.name)        accountProfile.name        = s.ownerFullName || '';
+        if (!accountProfile.email)       accountProfile.email       = s.email        || '';
+        if (!accountProfile.phone)       accountProfile.phone       = phone;
+        if (!accountProfile.companyName) accountProfile.companyName = s.businessName || '';
         if (typeof renderCFM === 'function') renderCFM();
       }
 
-      // 5. Restore full config snapshot (new device / cleared browser)
-      if (settings.fullConfig) {
-        const fc = settings.fullConfig;
+      // 5. Widget live/offline state
+      if (s.widgetLive !== undefined && typeof _widgetLive !== 'undefined') {
+        _widgetLive = Boolean(s.widgetLive);
+        localStorage.setItem('vettochat_widget_live', String(_widgetLive));
+        if (typeof applyWidgetStatus === 'function') applyWidgetStatus();
+      }
+
+      // 6. Full config snapshot — restore on new device / cleared browser
+      if (s.fullConfig) {
+        const fc = s.fullConfig;
         if (fc.botConfig   && !localStorage.getItem('vettochat_config'))
           localStorage.setItem('vettochat_config',       fc.botConfig);
         if (fc.serviceArea && !localStorage.getItem('vettochat_service_area'))
@@ -135,33 +140,19 @@
           localStorage.setItem('vettochat_spam_config',  fc.spamConfig);
       }
 
-      // 6. Restore widget live/offline state
-      if (settings.widgetLive !== undefined && typeof _widgetLive !== 'undefined') {
-        _widgetLive = Boolean(settings.widgetLive);
-        localStorage.setItem('vettochat_widget_live', String(_widgetLive));
-        if (typeof applyWidgetStatus === 'function') applyWidgetStatus();
-      }
-
-      // 7. Owner full name in sidebar
-      const sbUserNameEl = document.getElementById('sbUserName');
-      if (sbUserNameEl && settings.ownerFullName) sbUserNameEl.textContent = settings.ownerFullName;
-
-      // 2. Resolve values with fallbacks
-      const industry = settings.industry   || 'roofing';
-      const name     = settings.botName    || 'Vetto';
-      const color    = settings.themeColor || '#1E40AF';
-
-      // 3. Apply the industry template silently into memory
-      //    (same as _doApplyTemplate but without the toast)
+      // 7. Apply industry template + bot identity into memory (silent, no toast)
+      const industry = s.industry   || 'roofing';
+      const name     = s.botName    || 'Vetto';
+      const color    = s.themeColor || '#1E40AF';
       const tmpl = (typeof INDUSTRY_TEMPLATES !== 'undefined') && INDUSTRY_TEMPLATES[industry];
       if (tmpl) {
         _activeTemplate = industry;
-        questions = tmpl.steps.map((s, i) => ({
-          id: i + 1, key: s.key,
-          text: s.key === 'name' ? Q1_DEFAULT_TEXT : s.question,
-          type: s.type, enabled: true,
-          placeholder: s.placeholder || '',
-          chips: Array.isArray(s.chips) ? [...s.chips] : []
+        questions = tmpl.steps.map((step, i) => ({
+          id: i + 1, key: step.key,
+          text: step.key === 'name' ? Q1_DEFAULT_TEXT : step.question,
+          type: step.type, enabled: true,
+          placeholder: step.placeholder || '',
+          chips: Array.isArray(step.chips) ? [...step.chips] : []
         }));
         nextId = questions.length + 1;
         SCORING_QUESTIONS.length = 0;
@@ -171,8 +162,7 @@
         }));
       }
 
-      // 4. Write a complete vettochat_config to localStorage so every subsequent
-      //    read (widget, bot-config page, preview) sees the user's real settings
+      // 8. Write complete vettochat_config to localStorage
       const chatLabel = (tmpl && tmpl.chatLabel) || 'Get a free quote →';
       if (typeof CONFIG_VERSION !== 'undefined') {
         localStorage.setItem('vettochat_config', JSON.stringify({
@@ -190,26 +180,24 @@
         }));
       }
 
-      // 5. Re-run loadIdentityForm so the form and widget reflect the server data
+      // 9. Re-run loadIdentityForm so form fields reflect server data
       if (typeof loadIdentityForm === 'function') loadIdentityForm();
 
-      // 6. Re-render bot config page if already open
+      // 10. Re-render bot config page if already open
       if (typeof bcInited !== 'undefined' && bcInited) {
         if (typeof renderQB        === 'function') renderQB();
         if (typeof renderTemplates === 'function') renderTemplates();
         if (typeof renderScoring   === 'function') renderScoring();
       }
 
-      // 7. Auto-start guided demo for new users arriving from onboarding
+      // 11. Auto-start guided demo for new users arriving from onboarding
       if (localStorage.getItem('vc_new_user') === '1') {
         localStorage.removeItem('vc_new_user');
-        setTimeout(() => {
-          if (typeof startDemo === 'function') startDemo();
-        }, 1000);
+        setTimeout(() => { if (typeof startDemo === 'function') startDemo(); }, 1000);
       }
 
     } catch (error) {
-      console.error("Failed to load dashboard settings:", error);
+      console.error('fetchDashboardSettings failed:', error);
     }
   }
 </script>
