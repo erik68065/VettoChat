@@ -4030,6 +4030,7 @@ function saveAllBotConfig() {
 
   // Persist everything to Supabase so it survives logout / new device
   syncToBackend({
+    industry:   _activeTemplate,
     botName:    document.getElementById('identityName')?.value.trim()  || '',
     themeColor: document.getElementById('identityColor')?.value.trim() || '',
     smsPhone:   document.getElementById('smsPhone')?.value.trim()      || '',
