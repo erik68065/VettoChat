@@ -158,49 +158,45 @@ app.get('/api/leads', requireAuth, async (req, res) => {
   }
 });
 
-// Save all bot/dashboard settings (protected)
+// Save all settings — writes directly to clients table (single source of truth)
 app.put('/api/clients/:id/settings', requireAuth, async (req, res) => {
   const { id } = req.params;
   const {
-    industry, botName, themeColor, companyWebsite, businessName, businessPhone,
-    smsPhone, widgetLive, fullConfig
+    industry, botName, themeColor, companyWebsite, businessName,
+    businessPhone, smsPhone, widgetLive, fullConfig
   } = req.body;
 
   try {
-    const settingsData = {
+    // Everything goes into the clients record
+    const data = {
+      ...(industry       !== undefined && { industry }),
       ...(botName        !== undefined && { botName }),
       ...(themeColor     !== undefined && { themeColor }),
       ...(companyWebsite !== undefined && { companyWebsite }),
       ...(businessName                && { businessName }),
       ...(smsPhone       !== undefined && { smsPhone }),
+      ...(businessPhone               && { ownerPhone: businessPhone }),
       ...(widgetLive     !== undefined && { widgetLive: Boolean(widgetLive) }),
       ...(fullConfig     !== undefined && { fullConfig }),
-      onboardingCompleted: true
     };
 
-    const settings = await prisma.onboardingSettings.upsert({
+    const client = await prisma.client.update({ where: { id }, data });
+
+    // Mark onboarding complete in the tracking table
+    await prisma.onboardingSettings.upsert({
       where:  { client_id: id },
-      update: settingsData,
-      create: { client_id: id, ...settingsData }
+      update: { onboardingCompleted: true, completedAt: new Date() },
+      create: { client_id: id, onboardingCompleted: true, completedAt: new Date() }
     });
 
-    // industry and ownerPhone live on the Client record
-    const clientUpdate = {};
-    if (industry)      clientUpdate.industry   = industry;
-    if (businessPhone) clientUpdate.ownerPhone = businessPhone;
-    if (smsPhone && !businessPhone) clientUpdate.ownerPhone = smsPhone;
-    if (Object.keys(clientUpdate).length) {
-      await prisma.client.update({ where: { id }, data: clientUpdate });
-    }
-
-    res.status(200).json({ success: true, settings: { ...settings, industry: industry || null } });
+    res.status(200).json({ success: true, client });
   } catch (error) {
-    console.error('Settings Update Failed:', error);
+    console.error('Settings save failed:', error);
     res.status(500).json({ error: 'Failed to save settings' });
   }
 });
 
-// Update client profile (name, email, phone, company name)
+// Update profile fields on the clients record
 app.put('/api/clients/:id/profile', requireAuth, async (req, res) => {
   const { id } = req.params;
   const { ownerFullName, email, ownerPhone, businessName } = req.body;
@@ -208,82 +204,40 @@ app.put('/api/clients/:id/profile', requireAuth, async (req, res) => {
     const client = await prisma.client.update({
       where: { id },
       data: {
-        ...(ownerFullName && { ownerFullName }),
-        ...(email        && { email }),
+        ...(ownerFullName !== undefined && { ownerFullName }),
+        ...(email        !== undefined && { email }),
         ...(ownerPhone   !== undefined && { ownerPhone }),
-        ...(businessName && { businessName }),
+        ...(businessName !== undefined && { businessName }),
       }
     });
     res.status(200).json({ success: true, client });
   } catch (error) {
-    console.error('Profile Update Failed:', error);
+    console.error('Profile save failed:', error);
     res.status(500).json({ error: 'Failed to save profile' });
   }
 });
 
-
-// Fetch onboarding settings + industry for the dashboard
+// Fetch all settings — reads directly from clients table
 app.get('/api/clients/:id/settings', async (req, res) => {
-  const { id } = req.params;
-
   try {
-    // Join onboarding_settings with the client to get industry + businessName
-    const settings = await prisma.onboardingSettings.findUnique({
-      where: { client_id: id },
-      include: {
-        client: { select: { industry: true, businessName: true, ownerFullName: true, email: true, ownerPhone: true } }
-      }
+    const client = await prisma.client.findUnique({ where: { id: req.params.id } });
+    if (!client) return res.status(404).json({ error: 'Client not found' });
+
+    // Also grab onboarding progress
+    const onboarding = await prisma.onboardingSettings.findUnique({
+      where: { client_id: req.params.id }
     });
 
-    if (!settings) {
-      const client = await prisma.client.findUnique({ where: { id } });
-      if (!client) return res.status(404).json({ error: 'Client not found' });
-      return res.status(200).json({
-        industry:      client.industry,
-        businessName:  client.businessName,
-        ownerFullName: client.ownerFullName,
-        ownerPhone:    client.ownerPhone,
-        email:         client.email,
-        botName:       null,
-        themeColor:    null,
-        companyWebsite: null,
-        smsPhone:      client.ownerPhone || null,
-        widgetLive:    true,
-        fullConfig:    null,
-        onboardingCompleted: false
-      });
-    }
-
-    const { client, ...rest } = settings;
     res.status(200).json({
-      ...rest,
-      industry:      client.industry,
-      businessName:  rest.businessName  || client.businessName,
-      ownerFullName: client.ownerFullName,
-      ownerPhone:    client.ownerPhone,
-      email:         client.email,
-      smsPhone:      rest.smsPhone      || client.ownerPhone || null,
-      widgetLive:    rest.widgetLive    ?? true,
-      fullConfig:    rest.fullConfig    || null
+      ...client,
+      smsPhone:            client.smsPhone      || client.ownerPhone || null,
+      widgetLive:          client.widgetLive     ?? true,
+      onboardingCompleted: onboarding?.onboardingCompleted ?? false,
+      currentStep:         onboarding?.currentStep         ?? 1,
     });
   } catch (error) {
-    console.error("Failed to fetch settings:", error);
-    res.status(500).json({ error: "Failed to fetch onboarding config" });
-  }
-});
-
-// In server.js (Phase 1: Minimum Viable Public Settings Route)
-app.get('/api/clients/:id/settings', async (req, res) => {
-  try {
-    const client = await prisma.client.findUnique({
-      where: { id: req.params.id },
-      select: { themeColor: true, botName: true, businessName: true } // ONLY select public UI fields
-    });
-    
-    if (!client) return res.status(404).json({ error: 'Not found' });
-    res.json(client);
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Settings fetch failed:', error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
   }
 });
 

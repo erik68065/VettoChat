@@ -124,24 +124,27 @@
         if (typeof renderCFM === 'function') renderCFM();
       }
 
-      // 5. Restore full config snapshot from Supabase (bot config, service area, spam)
-      //    Only applies when localStorage is empty (new device / cleared browser)
+      // 5. Restore full config snapshot (new device / cleared browser)
       if (settings.fullConfig) {
         const fc = settings.fullConfig;
-        if (fc.botConfig    && !localStorage.getItem('vettochat_config'))
+        if (fc.botConfig   && !localStorage.getItem('vettochat_config'))
           localStorage.setItem('vettochat_config',       fc.botConfig);
-        if (fc.serviceArea  && !localStorage.getItem('vettochat_service_area'))
+        if (fc.serviceArea && !localStorage.getItem('vettochat_service_area'))
           localStorage.setItem('vettochat_service_area', fc.serviceArea);
-        if (fc.spamConfig   && !localStorage.getItem('vettochat_spam_config'))
+        if (fc.spamConfig  && !localStorage.getItem('vettochat_spam_config'))
           localStorage.setItem('vettochat_spam_config',  fc.spamConfig);
       }
 
-      // 6. Restore widget live/offline state from Supabase
+      // 6. Restore widget live/offline state
       if (settings.widgetLive !== undefined && typeof _widgetLive !== 'undefined') {
-        _widgetLive = settings.widgetLive;
+        _widgetLive = Boolean(settings.widgetLive);
         localStorage.setItem('vettochat_widget_live', String(_widgetLive));
         if (typeof applyWidgetStatus === 'function') applyWidgetStatus();
       }
+
+      // 7. Owner full name in sidebar
+      const sbUserNameEl = document.getElementById('sbUserName');
+      if (sbUserNameEl && settings.ownerFullName) sbUserNameEl.textContent = settings.ownerFullName;
 
       // 2. Resolve values with fallbacks
       const industry = settings.industry   || 'roofing';

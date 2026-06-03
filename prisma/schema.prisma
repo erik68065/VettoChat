@@ -9,19 +9,25 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// 1. CLIENTS (The Business / Contractor)
+// 1. CLIENTS — single source of truth for all user data and config
 model Client {
   id              String   @id @default(uuid())
-  supabaseUserId  String?  @unique  // Links to Supabase auth.users.id
+  supabaseUserId  String?  @unique
   email           String?
   businessName    String
   ownerFullName   String
   ownerPhone      String
   industry        String
+  // Bot / branding config (editable from dashboard)
+  botName         String?
+  themeColor      String?
+  companyWebsite  String?
+  smsPhone        String?
+  widgetLive      Boolean  @default(true)
+  fullConfig      Json?
   createdAt       DateTime @default(now())
 
   leads           Lead[]
-
   onboarding      OnboardingSettings?
 
   @@map("clients")
@@ -46,20 +52,16 @@ model Lead {
   @@map("leads")
 }
 
+// 2. ONBOARDING — tracks progress only, no editable business data
 model OnboardingSettings {
-  id                  String   @id @default(uuid())
-  client_id           String   @unique
-  businessName        String?
-  botName             String?
-  themeColor          String?
-  companyWebsite      String?
-  smsPhone            String?         // business phone for SMS alerts
-  widgetLive          Boolean  @default(true)
-  fullConfig          Json?           // complete snapshot: botConfig + serviceArea + spamConfig
-  onboardingCompleted Boolean  @default(false)
-  created_at          DateTime @default(now())
+  id                  String    @id @default(uuid())
+  client_id           String    @unique
+  onboardingCompleted Boolean   @default(false)
+  currentStep         Int       @default(1)
+  completedAt         DateTime?
+  created_at          DateTime  @default(now())
 
-  client              Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  client              Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
 
   @@map("onboarding_settings")
 }
