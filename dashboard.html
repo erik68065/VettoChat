@@ -124,6 +124,25 @@
         if (typeof renderCFM === 'function') renderCFM();
       }
 
+      // 5. Restore full config snapshot from Supabase (bot config, service area, spam)
+      //    Only applies when localStorage is empty (new device / cleared browser)
+      if (settings.fullConfig) {
+        const fc = settings.fullConfig;
+        if (fc.botConfig    && !localStorage.getItem('vettochat_config'))
+          localStorage.setItem('vettochat_config',       fc.botConfig);
+        if (fc.serviceArea  && !localStorage.getItem('vettochat_service_area'))
+          localStorage.setItem('vettochat_service_area', fc.serviceArea);
+        if (fc.spamConfig   && !localStorage.getItem('vettochat_spam_config'))
+          localStorage.setItem('vettochat_spam_config',  fc.spamConfig);
+      }
+
+      // 6. Restore widget live/offline state from Supabase
+      if (settings.widgetLive !== undefined && typeof _widgetLive !== 'undefined') {
+        _widgetLive = settings.widgetLive;
+        localStorage.setItem('vettochat_widget_live', String(_widgetLive));
+        if (typeof applyWidgetStatus === 'function') applyWidgetStatus();
+      }
+
       // 2. Resolve values with fallbacks
       const industry = settings.industry   || 'roofing';
       const name     = settings.botName    || 'Vetto';
@@ -2335,10 +2354,12 @@ function closePreview() {
 // ─── BOT CONFIG — SMS ────────────────────────────────────────────────────────
 function sendTestSMS(){
   const phone = document.getElementById('smsPhone').value.trim();
-  document.getElementById('smsToastNum').textContent = `to ${phone}`;
+  document.getElementById('smsToastNum').textContent = phone ? `to ${phone}` : '';
   const toast = document.getElementById('smsToast');
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 4000);
+  // Persist the phone number to Supabase whenever they save & test
+  if (phone) syncToBackend({ smsPhone: phone });
 }
 
 // ─── ASSISTANT IDENTITY SYNC ─────────────────────────────────────────────────
@@ -3978,14 +3999,57 @@ function toggleSpamMaster() {
   renderSpamUI();
 }
 
+// ── BACKEND SYNC HELPERS ─────────────────────────────────────────────────────
+
+// Silently persist settings to Supabase — never throws, never blocks the UI
+async function syncToBackend(fields) {
+  const tId = localStorage.getItem('vc_tenant_id');
+  const tok = localStorage.getItem('vc_token');
+  if (!tId || !tok) return;
+  try {
+    await fetch(`${API_URL}/api/clients/${tId}/settings`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tok}` },
+      body:    JSON.stringify(fields)
+    });
+  } catch(e) { console.warn('Background sync failed:', e); }
+}
+
+async function syncProfileToBackend(profile) {
+  const tId = localStorage.getItem('vc_tenant_id');
+  const tok = localStorage.getItem('vc_token');
+  if (!tId || !tok) return;
+  try {
+    await fetch(`${API_URL}/api/clients/${tId}/profile`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tok}` },
+      body:    JSON.stringify(profile)
+    });
+  } catch(e) { console.warn('Profile sync failed:', e); }
+}
+
 function saveAllBotConfig() {
   saveIdentity();
   saveSpamConfig();
   saveSAConfig();
-  rescoreAllLeads(); // re-evaluate every lead against new scoring rules
+  rescoreAllLeads();
   _botConfigDirty = false;
   const hint = document.getElementById('identitySyncStatus');
   if (hint) hint.style.display = 'none';
+
+  // Persist everything to Supabase so it survives logout / new device
+  syncToBackend({
+    botName:    document.getElementById('identityName')?.value.trim()  || '',
+    themeColor: document.getElementById('identityColor')?.value.trim() || '',
+    smsPhone:   document.getElementById('smsPhone')?.value.trim()      || '',
+    widgetLive: _widgetLive,
+    fullConfig: {
+      botConfig:    localStorage.getItem('vettochat_config'),
+      serviceArea:  localStorage.getItem('vettochat_service_area'),
+      spamConfig:   localStorage.getItem('vettochat_spam_config'),
+    }
+  });
+
   showToastMsg('✓ All changes saved', 'Your chatbot settings have been updated.', '#059669');
 }
 
@@ -4028,6 +4092,7 @@ function setWidgetStatus(live) {
   _widgetLive = !!live;
   localStorage.setItem('vettochat_widget_live', String(_widgetLive));
   applyWidgetStatus();
+  syncToBackend({ widgetLive: _widgetLive });
 }
 
 function applyWidgetStatus() {
@@ -4071,6 +4136,15 @@ function saveCFM() {
   updateSbProfile();
   applyCompanyBranding();
   closeCFM();
+
+  // Persist to Supabase so it survives logout and new devices
+  syncProfileToBackend({
+    ownerFullName: accountProfile.name,
+    email:         accountProfile.email,
+    ownerPhone:    accountProfile.phone,
+    businessName:  accountProfile.companyName,
+  });
+
   showToastMsg('✓ Profile saved', 'Your account profile has been updated.', '#059669');
 }
 

@@ -48,17 +48,18 @@ model Lead {
 
 model OnboardingSettings {
   id                  String   @id @default(uuid())
-  client_id           String   @unique // @unique enforces the 1-to-1 relationship
+  client_id           String   @unique
   businessName        String?
   botName             String?
   themeColor          String?
   companyWebsite      String?
+  smsPhone            String?         // business phone for SMS alerts
+  widgetLive          Boolean  @default(true)
+  fullConfig          Json?           // complete snapshot: botConfig + serviceArea + spamConfig
   onboardingCompleted Boolean  @default(false)
   created_at          DateTime @default(now())
 
-  // The strict relational link back to the parent client
   client              Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
 
-  // This maps the Prisma model to the exact Supabase table name we generated in SQL
   @@map("onboarding_settings")
 }
