@@ -871,19 +871,12 @@ async function finishConversation() {
 
   const rawName = S.data.name || S.data.firstName || '';
   const fullName = rawName.replace(/\b\w/g, c => c.toUpperCase());
-
-  // Preview mode: skip the real API call so no lead is saved or broadcast
-  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
-  if (isPreview) {
-    setTimeout(() => {
-      removeTyping();
-      addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
-    }, 900);
-  }
-
   const locRaw = S.data.location || '';
 
-  // Leads table schema: id, phone, intent, urgency, score, status, createdAt, companyId, fullName
+  // 1. Check for the preview flag, but DO NOT return early
+  const isPreview = new URLSearchParams(window.location.search).get('preview') === 'true';
+
+  // 2. Build the payload. Test leads get routed to a demo view, live leads get 'new'
   const leadPayload = {
     fullName:  fullName,
     phone:     S.data.phone || '',
@@ -892,12 +885,11 @@ async function finishConversation() {
     score:     0,
     status:    isPreview ? 'demo_test' : 'new',
     companyId: _vc_config.companyId || null,
-    // extra context for dashboard display (not stored in Leads table)
     location:  locRaw,
     budget:    S.data.budget || '',
   };
 
-  // Write to localStorage so the dashboard tab picks it up instantly
+  // 3. Write to localStorage so the active dashboard tab picks it up instantly
   try {
     localStorage.setItem('vettochat_pending_lead', JSON.stringify({
       ...leadPayload,
@@ -905,13 +897,13 @@ async function finishConversation() {
     }));
   } catch (_) {}
 
-  // Show success immediately — don't make the user wait for the server
+  // 4. Show success immediately — don't make the user wait for the server
   setTimeout(() => {
     removeTyping();
     addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
   }, 900);
 
-  // Fire the API call in the background — won't block the UI
+  // 5. Fire the API call in the background
   const SERVER_URL = "https://vettochat-backend.onrender.com";
   fetch(`${SERVER_URL}/api/leads/capture`, {
     method: 'POST',
@@ -919,7 +911,6 @@ async function finishConversation() {
     body: JSON.stringify(leadPayload)
   }).catch(err => console.warn("VettoChat background sync failed:", err));
 }
-
 function disableInput(){
   $('chatInput').disabled=true;
   $('sendBtn').disabled=true;
