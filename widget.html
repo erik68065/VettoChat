@@ -879,7 +879,6 @@ async function finishConversation() {
       removeTyping();
       addBotMsg(`You're all set, <strong>${S.data.firstName}</strong>! Our team will call you within 60 minutes.`, 'success');
     }, 900);
-    return;
   }
 
   const locRaw = S.data.location || '';
@@ -891,7 +890,7 @@ async function finishConversation() {
     intent:    S.data.service || S.data.intent || 'General Inquiry',
     urgency:   S.data.urgency || 'Not specified',
     score:     0,
-    status:    'new',
+    status:    isPreview ? 'demo_test' : 'new',
     companyId: _vc_config.companyId || null,
     // extra context for dashboard display (not stored in Leads table)
     location:  locRaw,
