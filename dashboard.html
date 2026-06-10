@@ -56,6 +56,10 @@
             phone:    dbLead.phone     || 'No phone',
             location: dbLead.location  || 'N/A',
             budget:   dbLead.budget    || '',
+            
+            // MAP INTENT TO SERVICE FOR THE UI
+            service:  dbLead.intent    || 'Not specified', 
+            
             reason:   dbLead.intent    || 'Not specified',
             urgency:  dbLead.urgency   || 'Not specified',
             priority: dbLead.status    ? dbLead.status.toLowerCase() : 'cold',
@@ -66,10 +70,14 @@
         });
 
         // 2. Fire your existing UI render functions without touching any HTML!
+        // 2. Fire your existing UI render functions without touching any HTML!
         if (typeof renderCRMTable === "function") renderCRMTable();
         if (typeof renderOverviewFromCRM === "function") renderOverviewFromCRM();
         if (typeof updateCRMBadge === "function") updateCRMBadge();
         if (typeof syncStatsFromCRM === "function") syncStatsFromCRM();
+        
+        // 🟢 ADD THIS LINE: Explicitly call the function that builds the Leads table HTML
+        if (typeof renderLeads === "function") renderLeads();
       }
     } catch (error) {
       console.error("Failed to connect to Render backend:", error);
@@ -4536,5 +4544,28 @@ socket.on('new_lead', async (lead) => {
   </div>
 </div>
 
+<script>
+  // Check if socket already exists, otherwise initialize it without "const" 
+  // to avoid redeclaration scope issues in case it's in another script tag
+  if (typeof window.socket === 'undefined') {
+    window.socket = io(API_URL);
+    
+    window.socket.on('connect', () => {
+      console.log('Connected to real-time server:', window.socket.id);
+    });
+  }
+
+  // Add the listener to the globally scoped socket
+  window.socket.on('newLead', (data) => {
+    if (data.companyId === tenantId) {
+       console.log('New lead received via websocket!', data);
+       
+       // Re-fetch all leads so the UI updates automatically
+       if (typeof fetchLiveLeads === 'function') {
+         fetchLiveLeads(); 
+       }
+    }
+  });
+</script>
 </body>
 </html>

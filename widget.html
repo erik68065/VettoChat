@@ -882,15 +882,13 @@ async function finishConversation() {
 
   // 2. Build the payload. Test leads get routed to a demo view, live leads get 'new'
   const leadPayload = {
-    fullName:  fullName,
-    phone:     S.data.phone || '',
-    intent:    S.data.service || S.data.intent || 'General Inquiry',
-    urgency:   S.data.urgency || 'Not specified',
-    score:     0,
-    status:    isPreview ? 'demo_test' : 'new',
-    companyId: _vc_config.companyId || null,
-    location:  locRaw,
-    budget:    S.data.budget || '',
+    companyId: _vc_config.companyId,
+    fullName: S.data.name || "Unknown",
+    phone: S.data.phone || "",
+    intent: S.data.reason || S.data.service || "Not specified", // Map reason/service to intent
+    urgency: S.data.urgency || "Not specified",
+    location: S.data.location || "N/A",
+    budget: S.data.budget || ""
   };
 
   // 3. Write to localStorage so the active dashboard tab picks it up instantly
