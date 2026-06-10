@@ -905,11 +905,24 @@ async function finishConversation() {
 
   // 5. Fire the API call in the background
   const SERVER_URL = "https://vettochat-backend.onrender.com";
+  // fetch(`${SERVER_URL}/api/leads/capture`, {
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  //   body: JSON.stringify(leadPayload)
+  // }).catch(err => console.warn("VettoChat background sync failed:", err));
+  // Replace your current fetch call with this temporarily
   fetch(`${SERVER_URL}/api/leads/capture`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(leadPayload)
-  }).catch(err => console.warn("VettoChat background sync failed:", err));
+  })
+  .then(async (response) => {
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      console.error("VettoChat API Error Details:", errorDetails);
+    }
+  })
+  .catch(err => console.error("VettoChat Network Failure:", err));
 }
 function disableInput(){
   $('chatInput').disabled=true;
