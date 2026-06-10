@@ -4545,8 +4545,7 @@ socket.on('new_lead', async (lead) => {
 </div>
 
 <script>
-  // Check if socket already exists, otherwise initialize it without "const" 
-  // to avoid redeclaration scope issues in case it's in another script tag
+  // Initialize socket securely
   if (typeof window.socket === 'undefined') {
     window.socket = io(API_URL);
     
@@ -4555,10 +4554,14 @@ socket.on('new_lead', async (lead) => {
     });
   }
 
-  // Add the listener to the globally scoped socket
-  window.socket.on('newLead', (data) => {
-    if (data.companyId === tenantId) {
-       console.log('New lead received via websocket!', data);
+  // 1. FIXED: Listen for the exact event name emitted by server.js
+  window.socket.on('new_lead', (data) => {
+    
+    // 2. FIXED: Check Prisma's standard relational keys for the ID
+    const incomingTenantId = data.clientId || data.client_id || data.companyId;
+    
+    if (incomingTenantId === tenantId) {
+       console.log('🔔 New lead received instantly!', data);
        
        // Re-fetch all leads so the UI updates automatically
        if (typeof fetchLiveLeads === 'function') {
