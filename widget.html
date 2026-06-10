@@ -271,7 +271,12 @@ let STEPS = DEFAULT_STEPS;
 
 function _vc_apply(cfg) {
   if (!cfg || typeof cfg !== 'object') return;
-  _vc_config = cfg;
+  
+  // 🔴 OLD CODE: This was destroying the companyId
+  // _vc_config = cfg; 
+  
+  // 🟢 NEW CODE: Merge configurations safely
+  Object.assign(_vc_config, cfg);
 
   if (cfg.brandColor && /^#[0-9A-Fa-f]{6}$/.test(cfg.brandColor)) {
     const h = cfg.brandColor;
@@ -292,7 +297,6 @@ function _vc_apply(cfg) {
 
   STEPS = buildSteps(cfg);
 }
-
 try { _vc_apply(JSON.parse(localStorage.getItem('vettochat_config') || '{}')); } catch(e) {}
 
 // Pick up companyId from embed.js URL param and store it in config
@@ -313,13 +317,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const dbData = await res.json();
 
       if (dbData) {
-        // Map the Database fields (botName, themeColor) to the Widget's expected fields
+        // Map the Database fields to the Widget's expected fields
         const widgetConfig = {
-          brandColor: dbData.themeColor || '#2563EB', // Fallback to default blue if null
-          assistantName: dbData.botName || 'Vetto Assistant'
+          brandColor: dbData.themeColor || '#2563EB', 
+          assistantName: dbData.botName || 'Vetto Assistant',
+          companyId: companyId // <-- Add this line as a failsafe!
         };
         
-        // Pass it into your existing math/color injection engine!
         if (typeof _vc_apply === 'function') {
            _vc_apply(widgetConfig);
         }
