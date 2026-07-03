@@ -11,6 +11,11 @@ const app = express();
 app.use(express.json());
 app.use(cors({ origin: '*' }));
 
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.url} - Body:`, req.body);
+  next();
+});
+
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
 
