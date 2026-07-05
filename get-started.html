@@ -557,6 +557,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
   }
 
   // ── AUTO-REFRESH POLLING LOGIC ─────────────────────────────────
+  // ── AUTO-REFRESH POLLING LOGIC ─────────────────────────────────
   function startVerificationPolling() {
     if (_pollingInterval) clearInterval(_pollingInterval);
 
@@ -574,26 +575,54 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
         // If data.session exists, it means they clicked the link on their phone!
         if (data?.session) {
           clearInterval(_pollingInterval);
-          _tempCreds = null;
           
-          // Show user that desktop detected it
-          document.querySelector('.verify-title').textContent = "Email Verified!";
-          document.querySelector('.verify-desc').textContent = "Syncing your workspace...";
-          document.querySelector('.verify-icon-ring svg').outerHTML = '<svg viewBox="0 0 12 12" fill="none" style="width:40px;height:40px"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          // Visual feedback for the user on the computer
+          const verifyTitle = document.querySelector('.verify-title');
+          if (verifyTitle) verifyTitle.textContent = "Email Verified! Syncing workspace...";
 
-          // Fetch the workspace setup by the phone's verify.html click
-          const res = await fetch(`${API}/api/clients/me`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${data.session.access_token}`
+          // The computer holds the pending signup data, so the computer must create the workspace
+          const pendingData = localStorage.getItem('vc_pending_signup');
+          let finalTenantId = null;
+
+          if (pendingData) {
+            const { biz, name, email } = JSON.parse(pendingData);
+            
+            // 1. Provision the workspace
+            const setupRes = await fetch(`${API}/api/clients/setup`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                supabaseUserId: data.session.user.id,
+                email: email,
+                businessName: biz,
+                ownerFullName: name
+              }),
+            });
+            const setupDb = await setupRes.json();
+            
+            if (setupRes.ok && setupDb.client) {
+              finalTenantId = setupDb.client.id;
             }
-          });
+          } else {
+            // 2. Fallback: If they clicked the link on the computer, verify.html may have already created it
+            const meRes = await fetch(`${API}/api/clients/me`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${data.session.access_token}`
+              }
+            });
+            const meDb = await meRes.json();
+            if (meRes.ok && meDb.client) {
+              finalTenantId = meDb.client.id;
+            }
+          }
 
-          const dbData = await res.json();
-          if (res.ok && dbData.client) {
+          // 3. Finalize and Redirect
+          if (finalTenantId) {
+            _tempCreds = null;
             localStorage.setItem('vc_token', data.session.access_token);
-            localStorage.setItem('vc_tenant_id', dbData.client.id);
+            localStorage.setItem('vc_tenant_id', finalTenantId);
             localStorage.removeItem('vc_pending_signup');
             
             // Redirect instantly to onboarding
@@ -605,7 +634,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
       }
     }, 3000);
   }
-
+  
   // ── RESEND & EMAIL CHANGE LOGIC ────────────────────────────────
 
   async function resendEmail() {
