@@ -231,7 +231,7 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
+<!-- <script>
   // ── INIT SUPABASE ──────────────────────────────────────────────
   const supabaseUrl = 'https://xneegnjcegsfkyvonziy.supabase.co';
   // Use the exact Anon Key you already have in auth.js
@@ -408,6 +408,275 @@ html,body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--h);m
     localStorage.removeItem('vc_pending_signup');
     showView('signup');
     // Pre-focus the email field so they can correct it quickly
+    setTimeout(() => document.getElementById('signup-email')?.focus(), 100);
+  }
+
+  async function handleLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+      showErr('login-err', 'Email and password required.');
+      return;
+    }
+
+    setLoading('login-btn', true, 'Log in');
+    try {
+      const { data: authData, error: authErr } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (authErr) throw authErr;
+
+      const res = await fetch(`${API}/api/clients/me`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authData.session.access_token}`
+        }
+      });
+      const dbData = await res.json();
+      if (!res.ok) throw new Error('Could not load workspace profile.');
+
+      localStorage.setItem('vc_token', authData.session.access_token);
+      localStorage.setItem('vc_tenant_id', dbData.client.id);
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      showErr('login-err', err.message);
+      setLoading('login-btn', false, 'Log in');
+    }
+  }
+
+  if (window.location.hash === '#signup') showView('signup');
+</script> -->
+<script>
+  // ── INIT SUPABASE ──────────────────────────────────────────────
+  const supabaseUrl = 'https://xneegnjcegsfkyvonziy.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuZWVnbmpjZWdzZmt5dm9ueml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjY4MzYsImV4cCI6MjA5NTI0MjgzNn0.nlVF9eI7p5Lmnl9u16YghtlyKmLmm9Y7HUjQfmcmSrE';
+  
+  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+  const API = 'https://vettochat-backend.onrender.com';
+
+  // State variables for cross-device polling
+  let _pollingInterval = null;
+  let _tempCreds = null; 
+  let _resendTimer = null;
+
+  // ── UI HELPERS ─────────────────────────────────────────────────
+  function showView(view) {
+    document.getElementById('view-login').classList.toggle('active', view === 'login');
+    document.getElementById('view-signup').classList.toggle('active', view === 'signup');
+    document.getElementById('view-verify').classList.toggle('active', view === 'verify');
+
+    const tabs = document.querySelector('.tabs');
+    const logo = document.querySelector('.logo');
+    const isVerify = view === 'verify';
+    if (tabs) tabs.style.display = isVerify ? 'none' : '';
+    if (logo) logo.style.marginBottom = isVerify ? '0' : '';
+
+    document.getElementById('tab-login').classList.toggle('active', view === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', view === 'signup');
+
+    document.getElementById('login-err').style.display = 'none';
+    document.getElementById('signup-err').style.display = 'none';
+  }
+
+  function showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    el.innerText = msg;
+  }
+
+  function setLoading(btnId, isLoading, text) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = isLoading;
+    btn.innerHTML = isLoading ? '<div class="spinner"></div> Processing...' : text;
+  }
+
+  function handleGoogle() {
+    alert("Google Sign-In integration coming soon!");
+  }
+
+  // ── AUTHENTICATION LOGIC ───────────────────────────────────────
+
+  async function handleSignup() {
+    const biz      = document.getElementById('signup-biz').value.trim();
+    const name     = document.getElementById('signup-name').value.trim();
+    const email    = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    if (!biz || !name || !email || !password) {
+      showErr('signup-err', 'Please fill in all fields.');
+      return;
+    }
+
+    setLoading('signup-btn', true, 'Create my account');
+    try {
+      const { data: authData, error: authErr } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: 'https://vettochat.com/verify.html' }
+      });
+
+      if (authErr) throw authErr;
+      if (!authData.user) throw new Error('Signup failed. Please try again.');
+
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        throw new Error('An account with this email already exists. Please sign in or use a different email address.');
+      }
+
+      localStorage.setItem('vc_pending_signup', JSON.stringify({ biz, name, email }));
+
+      if (authData.session) {
+        // Email confirmation disabled — provision immediately
+        const res = await fetch(`${API}/api/clients/setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            supabaseUserId: authData.user.id,
+            email, businessName: biz, ownerFullName: name
+          }),
+        });
+        const dbData = await res.json();
+        if (!res.ok) throw new Error(dbData.error || 'Failed to set up workspace.');
+        localStorage.removeItem('vc_pending_signup');
+        localStorage.setItem('vc_token', authData.session.access_token);
+        localStorage.setItem('vc_tenant_id', dbData.client.id);
+        window.location.href = 'on-boarding.html';
+      } else {
+        // Email confirmation enabled — show verify screen & start polling
+        document.getElementById('verify-email-display').textContent = email;
+        showView('verify');
+        setLoading('signup-btn', false, 'Create my account');
+        
+        // 1. Store credentials securely in memory and start polling
+        _tempCreds = { email, password };
+        startVerificationPolling();
+      }
+    } catch (err) {
+      showErr('signup-err', err.message);
+      setLoading('signup-btn', false, 'Create my account');
+    }
+  }
+
+  // ── AUTO-REFRESH POLLING LOGIC ─────────────────────────────────
+  function startVerificationPolling() {
+    if (_pollingInterval) clearInterval(_pollingInterval);
+
+    // Poll every 3 seconds
+    _pollingInterval = setInterval(async () => {
+      if (!_tempCreds) return;
+
+      try {
+        // Attempt to log in silently in the background
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: _tempCreds.email,
+          password: _tempCreds.password
+        });
+
+        // If data.session exists, it means they clicked the link on their phone!
+        if (data?.session) {
+          clearInterval(_pollingInterval);
+          _tempCreds = null;
+          
+          // Show user that desktop detected it
+          document.querySelector('.verify-title').textContent = "Email Verified!";
+          document.querySelector('.verify-desc').textContent = "Syncing your workspace...";
+          document.querySelector('.verify-icon-ring svg').outerHTML = '<svg viewBox="0 0 12 12" fill="none" style="width:40px;height:40px"><path d="M2.5 6l2.5 2.5 4.5-5" stroke="#16A34A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+          // Fetch the workspace setup by the phone's verify.html click
+          const res = await fetch(`${API}/api/clients/me`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${data.session.access_token}`
+            }
+          });
+
+          const dbData = await res.json();
+          if (res.ok && dbData.client) {
+            localStorage.setItem('vc_token', data.session.access_token);
+            localStorage.setItem('vc_tenant_id', dbData.client.id);
+            localStorage.removeItem('vc_pending_signup');
+            
+            // Redirect instantly to onboarding
+            window.location.href = 'on-boarding.html';
+          }
+        }
+      } catch (err) {
+        // Ignore "Email not confirmed" errors and keep polling quietly
+      }
+    }, 3000);
+  }
+
+  // ── RESEND & EMAIL CHANGE LOGIC ────────────────────────────────
+
+  async function resendEmail() {
+    const pending = JSON.parse(localStorage.getItem('vc_pending_signup') || 'null');
+    if (!pending) return;
+
+    const btn      = document.getElementById('resend-btn');
+    const feedback = document.getElementById('verify-feedback');
+    const badge    = document.getElementById('verify-resent');
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Sending...';
+    feedback.className = 'verify-feedback';
+    feedback.textContent = '';
+    badge.classList.remove('show');
+
+    try {
+      const { error } = await supabaseClient.auth.resend({
+        type: 'signup',
+        email: pending.email,
+        options: { emailRedirectTo: 'https://vettochat.com/verify.html' }
+      });
+
+      if (error) throw error;
+
+      badge.classList.add('show');
+      feedback.className = 'verify-feedback success';
+      feedback.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="#22C55E"/><path d="M4 7l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> A new verification email has been sent to your inbox.';
+
+      startCountdown(60);
+
+    } catch (err) {
+      const msg = err.message?.toLowerCase().includes('rate')
+        ? 'Too many attempts. Please wait a moment before trying again.'
+        : (err.message || 'Failed to send email. Please try again.');
+      feedback.className = 'verify-feedback error';
+      feedback.textContent = msg;
+      btn.disabled = false;
+      btn.textContent = 'Resend Verification Email';
+    }
+  }
+
+  function startCountdown(seconds) {
+    const btn = document.getElementById('resend-btn');
+    if (_resendTimer) clearInterval(_resendTimer);
+    let remaining = seconds;
+
+    const tick = () => {
+      btn.disabled = true;
+      btn.textContent = `Resend available in ${remaining}s`;
+      if (remaining <= 0) {
+        clearInterval(_resendTimer);
+        _resendTimer = null;
+        btn.disabled = false;
+        btn.textContent = 'Resend Verification Email';
+        document.getElementById('verify-resent').classList.remove('show');
+      }
+      remaining--;
+    };
+
+    tick();
+    _resendTimer = setInterval(tick, 1000);
+  }
+
+  function changeEmail() {
+    // 2. Clear credentials and stop polling if they decide to change email
+    if (_pollingInterval) clearInterval(_pollingInterval);
+    _tempCreds = null;
+    
+    localStorage.removeItem('vc_pending_signup');
+    showView('signup');
     setTimeout(() => document.getElementById('signup-email')?.focus(), 100);
   }
 
